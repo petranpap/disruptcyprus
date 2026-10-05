@@ -1,0 +1,416 @@
+<!DOCTYPE html>
+
+<html lang="en"><head>
+<meta charset="utf-8"/>
+<meta content="width=device-width, initial-scale=1.0" name="viewport"/>
+<title>Disrupt Cyprus - Personalize Your Feed</title>
+<!-- Google Fonts: Playfair Display, Source Serif 4, Inter -->
+<link href="https://fonts.googleapis.com" rel="preconnect"/>
+<link crossorigin="" href="https://fonts.gstatic.com" rel="preconnect"/>
+<link href="https://fonts.googleapis.com/css2?family=Inter:wght@400;500;600;700&amp;family=Playfair+Display:ital,wght@0,600;0,700;1,600&amp;family=Source+Serif+4:ital,wght@0,400;0,600;1,400&amp;display=swap" rel="stylesheet"/>
+<!-- Material Symbols Outlined -->
+<link href="https://fonts.googleapis.com/css2?family=Material+Symbols+Outlined:wght,FILL@100..700,0..1&amp;display=swap" rel="stylesheet"/>
+<link href="https://fonts.googleapis.com/css2?family=Material+Symbols+Outlined:wght,FILL@100..700,0..1&amp;display=swap" rel="stylesheet"/>
+<!-- Tailwind CSS v3 -->
+<script src="https://cdn.tailwindcss.com?plugins=forms,container-queries"></script>
+<script id="tailwind-config">
+    tailwind.config = {
+      darkMode: "class",
+      theme: {
+        extend: {
+          "colors": {
+            "on-primary-fixed-variant": "#004c6c",
+            "outline-variant": "#bdc8d1",
+            "on-surface": "#131b2e",
+            "surface-variant": "#dae2fd",
+            "primary-fixed": "#c7e7ff",
+            "tertiary-fixed-dim": "#93ccff",
+            "on-surface-variant": "#3e4850",
+            "inverse-primary": "#85cfff",
+            "surface-container-lowest": "#ffffff",
+            "on-secondary": "#ffffff",
+            "inverse-on-surface": "#eef0ff",
+            "on-tertiary-container": "#003655",
+            "on-tertiary-fixed": "#001d31",
+            "on-tertiary-fixed-variant": "#004b73",
+            "tertiary-container": "#40a2e7",
+            "primary-container": "#00a5e6",
+            "primary": "#00658e",
+            "on-tertiary": "#ffffff",
+            "primary-fixed-dim": "#85cfff",
+            "surface-container": "#eaedff",
+            "on-error-container": "#93000a",
+            "on-primary": "#ffffff",
+            "on-secondary-fixed-variant": "#920028",
+            "surface-tint": "#00658e",
+            "secondary": "#ba0035",
+            "surface-container-high": "#e2e7ff",
+            "surface-dim": "#d2d9f4",
+            "tertiary": "#006398",
+            "on-background": "#131b2e",
+            "secondary-fixed-dim": "#ffb3b6",
+            "background": "#faf8ff",
+            "inverse-surface": "#283044",
+            "outline": "#6e7881",
+            "surface-bright": "#faf8ff",
+            "error-container": "#ffdad6",
+            "surface": "#faf8ff",
+            "on-primary-container": "#00374f",
+            "on-primary-fixed": "#001e2e",
+            "secondary-container": "#e21e49",
+            "on-error": "#ffffff",
+            "secondary-fixed": "#ffdada",
+            "on-secondary-fixed": "#40000c",
+            "surface-container-highest": "#dae2fd",
+            "surface-container-low": "#f2f3ff",
+            "on-secondary-container": "#fffbff",
+            "tertiary-fixed": "#cce5ff",
+            "error": "#ba1a1a"
+          },
+          "borderRadius": {
+            "DEFAULT": "0.25rem",
+            "lg": "0.5rem",
+            "xl": "0.75rem",
+            "full": "9999px"
+          },
+          "spacing": {
+            "space-md": "1rem",
+            "space-lg": "1.5rem",
+            "space-xs": "0.25rem",
+            "space-xl": "2rem",
+            "margin": "1rem",
+            "gutter-sm": "0.75rem",
+            "margin-tablet": "1.5rem",
+            "space-sm": "0.5rem",
+            "gutter": "1rem"
+          },
+          "fontFamily": {
+            "headline-sm": ["Playfair Display"],
+            "headline-hero-mobile": ["Playfair Display"],
+            "label-sm": ["Inter"],
+            "headline-hero": ["Playfair Display"],
+            "headline-md": ["Playfair Display"],
+            "body-lg": ["\"Source Serif 4\""],
+            "label-md": ["Inter"],
+            "body-sm": ["Inter"],
+            "body-md": ["\"Source Serif 4\""],
+            "label-lg": ["Inter"],
+            "headline-lg": ["Playfair Display"]
+          },
+          "fontSize": {
+            "headline-sm": ["18px", { "lineHeight": "24px", "fontWeight": "600" }],
+            "headline-hero-mobile": ["28px", { "lineHeight": "34px", "letterSpacing": "-0.015em", "fontWeight": "700" }],
+            "label-sm": ["10px", { "lineHeight": "14px", "letterSpacing": "0.04em", "fontWeight": "500" }],
+            "headline-hero": ["36px", { "lineHeight": "44px", "letterSpacing": "-0.02em", "fontWeight": "700" }],
+            "headline-md": ["20px", { "lineHeight": "26px", "fontWeight": "600" }],
+            "body-lg": ["18px", { "lineHeight": "28px", "fontWeight": "400" }],
+            "label-md": ["11px", { "lineHeight": "16px", "letterSpacing": "0.06em", "fontWeight": "600" }],
+            "body-sm": ["14px", { "lineHeight": "20px", "fontWeight": "400" }],
+            "body-md": ["16px", { "lineHeight": "25px", "fontWeight": "400" }],
+            "label-lg": ["13px", { "lineHeight": "18px", "letterSpacing": "0.02em", "fontWeight": "600" }],
+            "headline-lg": ["24px", { "lineHeight": "30px", "letterSpacing": "-0.01em", "fontWeight": "700" }]
+          }
+        }
+      }
+    }
+  </script>
+<style>
+    body {
+      min-height: max(884px, 100dvh);
+    }
+  </style>
+  </head>
+<body class="bg-background text-on-surface antialiased min-h-screen flex flex-col selection:bg-primary-fixed selection:text-on-primary-fixed">
+<!-- Editorial Top Bar / Stepper (Onboarding Flow -> Global bottom navigation shell suppressed) -->
+<header class="sticky top-0 z-40 bg-surface/85 backdrop-blur-md px-space-md py-space-sm shadow-sm">
+<div class="max-w-screen-md mx-auto flex items-center justify-between">
+<!-- Progress and Step Indicator -->
+<div class="flex items-center gap-space-sm">
+<button aria-label="Go back" class="w-8 h-8 rounded-full flex items-center justify-center text-on-surface-variant hover:text-primary transition-colors duration-150 active:scale-95" type="button">
+<span class="material-symbols-outlined text-[20px]" data-icon="arrow_back">arrow_back</span>
+</button>
+<div class="flex flex-col">
+<span class="font-label-md text-label-md tracking-wider text-primary font-semibold">Step 2 of 3</span>
+<!-- Step Progress Track -->
+<div class="w-24 h-1.5 bg-surface-container-high rounded-full overflow-hidden mt-1">
+<div class="w-2/3 h-full bg-primary-container rounded-full transition-all duration-300"></div>
+</div>
+</div>
+</div>
+<!-- Brand Mark Anchor -->
+<div class="flex items-center gap-1.5">
+<span class="w-5 h-5 rounded bg-primary-container flex items-center justify-center text-on-primary font-bold text-xs tracking-tighter shadow-sm">#</span>
+<span class="font-headline-md text-headline-md font-bold tracking-tight text-on-surface hidden xs:inline-block">Disrupt Cyprus</span>
+</div>
+<!-- Skip Action -->
+<button class="font-label-lg text-label-lg text-on-surface-variant hover:text-primary transition-colors duration-150 px-2.5 py-1 rounded-lg active:scale-95" type="button">
+        Skip
+      </button>
+</div>
+</header>
+<!-- Main Canvas -->
+<main class="flex-1 w-full max-w-screen-md mx-auto px-space-md pt-space-lg pb-32">
+<!-- Hero Headline Header -->
+<section class="mb-space-lg">
+<div class="inline-flex items-center gap-1.5 px-2.5 py-1 rounded-full bg-primary-fixed/40 text-on-primary-fixed-variant mb-space-xs">
+<span class="material-symbols-outlined text-[14px]" data-icon="tune">tune</span>
+<span class="font-label-md text-label-md">Tailor Your Dispatch</span>
+</div>
+<h1 class="font-headline-hero-mobile text-headline-hero-mobile md:font-headline-hero md:text-headline-hero text-on-surface tracking-tight mt-1">
+        What interests you?
+      </h1>
+<p class="font-body-md text-body-md text-on-surface-variant mt-2 leading-relaxed">
+        Select at least 3 topics to personalize your magazine feed, deep-dive dossiers, and morning executive digest.
+      </p>
+</section>
+<!-- 2-Column Responsive Bento Grid of 12 Topics -->
+<section class="grid grid-cols-2 gap-3.5 sm:gap-4" id="topics-grid">
+<!-- 1. Technology (Selected) -->
+<article class="topic-card group relative h-48 sm:h-52 rounded-[16px] overflow-hidden cursor-pointer select-none transition-all duration-200 ring-2 ring-primary-container shadow-md active:scale-[0.98]" data-topic="technology">
+<img class="absolute inset-0 w-full h-full object-cover transition-transform duration-500 group-hover:scale-105" data-alt="An expansive cutting-edge silicon chip and fiber optic motherboard illuminated by radiant Mediterranean cyan and soft cobalt blue light in an ultramodern research facility. Cinematic composition, sharp crystalline reflections, shallow depth of field, high-end editorial tech photography." src="https://lh3.googleusercontent.com/aida-public/AB6AXuBW60zl-byCnnxdmRyQGPs9vvAXDdZygr_F3HrNm63lngi7JgMSdth34sUSVPEOCGVErQXUtZ25nlPK8kYv5MGsFcDjE9i_LcUnpwTO5vB9XIw9z2iWpboEFy8B8nYLSpoik7oGV1-MsKr3_XTMD1Z-b5R9pbqPwJZKivp_XzRM6ltjSeeeleweofivaFN9D5AgRGPNJ44WWeuNIfe-MXlrVWVBGmbz84L3dyaHCxqTlpkd-6OjrlsBPQ"/>
+<div class="absolute inset-0 bg-gradient-to-t from-on-surface/95 via-on-surface/40 to-transparent"></div>
+<div class="absolute inset-0 bg-primary/15 mix-blend-multiply"></div>
+<!-- Selection Pill (Top Right) -->
+<div class="check-pill absolute top-2.5 right-2.5 w-7 h-7 rounded-full bg-primary-container text-on-primary flex items-center justify-center shadow-md transition-transform duration-150">
+<span class="material-symbols-outlined text-[16px] font-bold" data-icon="check" data-weight="fill" style="font-variation-settings: 'FILL' 1;">check</span>
+</div>
+<!-- Topic Label (Bottom Left) -->
+<div class="absolute bottom-3 left-3 right-3">
+<span class="font-label-sm text-label-sm text-primary-fixed tracking-wider uppercase block mb-0.5">Deep Tech</span>
+<h2 class="font-headline-sm text-headline-sm text-surface-container-lowest leading-tight">Technology</h2>
+</div>
+</article>
+<!-- 2. Startups (Selected) -->
+<article class="topic-card group relative h-48 sm:h-52 rounded-[16px] overflow-hidden cursor-pointer select-none transition-all duration-200 ring-2 ring-primary-container shadow-md active:scale-[0.98]" data-topic="startups">
+<img class="absolute inset-0 w-full h-full object-cover transition-transform duration-500 group-hover:scale-105" data-alt="A dynamic collaborative startup hub in Limassol with Mediterranean sunlight pouring through tall loft windows onto energetic young founders collaborating over modern glass whiteboards. Modern editorial photography, warm ambient glow, rich navy shadows, crisp depth." src="https://lh3.googleusercontent.com/aida-public/AB6AXuALCVnoijC-3xsYzmlvJ-vngjNMbAlhwYCdtpja7oisiqloPo1LNP0mb9M6KoJjg8vnz9wNeoJKYHWDBT8Ya4p8HAM6F6YrgKpAK7wbG_ULiqOv73ioKCxUtNhDoHIlG3EmmmUqinMEkWd9y8b4g-1hvZN4bmjKSFtDq2jX8oAY6d9188ts04770TRjbDnhbzOsMs5i7YUP9iDSIH2OoNn48jPckadZd18hPCDihPqJ27zgehb8QULN5A"/>
+<div class="absolute inset-0 bg-gradient-to-t from-on-surface/95 via-on-surface/40 to-transparent"></div>
+<div class="absolute inset-0 bg-primary/15 mix-blend-multiply"></div>
+<!-- Selection Pill -->
+<div class="check-pill absolute top-2.5 right-2.5 w-7 h-7 rounded-full bg-primary-container text-on-primary flex items-center justify-center shadow-md transition-transform duration-150">
+<span class="material-symbols-outlined text-[16px] font-bold" data-icon="check" data-weight="fill" style="font-variation-settings: 'FILL' 1;">check</span>
+</div>
+<div class="absolute bottom-3 left-3 right-3">
+<span class="font-label-sm text-label-sm text-primary-fixed tracking-wider uppercase block mb-0.5">Venture &amp; Seed</span>
+<h2 class="font-headline-sm text-headline-sm text-surface-container-lowest leading-tight">Startups</h2>
+</div>
+</article>
+<!-- 3. Economy & Markets (Selected) -->
+<article class="topic-card group relative h-48 sm:h-52 rounded-[16px] overflow-hidden cursor-pointer select-none transition-all duration-200 ring-2 ring-primary-container shadow-md active:scale-[0.98]" data-topic="economy">
+<img class="absolute inset-0 w-full h-full object-cover transition-transform duration-500 group-hover:scale-105" data-alt="An abstract visualization of financial stock exchange market charts and quantitative analytics projected across dark polished marble in Nicosia's banking quarter. Sleek geometric line graphs, cyan and coral red data streams, high contrast, elegant journalistic depth." src="https://lh3.googleusercontent.com/aida-public/AB6AXuCHGm1CtMhg1gh7zXlF7mHwYzF4n-YYBl6U2cmrG8Jvl42PCrOIITQGp9YZLcY2P7YVlFq0FgVk4yKTKtB7QNwR0uLKlp6zodr48jzldCwBDwsC67fgM2MiUv9yoOoh74a-6o7eoyn6oDTT5ym0c44He5lfyHiosnXSLDrQ08UG1SgINkba9SfHy0wpxkZUFSKNRc29GPPSSb36d6KlQi3n91gtSeha7Ro0pIR72vtMTp57uboQ07QQ8Q"/>
+<div class="absolute inset-0 bg-gradient-to-t from-on-surface/95 via-on-surface/40 to-transparent"></div>
+<div class="absolute inset-0 bg-primary/15 mix-blend-multiply"></div>
+<!-- Selection Pill -->
+<div class="check-pill absolute top-2.5 right-2.5 w-7 h-7 rounded-full bg-primary-container text-on-primary flex items-center justify-center shadow-md transition-transform duration-150">
+<span class="material-symbols-outlined text-[16px] font-bold" data-icon="check" data-weight="fill" style="font-variation-settings: 'FILL' 1;">check</span>
+</div>
+<div class="absolute bottom-3 left-3 right-3">
+<span class="font-label-sm text-label-sm text-primary-fixed tracking-wider uppercase block mb-0.5">Finance</span>
+<h2 class="font-headline-sm text-headline-sm text-surface-container-lowest leading-tight">Economy &amp; Markets</h2>
+</div>
+</article>
+<!-- 4. Cyprus Politics (Unselected) -->
+<article class="topic-card group relative h-48 sm:h-52 rounded-[16px] overflow-hidden cursor-pointer select-none transition-all duration-200 ring-1 ring-outline-variant/30 hover:ring-outline active:scale-[0.98]" data-topic="politics">
+<img class="absolute inset-0 w-full h-full object-cover transition-transform duration-500 group-hover:scale-105" data-alt="The dignified neo-classical parliamentary facade in Nicosia bathed in warm evening golden hour light with gentle long shadows and Cyprus diplomatic flags. High-end editorial architectural photography, restrained warmth, documentary depth." src="https://lh3.googleusercontent.com/aida-public/AB6AXuCLtKQaXSTSZiUtlVwszse81PreEzRe7XCXi3MgDUlkN9uK8W1-qCK9wLAJtV91htAkWmOugFEywvr5_UkFO0dMkhfxlnKVTFMv0Dnld8uIXNtFLRvcCC7OlsR8J3NsLwL_YakZAzlALDhvMQocI6Sbad7bKkPcCWfvDDZFRgrLGR5cAOdUrXiFPisfzZ-Em4eibieweb2mZTxz4YpCLf5U3LTiuW7YS0uwWdWuA65nJNS8qYMRmRJT4A"/>
+<div class="absolute inset-0 bg-gradient-to-t from-on-surface/90 via-on-surface/45 to-transparent"></div>
+<!-- Selection Pill (Unselected State) -->
+<div class="check-pill absolute top-2.5 right-2.5 w-7 h-7 rounded-full bg-surface-container-lowest/80 backdrop-blur-sm text-transparent border border-outline-variant/60 flex items-center justify-center transition-transform duration-150">
+<span class="material-symbols-outlined text-[16px]" data-icon="check">check</span>
+</div>
+<div class="absolute bottom-3 left-3 right-3">
+<span class="font-label-sm text-label-sm text-outline-variant tracking-wider uppercase block mb-0.5">Policy &amp; Governance</span>
+<h2 class="font-headline-sm text-headline-sm text-surface-container-lowest leading-tight">Cyprus Politics</h2>
+</div>
+</article>
+<!-- 5. Innovation & AI (Selected) -->
+<article class="topic-card group relative h-48 sm:h-52 rounded-[16px] overflow-hidden cursor-pointer select-none transition-all duration-200 ring-2 ring-primary-container shadow-md active:scale-[0.98]" data-topic="innovation-ai">
+<img class="absolute inset-0 w-full h-full object-cover transition-transform duration-500 group-hover:scale-105" data-alt="An ethereal generative artificial intelligence neural node mesh glowing with intense azure blue and electric cyan particles against deep ink-black space. High precision, volumetric light rays, refined scientific aesthetic, crisp editorial visuals." src="https://lh3.googleusercontent.com/aida-public/AB6AXuB5yfHPTQ4WsgmtKA_rm3kOGtFBPWl5xRC5xENQeGwiH3d9Hy7fcGpmbMCfuR53i-vCeQ0Sd8SjkwMYkZc9-oo-9QK0RQJDPCDhDvpfYf79mHlaUYQSG8iqbVaEb2H8bCBEzslgJiZpsYDFuijM5oeT6bm5WTn_weeLD2axuubnYYXvafLW0EjZ3ZBd4MzkAlfasOQe6jPym_hWRgn0aDkHdXD-KkuzdQYzAKa8HUc657-xlOZcAP_eow"/>
+<div class="absolute inset-0 bg-gradient-to-t from-on-surface/95 via-on-surface/40 to-transparent"></div>
+<div class="absolute inset-0 bg-primary/15 mix-blend-multiply"></div>
+<!-- Selection Pill -->
+<div class="check-pill absolute top-2.5 right-2.5 w-7 h-7 rounded-full bg-primary-container text-on-primary flex items-center justify-center shadow-md transition-transform duration-150">
+<span class="material-symbols-outlined text-[16px] font-bold" data-icon="check" data-weight="fill" style="font-variation-settings: 'FILL' 1;">check</span>
+</div>
+<div class="absolute bottom-3 left-3 right-3">
+<span class="font-label-sm text-label-sm text-primary-fixed tracking-wider uppercase block mb-0.5">Next Horizon</span>
+<h2 class="font-headline-sm text-headline-sm text-surface-container-lowest leading-tight">Innovation &amp; AI</h2>
+</div>
+</article>
+<!-- 6. Culture & Arts (Unselected) -->
+<article class="topic-card group relative h-48 sm:h-52 rounded-[16px] overflow-hidden cursor-pointer select-none transition-all duration-200 ring-1 ring-outline-variant/30 hover:ring-outline active:scale-[0.98]" data-topic="culture">
+<img class="absolute inset-0 w-full h-full object-cover transition-transform duration-500 group-hover:scale-105" data-alt="A modern minimalist contemporary art gallery in Paphos displaying striking avant-garde terracotta ceramic sculptures illuminated by sharp overhead museum spotlights. Pristine off-white gallery walls, warm Mediterranean earth tones, serene editorial composition." src="https://lh3.googleusercontent.com/aida-public/AB6AXuCw9mEuDciaTj_GHF4x0tfsghBSaQSzMNxZ-A4N-s9R-iX9LtZMufwi-lH8pyGDizrcJ4ZX-dUzS0uuvrjNE6b1Qp59_BH78V-jM8Tl_XspysemN-pJjqLEubnozzuqhW3tjX5xNQKpD8kjbodwMUgbLdkwHlv8Eb0VhBccz2t5oPEQGMXBhoTdUAsL87SGpjL3py3JjdYWZaG9iJdDYxDuUim5rlyG8MnRLgA_7ba2kLEn1nsxxPoj7Q"/>
+<div class="absolute inset-0 bg-gradient-to-t from-on-surface/90 via-on-surface/45 to-transparent"></div>
+<!-- Selection Pill -->
+<div class="check-pill absolute top-2.5 right-2.5 w-7 h-7 rounded-full bg-surface-container-lowest/80 backdrop-blur-sm text-transparent border border-outline-variant/60 flex items-center justify-center transition-transform duration-150">
+<span class="material-symbols-outlined text-[16px]" data-icon="check">check</span>
+</div>
+<div class="absolute bottom-3 left-3 right-3">
+<span class="font-label-sm text-label-sm text-outline-variant tracking-wider uppercase block mb-0.5">Creativity</span>
+<h2 class="font-headline-sm text-headline-sm text-surface-container-lowest leading-tight">Culture &amp; Arts</h2>
+</div>
+</article>
+<!-- 7. Real Estate & Tourism (Unselected) -->
+<article class="topic-card group relative h-48 sm:h-52 rounded-[16px] overflow-hidden cursor-pointer select-none transition-all duration-200 ring-1 ring-outline-variant/30 hover:ring-outline active:scale-[0.98]" data-topic="real-estate">
+<img class="absolute inset-0 w-full h-full object-cover transition-transform duration-500 group-hover:scale-105" data-alt="High-angle view of a luxury waterfront residential tower overlooking the turquoise Mediterranean Sea and Limassol marina at dawn. Pristine architectural lines, expansive floor-to-ceiling glass balconies, soft golden morning light, premium editorial aesthetic." src="https://lh3.googleusercontent.com/aida-public/AB6AXuBOLDGN_LDmnY7YDJxN2igcsCQWP0E1n5qDrhqlgcit0hP7YWYW1JgAyqUsv88unITuRyiNcLsDP0qk_e8YIyPMMVgYfCIGUkCt8TJMbSGnwSkkoIRYIgzEt-sZm_A1fg7sglf7g0VXQ6UxSWU81Z6K0XAM-5OYqE64pkfNmkw9yXI2DWY1MPXogfUqIzuZw-X9-YP4BWBi4iNNpHoEP9ENaQ-67uUZ7yB3Qpn0M3lsDbeIeyEk1Ind4g"/>
+<div class="absolute inset-0 bg-gradient-to-t from-on-surface/90 via-on-surface/45 to-transparent"></div>
+<!-- Selection Pill -->
+<div class="check-pill absolute top-2.5 right-2.5 w-7 h-7 rounded-full bg-surface-container-lowest/80 backdrop-blur-sm text-transparent border border-outline-variant/60 flex items-center justify-center transition-transform duration-150">
+<span class="material-symbols-outlined text-[16px]" data-icon="check">check</span>
+</div>
+<div class="absolute bottom-3 left-3 right-3">
+<span class="font-label-sm text-label-sm text-outline-variant tracking-wider uppercase block mb-0.5">Hospitality &amp; Living</span>
+<h2 class="font-headline-sm text-headline-sm text-surface-container-lowest leading-tight">Real Estate &amp; Tourism</h2>
+</div>
+</article>
+<!-- 8. Environment & Clean Energy (Unselected) -->
+<article class="topic-card group relative h-48 sm:h-52 rounded-[16px] overflow-hidden cursor-pointer select-none transition-all duration-200 ring-1 ring-outline-variant/30 hover:ring-outline active:scale-[0.98]" data-topic="clean-energy">
+<img class="absolute inset-0 w-full h-full object-cover transition-transform duration-500 group-hover:scale-105" data-alt="A sprawling modern solar energy farm and sleek wind turbines situated on the sun-drenched hills of Larnaca under a brilliant cloudless Mediterranean sky. Crisp technical clarity, vibrant green energy landscape, editorial environmental photo." src="https://lh3.googleusercontent.com/aida-public/AB6AXuABBFTjcMFN2GWL73bQt81z9EbmNYg4fxVtov0TNlUB_cyY2HLCdn8KDUe9TXPt513IuojY_bvp_XCTB8RAhvlaWfJHPZsaYnQwejORrS--tOet1i8i0QTPWV9TmM9eAmIKJmmYXe4m60qVyxErbfutCcMKEJFdAE9YrZZiS3mDKD_E7mUUDo25wukkvMYIJXvlq3kshexQ9WbQgE1kCoNA73CsIxJ-u7uDc5XZHJ3rXSqIf0ZjBlzKIA"/>
+<div class="absolute inset-0 bg-gradient-to-t from-on-surface/90 via-on-surface/45 to-transparent"></div>
+<!-- Selection Pill -->
+<div class="check-pill absolute top-2.5 right-2.5 w-7 h-7 rounded-full bg-surface-container-lowest/80 backdrop-blur-sm text-transparent border border-outline-variant/60 flex items-center justify-center transition-transform duration-150">
+<span class="material-symbols-outlined text-[16px]" data-icon="check">check</span>
+</div>
+<div class="absolute bottom-3 left-3 right-3">
+<span class="font-label-sm text-label-sm text-outline-variant tracking-wider uppercase block mb-0.5">Sustainability</span>
+<h2 class="font-headline-sm text-headline-sm text-surface-container-lowest leading-tight">Environment &amp; Clean Energy</h2>
+</div>
+</article>
+<!-- 9. Sports (Unselected) -->
+<article class="topic-card group relative h-48 sm:h-52 rounded-[16px] overflow-hidden cursor-pointer select-none transition-all duration-200 ring-1 ring-outline-variant/30 hover:ring-outline active:scale-[0.98]" data-topic="sports">
+<img class="absolute inset-0 w-full h-full object-cover transition-transform duration-500 group-hover:scale-105" data-alt="An athletic competitive tennis player serving on a high-end Mediterranean clay court at dusk with stadium floodlights creating dynamic backlight silhouettes and dramatic chalk dust mid-air. High action, crisp shutter speed, rich editorial sports journalism." src="https://lh3.googleusercontent.com/aida-public/AB6AXuBRQoAQ4NqxmeMeVfWskhte1yjHTdAqSpBmfnzvsUjl6dFKbqYBgWnnB8eiKn1KAZwvxrrK_wcAbdVsiMSoXb9Nbg2cYwtupjGqG989egcLMOlgrjH8B37pwQR76J7Oj3JvFiPuS7vJPHbOQvzXZsvfA69450xqo8wGiGhAi2R-mTgzyfGykmWhqf5uMaQboF7NiR1E0felthi-4WhqOcnForz_YTGmKQo4jqbu3hrHsX0IvXt7IElqIw"/>
+<div class="absolute inset-0 bg-gradient-to-t from-on-surface/90 via-on-surface/45 to-transparent"></div>
+<!-- Selection Pill -->
+<div class="check-pill absolute top-2.5 right-2.5 w-7 h-7 rounded-full bg-surface-container-lowest/80 backdrop-blur-sm text-transparent border border-outline-variant/60 flex items-center justify-center transition-transform duration-150">
+<span class="material-symbols-outlined text-[16px]" data-icon="check">check</span>
+</div>
+<div class="absolute bottom-3 left-3 right-3">
+<span class="font-label-sm text-label-sm text-outline-variant tracking-wider uppercase block mb-0.5">Athletics</span>
+<h2 class="font-headline-sm text-headline-sm text-surface-container-lowest leading-tight">Sports</h2>
+</div>
+</article>
+<!-- 10. Health & Science (Unselected) -->
+<article class="topic-card group relative h-48 sm:h-52 rounded-[16px] overflow-hidden cursor-pointer select-none transition-all duration-200 ring-1 ring-outline-variant/30 hover:ring-outline active:scale-[0.98]" data-topic="health-science">
+<img class="absolute inset-0 w-full h-full object-cover transition-transform duration-500 group-hover:scale-105" data-alt="A scientist working with advanced genomic sequencing equipment inside an immaculate biosciences laboratory in Nicosia with luminescent liquid samples in micropipettes. Crisp reflections, sterile white clinical lighting, bright cyan scientific aesthetic." src="https://lh3.googleusercontent.com/aida-public/AB6AXuB40JLEAQFQp6aD7YI8_kQ_SF5Gtror9YRbEyWcDLXhGke-m3wRntbUcouNHQew-thLYuAz9IsFi1O2PS9vZpqZ5jKwTmxdEfnspLmGL-E1EYpuQvgvu5WF1hXvyp2QJU5Hzp9l7wzLOfP8T0_uWH8E4dT8-5gjrqOQmWsAqIDvx0fyzVTjOsmxZS2NTQke4JspbtG2fluTYPOTskYeXrStewKnOJ9pKFdOst8ImdE1vaWA0c44ReXFBA"/>
+<div class="absolute inset-0 bg-gradient-to-t from-on-surface/90 via-on-surface/45 to-transparent"></div>
+<!-- Selection Pill -->
+<div class="check-pill absolute top-2.5 right-2.5 w-7 h-7 rounded-full bg-surface-container-lowest/80 backdrop-blur-sm text-transparent border border-outline-variant/60 flex items-center justify-center transition-transform duration-150">
+<span class="material-symbols-outlined text-[16px]" data-icon="check">check</span>
+</div>
+<div class="absolute bottom-3 left-3 right-3">
+<span class="font-label-sm text-label-sm text-outline-variant tracking-wider uppercase block mb-0.5">Biotech &amp; Care</span>
+<h2 class="font-headline-sm text-headline-sm text-surface-container-lowest leading-tight">Health &amp; Science</h2>
+</div>
+</article>
+<!-- 11. Education (Unselected) -->
+<article class="topic-card group relative h-48 sm:h-52 rounded-[16px] overflow-hidden cursor-pointer select-none transition-all duration-200 ring-1 ring-outline-variant/30 hover:ring-outline active:scale-[0.98]" data-topic="education">
+<img class="absolute inset-0 w-full h-full object-cover transition-transform duration-500 group-hover:scale-105" data-alt="Students gathered inside an impressive contemporary university amphitheater library with floor-to-ceiling book stacks and collaborative wooden study benches in Cyprus. Natural warm ambient lighting, intellectual calm, refined editorial magazine styling." src="https://lh3.googleusercontent.com/aida-public/AB6AXuDGXvmfGsCp7F-tPKHSLZPG4bXEAF9mwJz4KSXR_oK8SEqbOmdF2axyh4PaaD4qhrwP-Upw6ED2oVpv0PQr5Gz5kL6H9U70lOj4EYTkWXzQ8JRxWOiX807Zin9PP6nbesPrIKmv_eZrxoalaLLAplvDf-8ly2jW2w3xUrEggvuE9ol2g3nOyelaISrr7bRcyfDhLsv1Nx5FbZXGh6xkcZ5hx5hv_TBQSYf7vVn-39sAbSupFHn3ngJxrA"/>
+<div class="absolute inset-0 bg-gradient-to-t from-on-surface/90 via-on-surface/45 to-transparent"></div>
+<!-- Selection Pill -->
+<div class="check-pill absolute top-2.5 right-2.5 w-7 h-7 rounded-full bg-surface-container-lowest/80 backdrop-blur-sm text-transparent border border-outline-variant/60 flex items-center justify-center transition-transform duration-150">
+<span class="material-symbols-outlined text-[16px]" data-icon="check">check</span>
+</div>
+<div class="absolute bottom-3 left-3 right-3">
+<span class="font-label-sm text-label-sm text-outline-variant tracking-wider uppercase block mb-0.5">Academia</span>
+<h2 class="font-headline-sm text-headline-sm text-surface-container-lowest leading-tight">Education</h2>
+</div>
+</article>
+<!-- 12. Global Affairs (Unselected) -->
+<article class="topic-card group relative h-48 sm:h-52 rounded-[16px] overflow-hidden cursor-pointer select-none transition-all duration-200 ring-1 ring-outline-variant/30 hover:ring-outline active:scale-[0.98]" data-topic="global-affairs">
+<img class="absolute inset-0 w-full h-full object-cover transition-transform duration-500 group-hover:scale-105" data-alt="A diplomatic summit conference table with formal leather folders, European Union and Mediterranean regional flags, and polished bronze microphones in a state hall. Refined governmental lighting, sharp dignified perspective, high-end editorial coverage." src="https://lh3.googleusercontent.com/aida-public/AB6AXuD044vSPYqpFa8cM6-VHvugaPj744c_7nRjRoRNxcRO_7lvsqr3QgAGXF1bbUmcCYfl0_1rmkyJLwb_LPr0tUkzWXzQkE-To9XeLwSMOjPBguYl-tNniIJTCpdqQoutiDP8ylzZQbo_j2UJSIWf4NBuUDdg0bE_ACbNriBWYMIrDJaBnzFEs076T4bqgpLkxsPi2LwFRqUdvMFaY2Z9QaM3CXGr5DpJ_OiREf4DPrs8iUoPNDRLxUnByQ"/>
+<div class="absolute inset-0 bg-gradient-to-t from-on-surface/90 via-on-surface/45 to-transparent"></div>
+<!-- Selection Pill -->
+<div class="check-pill absolute top-2.5 right-2.5 w-7 h-7 rounded-full bg-surface-container-lowest/80 backdrop-blur-sm text-transparent border border-outline-variant/60 flex items-center justify-center transition-transform duration-150">
+<span class="material-symbols-outlined text-[16px]" data-icon="check">check</span>
+</div>
+<div class="absolute bottom-3 left-3 right-3">
+<span class="font-label-sm text-label-sm text-outline-variant tracking-wider uppercase block mb-0.5">Geopolitics</span>
+<h2 class="font-headline-sm text-headline-sm text-surface-container-lowest leading-tight">Global Affairs</h2>
+</div>
+</article>
+</section>
+<!-- Contextual Helper Note -->
+<p class="text-center font-label-md text-label-md text-on-surface-variant mt-6 flex items-center justify-center gap-1.5">
+<span class="material-symbols-outlined text-[16px] text-primary" data-icon="auto_awesome">auto_awesome</span>
+      You can fine-tune or add custom niche newsletters anytime in Profile.
+    </p>
+</main>
+<!-- Sticky Bottom Floating Action Dock (Linear Onboarding Journey) -->
+<aside class="fixed bottom-0 left-0 w-full z-50 bg-surface/90 backdrop-blur-md px-space-md py- space-sm pb-6 pt-3 shadow-[0_-8px_30px_-4px_rgba(15,23,42,0.12)]">
+<div class="max-w-screen-md mx-auto flex items-center justify-between gap-3">
+<!-- Counter Status -->
+<div class="flex flex-col pl-1">
+<span class="font-label-sm text-label-sm text-on-surface-variant tracking-wide">SELECTION</span>
+<span class="font-headline-sm text-headline-sm text-on-surface" id="topic-counter-text">4 of 12 chosen</span>
+</div>
+<!-- Continue Primary Action Button -->
+<button class="flex-1 sm:flex-initial sm:min-w-[240px] flex items-center justify-center gap-2 bg-primary-container hover:bg-primary text-on-primary font-label-lg text-label-lg py-3.5 px-6 rounded-xl shadow-md transition-all duration-150 active:scale-95 focus:outline-none focus:ring-2 focus:ring-primary-container focus:ring-offset-2" id="continue-btn" type="button">
+<span id="btn-label-text">Continue (4 Selected)</span>
+<span class="material-symbols-outlined text-[18px]" data-icon="arrow_forward">arrow_forward</span>
+</button>
+</div>
+</aside>
+<!-- Interactive Topic Selection Script -->
+<script>
+    document.addEventListener('DOMContentLoaded', () => {
+      const cards = document.querySelectorAll('.topic-card');
+      const counterText = document.getElementById('topic-counter-text');
+      const continueBtn = document.getElementById('continue-btn');
+      const btnLabelText = document.getElementById('btn-label-text');
+
+      let selectedTopics = new Set(['technology', 'startups', 'economy', 'innovation-ai']);
+
+      function updateUI() {
+        const count = selectedTopics.size;
+        counterText.textContent = `${count} of 12 chosen`;
+        btnLabelText.textContent = `Continue (${count} Selected)`;
+
+        if (count >= 3) {
+          continueBtn.disabled = false;
+          continueBtn.classList.remove('opacity-50', 'cursor-not-allowed', 'bg-outline-variant');
+          continueBtn.classList.add('bg-primary-container', 'hover:bg-primary', 'shadow-md');
+        } else {
+          continueBtn.disabled = true;
+          continueBtn.classList.add('opacity-50', 'cursor-not-allowed');
+          continueBtn.classList.remove('hover:bg-primary', 'shadow-md');
+          btnLabelText.textContent = `Select ${3 - count} more`;
+        }
+      }
+
+      cards.forEach(card => {
+        card.addEventListener('click', () => {
+          const topicId = card.dataset.topic;
+          const isSelected = selectedTopics.has(topicId);
+          const pill = card.querySelector('.check-pill');
+
+          if (isSelected) {
+            selectedTopics.delete(topicId);
+            // Switch to unselected style
+            card.classList.remove('ring-2', 'ring-primary-container', 'shadow-md');
+            card.classList.add('ring-1', 'ring-outline-variant/30');
+
+            pill.className = 'check-pill absolute top-2.5 right-2.5 w-7 h-7 rounded-full bg-surface-container-lowest/80 backdrop-blur-sm text-transparent border border-outline-variant/60 flex items-center justify-center transition-transform duration-150';
+            
+            // Remove tint overlay if present
+            const tint = card.querySelector('.bg-primary\\/15');
+            if (tint) tint.remove();
+          } else {
+            selectedTopics.add(topicId);
+            // Switch to selected style
+            card.classList.remove('ring-1', 'ring-outline-variant/30');
+            card.classList.add('ring-2', 'ring-primary-container', 'shadow-md');
+
+            pill.className = 'check-pill absolute top-2.5 right-2.5 w-7 h-7 rounded-full bg-primary-container text-on-primary flex items-center justify-center shadow-md transition-transform duration-150';
+            pill.innerHTML = '<span class="material-symbols-outlined text-[16px] font-bold" data-icon="check" data-weight="fill" style="font-variation-settings: \'FILL\' 1;">check</span>';
+
+            // Add brand cyan tint overlay
+            const tint = document.createElement('div');
+            tint.className = 'absolute inset-0 bg-primary/15 mix-blend-multiply pointer-events-none';
+            card.appendChild(tint);
+          }
+          updateUI();
+        });
+      });
+
+      updateUI();
+    });
+  </script>
+</body></html>

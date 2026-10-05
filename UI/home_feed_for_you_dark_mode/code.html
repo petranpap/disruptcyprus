@@ -1,0 +1,452 @@
+<!DOCTYPE html>
+
+<html class="dark" lang="en"><head>
+<meta charset="utf-8"/>
+<meta content="width=device-width, initial-scale=1.0" name="viewport"/>
+<title>Disrupt Cyprus - Home Feed</title>
+<!-- Fonts -->
+<link href="https://fonts.googleapis.com" rel="preconnect"/>
+<link crossorigin="" href="https://fonts.gstatic.com" rel="preconnect"/>
+<link href="https://fonts.googleapis.com/css2?family=Inter:wght@400;500;600;700&amp;family=Playfair+Display:ital,wght@0,600;0,700;1,600&amp;family=Source+Serif+4:ital,opsz,wght@0,8..60,400;0,8..60,600;1,8..60,400&amp;display=swap" rel="stylesheet"/>
+<!-- Material Symbols Outlined -->
+<link href="https://fonts.googleapis.com/css2?family=Material+Symbols+Outlined:wght,FILL@100..700,0..1&amp;display=swap" rel="stylesheet"/>
+<link href="https://fonts.googleapis.com/css2?family=Material+Symbols+Outlined:wght,FILL@100..700,0..1&amp;display=swap" rel="stylesheet"/>
+<!-- Tailwind CSS v3 -->
+<script src="https://cdn.tailwindcss.com?plugins=forms,container-queries"></script>
+<script id="tailwind-config">
+    tailwind.config = {
+      darkMode: "class",
+      theme: {
+        extend: {
+          "colors": {
+            "on-primary-fixed-variant": "#004c6c",
+            "outline-variant": "#bdc8d1",
+            "on-surface": "#131b2e",
+            "surface-variant": "#dae2fd",
+            "primary-fixed": "#c7e7ff",
+            "tertiary-fixed-dim": "#93ccff",
+            "on-surface-variant": "#3e4850",
+            "inverse-primary": "#85cfff",
+            "surface-container-lowest": "#ffffff",
+            "on-secondary": "#ffffff",
+            "inverse-on-surface": "#eef0ff",
+            "on-tertiary-container": "#003655",
+            "on-tertiary-fixed": "#001d31",
+            "on-tertiary-fixed-variant": "#004b73",
+            "tertiary-container": "#40a2e7",
+            "primary-container": "#00a5e6",
+            "primary": "#00658e",
+            "on-tertiary": "#ffffff",
+            "primary-fixed-dim": "#85cfff",
+            "surface-container": "#eaedff",
+            "on-error-container": "#93000a",
+            "on-primary": "#ffffff",
+            "on-secondary-fixed-variant": "#920028",
+            "surface-tint": "#00658e",
+            "secondary": "#ba0035",
+            "surface-container-high": "#e2e7ff",
+            "surface-dim": "#d2d9f4",
+            "tertiary": "#006398",
+            "on-background": "#131b2e",
+            "secondary-fixed-dim": "#ffb3b6",
+            "background": "#faf8ff",
+            "inverse-surface": "#283044",
+            "outline": "#6e7881",
+            "surface-bright": "#faf8ff",
+            "error-container": "#ffdad6",
+            "surface": "#faf8ff",
+            "on-primary-container": "#00374f",
+            "on-primary-fixed": "#001e2e",
+            "secondary-container": "#e21e49",
+            "on-error": "#ffffff",
+            "secondary-fixed": "#ffdada",
+            "on-secondary-fixed": "#40000c",
+            "surface-container-highest": "#dae2fd",
+            "surface-container-low": "#f2f3ff",
+            "on-secondary-container": "#fffbff",
+            "tertiary-fixed": "#cce5ff",
+            "error": "#ba1a1a"
+          },
+          "borderRadius": {
+            "DEFAULT": "0.25rem",
+            "lg": "0.5rem",
+            "xl": "0.75rem",
+            "full": "9999px"
+          },
+          "spacing": {
+            "space-md": "1rem",
+            "space-lg": "1.5rem",
+            "space-xs": "0.25rem",
+            "space-xl": "2rem",
+            "margin": "1rem",
+            "gutter-sm": "0.75rem",
+            "margin-tablet": "1.5rem",
+            "space-sm": "0.5rem",
+            "gutter": "1rem"
+          },
+          "fontFamily": {
+            "headline-sm": ["Playfair Display"],
+            "headline-hero-mobile": ["Playfair Display"],
+            "label-sm": ["Inter"],
+            "headline-hero": ["Playfair Display"],
+            "headline-md": ["Playfair Display"],
+            "body-lg": ["\"Source Serif 4\""],
+            "label-md": ["Inter"],
+            "body-sm": ["Inter"],
+            "body-md": ["\"Source Serif 4\""],
+            "label-lg": ["Inter"],
+            "headline-lg": ["Playfair Display"]
+          },
+          "fontSize": {
+            "headline-sm": ["18px", { "lineHeight": "24px", "fontWeight": "600" }],
+            "headline-hero-mobile": ["28px", { "lineHeight": "34px", "letterSpacing": "-0.015em", "fontWeight": "700" }],
+            "label-sm": ["10px", { "lineHeight": "14px", "letterSpacing": "0.04em", "fontWeight": "500" }],
+            "headline-hero": ["36px", { "lineHeight": "44px", "letterSpacing": "-0.02em", "fontWeight": "700" }],
+            "headline-md": ["20px", { "lineHeight": "26px", "fontWeight": "600" }],
+            "body-lg": ["18px", { "lineHeight": "28px", "fontWeight": "400" }],
+            "label-md": ["11px", { "lineHeight": "16px", "letterSpacing": "0.06em", "fontWeight": "600" }],
+            "body-sm": ["14px", { "lineHeight": "20px", "fontWeight": "400" }],
+            "body-md": ["16px", { "lineHeight": "25px", "fontWeight": "400" }],
+            "label-lg": ["13px", { "lineHeight": "18px", "letterSpacing": "0.02em", "fontWeight": "600" }],
+            "headline-lg": ["24px", { "lineHeight": "30px", "letterSpacing": "-0.01em", "fontWeight": "700" }]
+          }
+        }
+      }
+    }
+  </script>
+<style>
+    .no-scrollbar::-webkit-scrollbar {
+      display: none;
+    }
+    .no-scrollbar {
+      -ms-overflow-style: none;
+      scrollbar-width: none;
+    }
+  </style>
+<style>
+    body {
+      min-height: max(884px, 100dvh);
+    }
+  </style>
+  </head>
+<body class="bg-[#121316] text-[#eef0ff] antialiased selection:bg-primary-container selection:text-on-primary-container pb-28">
+<!-- Pull-to-refresh subtle indicator -->
+<div class="w-full flex justify-center py-2 bg-transparent select-none">
+<div class="flex items-center gap-1.5 px-3 py-0.5 rounded-full bg-[#1A1D24]/80 border border-white/5 text-outline text-[11px] font-label-sm">
+<span class="material-symbols-outlined text-[13px] animate-spin text-primary-container" data-icon="refresh">refresh</span>
+<span>Updated just now</span>
+</div>
+</div>
+<!-- TopAppBar Component (from Shared Components JSON with Dark Mode & Semantic Shell rules) -->
+<header class="bg-surface/85 backdrop-blur-md dark:bg-inverse-surface/85 docked full-width top-0 sticky z-40 shadow-sm dark:shadow-none">
+<div class="flex justify-between items-center w-full px-space-md py-space-sm max-w-screen-md mx-auto">
+<!-- Wordmark Logo -->
+<div class="flex items-center space-x-2">
+<div class="w-7 h-7 rounded-lg bg-primary-container flex items-center justify-center text-white font-black text-sm tracking-tighter">
+          #
+        </div>
+<a class="text-headline-md font-headline-md font-bold tracking-tight text-on-surface dark:text-inverse-on-surface flex items-center" href="#">
+<span class="text-secondary-container">Disrupt</span><span class="text-primary-container font-medium ml-0.5">Cyprus</span>
+</a>
+</div>
+<!-- Action Cluster -->
+<div class="flex items-center space-x-1">
+<button aria-label="Search" class="p-2 rounded-full text-on-surface-variant dark:text-outline-variant hover:text-primary dark:hover:text-inverse-primary transition-colors duration-150 active:scale-95 transition-transform duration-150">
+<span class="material-symbols-outlined text-[22px]" data-icon="search">search</span>
+</button>
+<button aria-label="Notifications" class="p-2 rounded-full text-on-surface-variant dark:text-outline-variant hover:text-primary dark:hover:text-inverse-primary transition-colors duration-150 active:scale-95 transition-transform duration-150 relative">
+<span class="material-symbols-outlined text-[22px]" data-icon="notifications">notifications</span>
+<span class="absolute top-2 right-2 w-2 h-2 rounded-full bg-secondary-container ring-2 ring-[#1A1D24]"></span>
+</button>
+</div>
+</div>
+</header>
+<!-- Horizontal Scrollable Category Tabs -->
+<nav class="sticky top-[53px] z-30 bg-[#121316]/95 backdrop-blur-md px-margin py-space-xs max-w-screen-md mx-auto">
+<div class="flex items-center space-x-6 overflow-x-auto no-scrollbar py-1">
+<!-- Active Tab: 'For You' -->
+<button class="relative pb-1.5 text-primary-container font-label-lg text-label-lg whitespace-nowrap font-bold flex flex-col items-center">
+<span>For You</span>
+<span class="absolute bottom-0 w-full h-[2.5px] bg-primary-container rounded-full shadow-[0_0_8px_rgba(0,165,230,0.6)]"></span>
+</button>
+<button class="pb-1.5 text-outline hover:text-inverse-on-surface transition-colors duration-150 font-label-lg text-label-lg whitespace-nowrap">
+        Technology
+      </button>
+<button class="pb-1.5 text-outline hover:text-inverse-on-surface transition-colors duration-150 font-label-lg text-label-lg whitespace-nowrap">
+        Startups
+      </button>
+<button class="pb-1.5 text-outline hover:text-inverse-on-surface transition-colors duration-150 font-label-lg text-label-lg whitespace-nowrap">
+        Economy
+      </button>
+<button class="pb-1.5 text-outline hover:text-inverse-on-surface transition-colors duration-150 font-label-lg text-label-lg whitespace-nowrap">
+        Politics
+      </button>
+<button class="pb-1.5 text-outline hover:text-inverse-on-surface transition-colors duration-150 font-label-lg text-label-lg whitespace-nowrap">
+        Culture
+      </button>
+</div>
+</nav>
+<!-- Main Feed Stream -->
+<main class="max-w-screen-md mx-auto px-margin space-y-space-xl mt-space-md">
+<!-- 1. Hero Card (Disrupt Original) -->
+<article class="relative rounded-2xl overflow-hidden bg-[#1A1D24] shadow-[0_8px_30px_-4px_rgba(0,0,0,0.5)] group cursor-pointer transition-transform duration-200 active:scale-[0.99]">
+<div class="relative w-full aspect-[4/3] sm:aspect-[16/9] overflow-hidden">
+<img class="w-full h-full object-cover group-hover:scale-105 transition-transform duration-500 ease-out" data-alt="Modern Limassol Cyprus coastal skyline illuminated at dusk with futuristic architectural glass towers overlooking the deep blue Mediterranean Sea. Gleaming warm neon city reflections touch the water with cinematic ambient deep twilight glow. Modern editorial magazine style with high-end tech financial center composition." src="https://lh3.googleusercontent.com/aida-public/AB6AXuDkqIgzSoPPgDW0qW0uN9xE3ytLbXv8iONbEfOvYb2HqUt8FaMY_y54q7qlIOGP10ToEvNSLZhaCyUmuICV_6rlxImGnLVyA1CdJmvrIrNs6I6uIcNo7Lk5r30VQqjFPph85PperHPwOWeBfB0WqlxtNZBX4CzfybVoKw_96Y9csLpqQ83NsX6Y-wQKQfh-sRnAr1ut97RhvYSoWdyVDgaxY941Ojsx0qhm4ugMX888MCJ38Owqep4l2g"/>
+<!-- Scrim Gradient -->
+<div class="absolute inset-0 bg-gradient-to-t from-[#121316] via-[#121316]/50 to-transparent"></div>
+<!-- Disrupt Original Crimson Badge -->
+<div class="absolute top-4 left-4">
+<span class="inline-flex items-center px-2.5 py-1 rounded-full bg-secondary-container text-white text-[11px] font-label-md font-bold tracking-wider shadow-md uppercase">
+            Disrupt Original
+          </span>
+</div>
+</div>
+<div class="p-space-md -mt-14 relative z-10 space-y-2">
+<h1 class="text-headline-hero-mobile sm:text-headline-hero font-headline-hero-mobile sm:font-headline-hero text-inverse-on-surface hover:text-primary-fixed-dim transition-colors leading-tight">
+          Cyprus Emerges as Mediterranean Tech Hub with Record €450M Venture Inflow
+        </h1>
+<p class="text-body-md font-body-md text-outline line-clamp-2">
+          International funds and homegrown innovators combine to accelerate Limassol and Nicosia into dominant European research corridors.
+        </p>
+<div class="flex items-center justify-between pt-2 border-t border-white/5">
+<div class="flex items-center space-x-2 text-label-sm font-label-sm text-outline">
+<span class="font-semibold text-secondary-container">Disrupt Original</span>
+<span>•</span>
+<span>2h ago</span>
+</div>
+<button aria-label="Bookmark" class="text-outline hover:text-primary-container transition-colors p-1.5 rounded-full hover:bg-white/5">
+<span class="material-symbols-outlined text-[20px]" data-icon="bookmark">bookmark</span>
+</button>
+</div>
+</div>
+</article>
+<!-- 2. Two Standard Cards Side-by-Side (Bento Split) -->
+<section>
+<div class="grid grid-cols-1 sm:grid-cols-2 gap-gutter">
+<!-- Card A -->
+<article class="bg-[#1A1D24] p-3.5 rounded-2xl flex flex-col justify-between border border-white/5 hover:border-white/10 transition duration-150 group cursor-pointer shadow-[0_4px_20px_-2px_rgba(0,0,0,0.3)]">
+<div class="space-y-3">
+<div class="w-full aspect-[16/10] rounded-xl overflow-hidden relative">
+<img class="w-full h-full object-cover group-hover:scale-105 transition-transform duration-300" data-alt="Expansive ultra-modern solar panel photovoltaic farm installed against the rustic rolling hills of Paphos Cyprus bathed in brilliant Mediterranean sunlight. Bright blue cloudless sky with crisp clean renewable energy infrastructure aesthetic, high editorial quality with cool blue and slate palette." src="https://lh3.googleusercontent.com/aida-public/AB6AXuCdv5YIGsb2fCUtmCxLDcRiiV1KDnSZypGEU9jdh6lOqwCNKQdY3-TP_nZY9DLJJ0oaa9ZxASl-vwTDa8VAm2dny550HptJ2cAhigR-FrzM96EF2hfQn-ny4RZcqUujs0wimfHkmmK6J-b9S5J9ZOWTxPEZXoz2aqgPSw9KF4Rto3O4fCophBC15SbJj7oZse66wIGDEAgnTsRT1Hy-VxJiFFj62p9JgSdF1bykPu8uFCyII14rb1BpJQ"/>
+<span class="absolute bottom-2 left-2 px-2 py-0.5 bg-[#121316]/80 backdrop-blur-md rounded text-[10px] font-label-sm font-semibold tracking-wide text-primary-fixed uppercase">
+                Clean Energy Shift
+              </span>
+</div>
+<h2 class="text-headline-sm font-headline-sm text-inverse-on-surface line-clamp-2 group-hover:text-primary-fixed-dim transition-colors">
+              Solar Grid Upgrade to Power 80,000 Homes in Paphos
+            </h2>
+</div>
+<div class="flex items-center justify-between mt-3 pt-2.5 border-t border-white/5 text-label-sm font-label-sm text-outline">
+<span>Cyprus Mail · 3h ago</span>
+<button aria-label="Bookmark" class="hover:text-primary-container transition-colors">
+<span class="material-symbols-outlined text-[18px]" data-icon="bookmark">bookmark</span>
+</button>
+</div>
+</article>
+<!-- Card B -->
+<article class="bg-[#1A1D24] p-3.5 rounded-2xl flex flex-col justify-between border border-white/5 hover:border-white/10 transition duration-150 group cursor-pointer shadow-[0_4px_20px_-2px_rgba(0,0,0,0.3)]">
+<div class="space-y-3">
+<div class="w-full aspect-[16/10] rounded-xl overflow-hidden relative">
+<img class="w-full h-full object-cover group-hover:scale-105 transition-transform duration-300" data-alt="Futuristic digital banking sandbox interface featuring biometric authentication and algorithmic investment charts glowing on a sleek glass terminal in a Nicosia fintech office. Cool cyan highlights accentuating minimalist slate interior architecture." src="https://lh3.googleusercontent.com/aida-public/AB6AXuASYbGTyTS9xNO3nG4CqMxqqvdCewwU_QAU93nFZXwZjbohe5P6d99DAs2VhsmbssuEUwD4F2Go5M06wKFOqn9UoeCDDLae5hAgi0t6Z0yMTrzCcySMcfByO2hHi8olmmAN8eVBlupTDFZkWlSUq_r4oZX1t-13e0zBmJtPSfQBjJBQKIMpf2kz7nwOaNgPBFSwQosrLEd1x1h_6uEwHFc_cK9kx9EoI3lEt0C7GcPZHVyYPDOYVsoH0A"/>
+<span class="absolute bottom-2 left-2 px-2 py-0.5 bg-[#121316]/80 backdrop-blur-md rounded text-[10px] font-label-sm font-semibold tracking-wide text-primary-fixed uppercase">
+                Fintech Surge
+              </span>
+</div>
+<h2 class="text-headline-sm font-headline-sm text-inverse-on-surface line-clamp-2 group-hover:text-primary-fixed-dim transition-colors">
+              EU Banking Sandbox Greenlights 12 Local Startups
+            </h2>
+</div>
+<div class="flex items-center justify-between mt-3 pt-2.5 border-t border-white/5 text-label-sm font-label-sm text-outline">
+<span>InBusiness · 4h ago</span>
+<button aria-label="Bookmark" class="hover:text-primary-container transition-colors">
+<span class="material-symbols-outlined text-[18px]" data-icon="bookmark">bookmark</span>
+</button>
+</div>
+</article>
+</div>
+</section>
+<!-- 3. Trending Today: Horizontal Carousel with Numbered Badges -->
+<section class="space-y-3">
+<div class="flex items-center justify-between">
+<div class="flex items-center space-x-2">
+<span class="material-symbols-outlined text-secondary-container text-xl" data-icon="trending_up">trending_up</span>
+<h2 class="text-headline-md font-headline-md font-bold text-inverse-on-surface">Trending Today</h2>
+</div>
+<span class="text-label-md font-label-md text-primary-container cursor-pointer hover:underline">View Rank</span>
+</div>
+<!-- Carousel Cards -->
+<div class="flex space-x-3.5 overflow-x-auto no-scrollbar -mx-margin px-margin pb-2">
+<!-- Trend Item #1 -->
+<div class="flex-none w-[260px] bg-[#1A1D24] p-3.5 rounded-2xl border border-white/5 relative flex flex-col justify-between">
+<div class="space-y-2">
+<div class="flex items-center justify-between">
+<span class="text-2xl font-black italic tracking-tighter text-secondary-container">#1</span>
+<span class="px-2 py-0.5 rounded text-[10px] font-label-sm uppercase bg-white/5 text-outline">Venture</span>
+</div>
+<h3 class="text-headline-sm font-headline-sm text-inverse-on-surface line-clamp-2">
+              Larnaca Port Tech Quarter Secures €90M Seed Syndicate
+            </h3>
+</div>
+<div class="mt-4 flex items-center justify-between text-label-sm font-label-sm text-outline">
+<span>12.4k Reads</span>
+<span class="material-symbols-outlined text-[16px] text-primary-container" data-icon="insights">insights</span>
+</div>
+</div>
+<!-- Trend Item #2 -->
+<div class="flex-none w-[260px] bg-[#1A1D24] p-3.5 rounded-2xl border border-white/5 relative flex flex-col justify-between">
+<div class="space-y-2">
+<div class="flex items-center justify-between">
+<span class="text-2xl font-black italic tracking-tighter text-primary-container">#2</span>
+<span class="px-2 py-0.5 rounded text-[10px] font-label-sm uppercase bg-white/5 text-outline">AI Lab</span>
+</div>
+<h3 class="text-headline-sm font-headline-sm text-inverse-on-surface line-clamp-2">
+              DeepTech Cyprus Publishes First LLM Trained in Cypriot Dialect
+            </h3>
+</div>
+<div class="mt-4 flex items-center justify-between text-label-sm font-label-sm text-outline">
+<span>8.1k Reads</span>
+<span class="material-symbols-outlined text-[16px] text-primary-container" data-icon="insights">insights</span>
+</div>
+</div>
+<!-- Trend Item #3 -->
+<div class="flex-none w-[260px] bg-[#1A1D24] p-3.5 rounded-2xl border border-white/5 relative flex flex-col justify-between">
+<div class="space-y-2">
+<div class="flex items-center justify-between">
+<span class="text-2xl font-black italic tracking-tighter text-outline">#3</span>
+<span class="px-2 py-0.5 rounded text-[10px] font-label-sm uppercase bg-white/5 text-outline">Policy</span>
+</div>
+<h3 class="text-headline-sm font-headline-sm text-inverse-on-surface line-clamp-2">
+              Digital Nomad Visa Cap Raised by 35% Following Influx
+            </h3>
+</div>
+<div class="mt-4 flex items-center justify-between text-label-sm font-label-sm text-outline">
+<span>6.9k Reads</span>
+<span class="material-symbols-outlined text-[16px] text-primary-container" data-icon="insights">insights</span>
+</div>
+</div>
+</div>
+</section>
+<!-- 4. Compact Editorial List Stories -->
+<section class="space-y-space-sm pt-2">
+<div class="border-b border-white/10 pb-2 flex items-center justify-between">
+<h2 class="text-label-md font-label-md uppercase tracking-wider text-outline">Latest Coverage</h2>
+<span class="text-label-sm font-label-sm text-primary-container">Live Wire</span>
+</div>
+<!-- Compact Story Row 1 -->
+<article class="p-3 bg-[#1A1D24] rounded-2xl border border-white/5 flex items-center space-x-3.5 group cursor-pointer hover:border-white/10 transition">
+<div class="w-20 h-20 flex-shrink-0 rounded-xl overflow-hidden relative">
+<img class="w-full h-full object-cover group-hover:scale-105 transition-transform duration-300" data-alt="Interior of state-of-the-art computational artificial intelligence laboratory at the University of Nicosia, featuring robotics, multi-screen holographic data monitors, and students collaborating under moody, ambient cinematic blue and charcoal lighting." src="https://lh3.googleusercontent.com/aida-public/AB6AXuANsVLFd1bmPEGKM9du_BeFcOvZrj0-3t01ZKI-20mEUBWLFUeEKZyLJt8U9mRm9ZC56QsWL_FUXXerfBR0nkf6E54bhNIxU3CT_tPvWc_8KqmBdP1rY9Ok9VDBUNazNPXKU3nk6qU8mGKCm-5TCF01el56O5gA1jKhWKmUu6JFy1Vs4O-OBPMjlkOqFgjG92fh0K499QRqGJr7xTjgQ8mmxf1GYg4dR8Atnj1UsG5vGjWe0udyAVZGSg"/>
+</div>
+<div class="flex-1 min-w-0">
+<span class="text-[10px] font-label-sm text-primary-container font-semibold uppercase tracking-wider">Research &amp; Academics</span>
+<h3 class="text-headline-sm font-headline-sm text-inverse-on-surface line-clamp-2 leading-snug group-hover:text-primary-fixed-dim transition-colors mt-0.5">
+            AI in Higher Education: University of Nicosia Launches New Research Lab
+          </h3>
+<div class="flex items-center justify-between mt-2 text-label-sm font-label-sm text-outline">
+<span>Disrupt · 5h ago</span>
+<button aria-label="Bookmark" class="hover:text-primary-container transition-colors">
+<span class="material-symbols-outlined text-[18px]" data-icon="bookmark">bookmark</span>
+</button>
+</div>
+</div>
+</article>
+<!-- Compact Story Row 2 -->
+<article class="p-3 bg-[#1A1D24] rounded-2xl border border-white/5 flex items-center space-x-3.5 group cursor-pointer hover:border-white/10 transition">
+<div class="w-20 h-20 flex-shrink-0 rounded-xl overflow-hidden relative">
+<img class="w-full h-full object-cover group-hover:scale-105 transition-transform duration-300" data-alt="Modern maritime cargo terminal in Limassol harbor utilizing autonomous smart cranes and electric container trucks against a Mediterranean sunset with shimmering gold and indigo sea reflections." src="https://lh3.googleusercontent.com/aida-public/AB6AXuDp4vtrHPcYyQTNdIIzJRkRtoDGC8b89GkX2J4x1DCQwm6QSnETxY6adUIG28Sx01B-mup5ya6rQwcmk4iOhPt_cuI7srkR-uBOrRmIE6PHt3H_Cy-jheTEcW2mmidgjVWJPgq_RO5SMUS9L5VuknFN5WQ6rvd6oqxeUDSz4VKZ5kk9MIo_Vj9-jpDZzWxCJVaycnfJ-1TXjkPin7yyPZv5NY4HWW3I5dHWoY6kCm3IFoKPvTYAhT1-cQ"/>
+</div>
+<div class="flex-1 min-w-0">
+<span class="text-[10px] font-label-sm text-secondary-container font-semibold uppercase tracking-wider">Logistics</span>
+<h3 class="text-headline-sm font-headline-sm text-inverse-on-surface line-clamp-2 leading-snug group-hover:text-primary-fixed-dim transition-colors mt-0.5">
+            Limassol Port Deploys First Fleet of Fully Automated Electric Freight Cranes
+          </h3>
+<div class="flex items-center justify-between mt-2 text-label-sm font-label-sm text-outline">
+<span>Cyprus Tech News · 6h ago</span>
+<button aria-label="Bookmark" class="hover:text-primary-container transition-colors">
+<span class="material-symbols-outlined text-[18px]" data-icon="bookmark">bookmark</span>
+</button>
+</div>
+</div>
+</article>
+</section>
+<!-- 5. Second Hero Feature: 'Culture & Lifestyle' -->
+<section class="pt-2">
+<div class="flex items-center justify-between mb-3">
+<h2 class="text-headline-md font-headline-md font-bold text-inverse-on-surface">Culture &amp; Lifestyle</h2>
+<a class="text-label-sm font-label-sm text-outline hover:text-primary-container flex items-center" href="#">
+          Explore Section <span class="material-symbols-outlined text-sm ml-0.5" data-icon="chevron_right">chevron_right</span>
+</a>
+</div>
+<article class="relative rounded-2xl overflow-hidden bg-[#1A1D24] shadow-[0_8px_30px_-4px_rgba(0,0,0,0.5)] group cursor-pointer border border-white/5">
+<div class="relative w-full aspect-[16/9] overflow-hidden">
+<img class="w-full h-full object-cover group-hover:scale-105 transition-transform duration-500 ease-out" data-alt="A restored stone village courtyard in the Troodos mountains of Cyprus transformed into a contemporary co-working retreat for digital creatives. Artisanal terracotta pottery, olive trees, high-speed fiber terminals, and warm twilight string lights illuminate a tranquil Mediterranean dusk." src="https://lh3.googleusercontent.com/aida-public/AB6AXuAIkD2AnHpNgwpSwlnm-KrW8vHUxQTuooHgAT8vN248fPjH8bjB_eL0yIjzVO1q_2hVofXcZSvZ8_dvmVnr-qXBOeePVmyfAy97IKyihSs70n2lxqlo36EEnpJD6KQVsezIGA8BE3lFvSND5QfpzdP2VHZ8v7Xz8xdcie7gQFXX8cYveO7-0dh4q-czCveSmIutwZ1Rn2QYoGeV4kejhDfyBeFxU4V9j5pumpRU_rJmcO7z1Eqr7WiZvg"/>
+<div class="absolute inset-0 bg-gradient-to-t from-[#121316] via-[#121316]/60 to-transparent"></div>
+<div class="absolute top-4 left-4">
+<span class="inline-flex items-center px-2.5 py-1 rounded-full bg-primary-container text-white text-[11px] font-label-md font-bold tracking-wider shadow uppercase">
+              Mountain Silicon
+            </span>
+</div>
+</div>
+<div class="p-space-md -mt-12 relative z-10 space-y-2">
+<h2 class="text-headline-lg font-headline-lg text-inverse-on-surface hover:text-primary-fixed-dim transition-colors leading-tight">
+            How Troodos Mountain Villages Are Becoming the Mediterranean’s Premier Creative Sanctuaries
+          </h2>
+<p class="text-body-sm font-body-sm text-outline line-clamp-2">
+            Remote founders and multidisciplinary designers revive ancient stone villages with gigabit connections, local wineries, and decentralized work hubs.
+          </p>
+<div class="flex items-center justify-between pt-2 border-t border-white/5 text-label-sm font-label-sm text-outline">
+<span>Cultural Review · 7h ago · 6 min read</span>
+<div class="flex items-center space-x-2">
+<button aria-label="Share" class="hover:text-primary-container transition-colors p-1">
+<span class="material-symbols-outlined text-[18px]" data-icon="share">share</span>
+</button>
+<button aria-label="Bookmark" class="hover:text-primary-container transition-colors p-1">
+<span class="material-symbols-outlined text-[18px]" data-icon="bookmark">bookmark</span>
+</button>
+</div>
+</div>
+</div>
+</article>
+</section>
+</main>
+<!-- BottomNavBar Component (Exact execution from Shared Components JSON + Semantic Shell Logic) -->
+<nav class="bg-surface/85 backdrop-blur-md dark:bg-inverse-surface/85 docked full-width bottom-0 fixed bottom-0 left-0 w-full z-50 flex justify-around items-center px-space-md py-space-xs shadow-[0_-4px_20px_-2px_rgba(15,23,42,0.05)] md:hidden">
+<!-- Item 1: Home (Active State strictly calculated based on the current page: Home Feed) -->
+<a class="flex flex-col items-center justify-center text-primary dark:text-inverse-primary font-semibold active:scale-95 transition-transform duration-150 py-1" href="#">
+<span class="material-symbols-outlined text-[24px]" data-icon="home" style="font-variation-settings: 'FILL' 1;">home</span>
+<span class="text-label-sm font-label-sm mt-0.5">Home</span>
+</a>
+<!-- Item 2: Explore -->
+<a class="flex flex-col items-center justify-center text-on-surface-variant dark:text-outline-variant font-medium hover:text-primary dark:hover:text-inverse-primary transition-colors duration-150 active:scale-95 transition-transform duration-150 py-1" href="#">
+<span class="material-symbols-outlined text-[24px]" data-icon="explore">explore</span>
+<span class="text-label-sm font-label-sm mt-0.5">Explore</span>
+</a>
+<!-- Item 3: Saved -->
+<a class="flex flex-col items-center justify-center text-on-surface-variant dark:text-outline-variant font-medium hover:text-primary dark:hover:text-inverse-primary transition-colors duration-150 active:scale-95 transition-transform duration-150 py-1" href="#">
+<span class="material-symbols-outlined text-[24px]" data-icon="bookmark">bookmark</span>
+<span class="text-label-sm font-label-sm mt-0.5">Saved</span>
+</a>
+<!-- Item 4: Profile -->
+<a class="flex flex-col items-center justify-center text-on-surface-variant dark:text-outline-variant font-medium hover:text-primary dark:hover:text-inverse-primary transition-colors duration-150 active:scale-95 transition-transform duration-150 py-1" href="#">
+<span class="material-symbols-outlined text-[24px]" data-icon="person">person</span>
+<span class="text-label-sm font-label-sm mt-0.5">Profile</span>
+</a>
+</nav>
+<!-- Interactive script for bookmark and active tab toggles -->
+<script>
+    document.querySelectorAll('[data-icon="bookmark"]').forEach(btn => {
+      btn.parentElement.addEventListener('click', (e) => {
+        e.preventDefault();
+        const span = btn;
+        const isFilled = span.getAttribute('style')?.includes("'FILL' 1");
+        if (isFilled) {
+          span.style.fontVariationSettings = "'FILL' 0";
+          span.classList.remove('text-primary-container');
+        } else {
+          span.style.fontVariationSettings = "'FILL' 1";
+          span.classList.add('text-primary-container');
+        }
+      });
+    });
+  </script>
+</body></html>
