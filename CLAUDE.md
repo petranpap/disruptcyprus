@@ -27,25 +27,35 @@ docker-compose.yml   local dev: php-fpm, nginx, mysql, redis, mailpit
 
 ## Commands
 
-Filled in as each phase lands. `—` = not available yet.
+All backend commands run in containers. Prefix: `podman compose exec app …` (set `PODMAN_COMPOSE_WARNING_LOGS=false`
+to silence the provider banner; use `exec -T` in non-interactive scripts).
 
-| Task | Backend | Web |
-|---|---|---|
-| Start dev stack | `docker compose up -d` (Phase 1) | `npm --prefix web run dev` (Phase 4) |
-| Install deps | `docker compose exec app composer install` | `npm --prefix web ci` |
-| Migrate + seed | `docker compose exec app php artisan migrate --seed` | — |
-| Fresh DB | `docker compose exec app php artisan migrate:fresh --seed` | — |
-| Tests | `docker compose exec app php artisan test` (Pest) | `npm --prefix web test` (Vitest), `npm --prefix web run e2e` (Playwright) |
-| Lint / format | `vendor/bin/pint`, `vendor/bin/phpstan analyse` | `npm --prefix web run lint`, `npm --prefix web run typecheck` |
-| Generate digests manually | `php artisan digests:generate news daily --date=YYYY-MM-DD` | — |
-| Generate design theme | — | `npm --prefix web run tokens` |
+| Task | Command |
+|---|---|
+| Start / stop stack | `podman compose up -d` / `podman compose down` |
+| Rebuild PHP image | `podman compose build app` (compiles with `-j2`; the machine has little free RAM) |
+| Composer | `podman compose exec app composer require …`, then `podman compose restart queue scheduler` |
+| Migrate + seed | `podman compose exec app php artisan migrate --seed` |
+| Fresh DB with demo content | `podman compose exec app php artisan migrate:fresh --seed` |
+| Tests (Pest, MySQL `disrupt_testing`) | `podman compose exec app php artisan test --compact` |
+| Code style | `podman compose exec app vendor/bin/pint` |
+| Static analysis (level 6) | `podman compose exec app vendor/bin/phpstan analyse --memory-limit=1G` |
+| Failed jobs | `podman compose exec app php artisan queue:failed` / `queue:retry all` |
+| Web (Phase 4) | `npm --prefix web run dev` · `npm --prefix web test` · `npm --prefix web run lint` |
 
-Local machine note: `docker` is podman (podman-docker shim). A compose provider (`podman-compose` or
-`docker-compose`) must be installed for `docker compose` to work.
+Ports (host network, 127.0.0.1): nginx 8080, php-fpm 9000, MySQL 3307 (a host MySQL owns 3306), Redis 6379, Mailpit 1025/8025.
+
+Environment quirks on this machine:
+- `docker` is podman (podman-docker). `podman-compose` is installed in `~/.local/bin` (pip --user).
+- Rootless bridge networking (pasta) fails with "Failed to remount /: Permission denied", so every service uses `network_mode: host`.
+- One-off containers: `podman run --rm --network=host --userns=keep-id -v ./backend:/var/www/html:z localhost/disrupt-php:dev …`.
+- `php artisan tinker <file>` hangs (interactive). For ad-hoc scripts, bootstrap the app in a PHP file under `backend/storage/app/private/` and run it with `php`.
 
 ## Conventions
 
 **Backend**
+- Laravel 13 idioms: model config via attributes (`#[Fillable]`, `#[Hidden]`), `casts()` method, `bootstrap/app.php` for middleware/exceptions.
+- Morph map is enforced (`article`, `event`, `digest`, `user`, `industry`, `section`, `author`); never store class names.
 - Thin controllers → Form Requests (validation) → Services (logic) → API Resources (output). Policies for every model.
 - API prefix `/api/v1`, `Accept-Language: el|en` (default `el`). Error shape `{message, errors?, code}`. Cursor pagination everywhere.
 - Translatable fields via `spatie/laravel-translatable`. A locale is "available" only if title + body exist for it.
@@ -77,12 +87,17 @@ Local machine note: `docker` is podman (podman-docker shim). A compose provider 
 | 2026-10-05 | Welcome: Apple button hidden until Apple Sign-In exists; copy rewritten for startup audience (ARCHITECTURE §4 C6); no "Ad-Free" claim | Product owner |
 | 2026-10-05 | Logo: Stitch Playfair wordmark until an SVG logo is supplied | Product owner will provide SVG |
 | 2026-10-05 | Domains: `app.disruptcyprus.com` (PWA + API), `disruptcyprus.com` (landing, share pages, admin) | Confirmed |
+| 2026-10-05 | `POST /me/export` (not GET) and separate `POST /me/avatar` | Side-effect-free GETs; PHP can't parse multipart PATCH |
+| 2026-10-05 | Digests opt-in by default; event reminders on by default | GDPR-friendly; reminders only concern items the user saved |
+| 2026-10-05 | `push_subscriptions` table deferred to Phase 6 | Comes with the web-push package migration |
+| 2026-10-05 | Tests run on MySQL (`disrupt_testing`), not SQLite | JSON columns, FULLTEXT and collations must behave like production |
+| 2026-10-05 | Account deletion = anonymize + soft delete immediately (hard purge job in Phase 7) | GDPR erasure without breaking FKs |
 | 2026-10-05 | Everything runs in containers (podman + podman-compose locally; compose file stays Docker-compatible) | Product owner |
 
 ## Phase status
 
 - [x] Phase 0 — Discovery & plan (docs/ARCHITECTURE.md, docs/DESIGN_TOKENS.md)
-- [ ] Phase 1 — Backend foundation
+- [x] Phase 1 — Backend foundation (schema, seeders, auth, account, taxonomy, preferences)
 - [ ] Phase 2 — Content API
 - [ ] Phase 3 — Admin panel + digests + scheduler
 - [ ] Phase 4 — Web foundation
