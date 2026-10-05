@@ -72,8 +72,12 @@ Local machine note: `docker` is podman (podman-docker shim). A compose provider 
 | 2026-10-05 | Search: Scout database engine over denormalized `search_text` (ai_ci collation, FULLTEXT) | Accent/case-insensitive Greek search; JSON columns can't do it |
 | 2026-10-05 | Greek headline fallback: Noto Serif Display | Playfair Display lacks Greek glyphs |
 | 2026-10-05 | Bottom nav = 4 tabs (Home, Explore, Saved, Profile) | Matches home export + brief; DESIGN.md text outdated |
-| pending | Accessible color adjustments (DESIGN_TOKENS §1.4) | WCAG AA. Awaiting approval |
-| pending | Drop Applauds/Comments from reader | Not in scope. Awaiting approval |
+| 2026-10-05 | Accessible color adjustments approved (filled buttons `#0077B6`, see DESIGN_TOKENS §1.4) | WCAG AA |
+| 2026-10-05 | Reader: no Applauds/Comments; bottom bar = Share + Save | Out of scope for MVP (moderation, GDPR) |
+| 2026-10-05 | Welcome: Apple button hidden until Apple Sign-In exists; copy rewritten for startup audience (ARCHITECTURE §4 C6); no "Ad-Free" claim | Product owner |
+| 2026-10-05 | Logo: Stitch Playfair wordmark until an SVG logo is supplied | Product owner will provide SVG |
+| 2026-10-05 | Domains: `app.disruptcyprus.com` (PWA + API), `disruptcyprus.com` (landing, share pages, admin) | Confirmed |
+| 2026-10-05 | Everything runs in containers (podman + podman-compose locally; compose file stays Docker-compatible) | Product owner |
 
 ## Phase status
 

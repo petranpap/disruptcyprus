@@ -86,14 +86,32 @@ No light-mode home and no dark-mode reader/welcome/onboarding exist. Their count
 | C1 | Top tabs: Technology, Startups, Economy, Politics, Culture | 5 sections + For you | Replace labels, keep the tab component exactly |
 | C2 | 12 generic topic tiles (h-48 image tiles) | 33 industries | Keep the tile design and make tiles shorter (h-32, 3:2). Add a search/filter field above the grid and group tiles into 5 clusters (Finance & Investment, Deep Tech, Digital & Software, Sectors, Society & Gov) so 33 tiles remain scannable. The counter shows "N of 33" |
 | C3 | Card meta shows external sources ("Cyprus Mail · 3h ago", "InBusiness") | No external content | Meta = author name · relative time. "Disrupt Original" in crimson when `is_original` |
-| C4 | Reader shows **Applauds (1.4k)** and **Comments (48)** | Not in brief | ❓ Drop both for MVP and keep the bar with **Share + Save** only. Comments need moderation and GDPR work |
+| C4 | Reader shows **Applauds (1.4k)** and **Comments (48)** | Not in brief | ✅ Dropped. Bar = **Share + Save** |
 | C5 | Welcome shows an **Apple** button | Apple Sign-In later | Hide Apple. Google becomes a full-width button. The slot comes back later |
-| C6 | Welcome copy: "news and stories shaping Cyprus… unfiltered independent journalism", "Ad-Free" | Startup/innovation focus | ❓ Rewrite in EN/GR for startup/innovation positioning, and only claim "Ad-Free" if true |
-| C7 | Brand-cyan buttons with white text (2.79:1) and other low-contrast pairs | Accessibility target | ❓ Adjusted tokens, see DESIGN_TOKENS §1.4 |
+| C6 | Welcome copy: "news and stories shaping Cyprus… unfiltered independent journalism", "Ad-Free" | Startup/innovation focus | ✅ Rewritten (copy below). "Ad-Free" removed |
+| C7 | Brand-cyan buttons with white text (2.79:1) and other low-contrast pairs | Accessibility target | ✅ Adjusted tokens approved, see DESIGN_TOKENS §1.4 |
 | C8 | Playfair Display headlines | Greek default locale | Playfair has no Greek. Greek glyphs fall back to Noto Serif Display (DESIGN_TOKENS §2.1) |
 | C9 | DESIGN.md says 3-tab bottom nav (Today, Discover, Saved) and a floating audio mini-player | Brief: 4-tab nav | 4 tabs per the home export. The mini-player appears only while "Listen" is playing and sits above the bottom nav |
 | C10 | Onboarding is "Step 2 of 3" with a "Skip" action | Min 3 industries | "Skip" is shown but leads to a confirm sheet ("Your feed will show trending stories"). Skipping is allowed; For you then falls back to trending |
 | C11 | Wordmark in Playfair (exports) vs geometric sans (real logo) | — | Use the exports' version until an SVG logo exists |
+
+### 4.1 Welcome copy (C6)
+
+Greek uses the informal "εσύ", as is usual for consumer tech apps.
+
+| Element | EN | GR |
+|---|---|---|
+| Edition line | CYPRUS EDITION | ΕΚΔΟΣΗ ΚΥΠΡΟΥ |
+| Tagline | STARTUPS • VENTURES • RESEARCH | STARTUPS • ΕΠΕΝΔΥΣΕΙΣ • ΕΡΕΥΝΑ |
+| Badge | Personalized • Daily briefing • Events calendar | Εξατομικευμένο • Καθημερινή ενημέρωση • Ημερολόγιο εκδηλώσεων |
+| Headline | Cyprus startups and innovation, curated for you. | Startups και καινοτομία στην Κύπρο, επιλεγμένα για εσένα. |
+| Subtitle | Funding rounds, founders, research and events from Cyprus and the Eastern Mediterranean, filtered by the industries you follow. | Χρηματοδοτήσεις, ιδρυτές, έρευνα και εκδηλώσεις από την Κύπρο και την Ανατολική Μεσόγειο, με βάση τους κλάδους που ακολουθείς. |
+| Preview kicker | DAILY BRIEFING | ΗΜΕΡΗΣΙΑ ΕΝΗΜΕΡΩΣΗ |
+| Primary CTA | Create an account | Δημιουργία λογαριασμού |
+| Secondary CTA | Sign in | Σύνδεση |
+| Social | Continue with Google | Συνέχεια με Google |
+| Guest | Continue as guest | Συνέχεια ως επισκέπτης |
+| Legal | By signing up, you agree to our Terms & Privacy Policy | Με την εγγραφή σου αποδέχεσαι τους Όρους Χρήσης και την Πολιτική Απορρήτου |
 
 ## 5. Route → screen → API map
 
@@ -212,7 +230,7 @@ web/src/
 
 ## 9. Assumptions (proceeding unless you say otherwise)
 
-1. Production hosts: `app.disruptcyprus.com` (PWA + API) and `disruptcyprus.com` (landing, share pages, admin). ❓ domain names.
+1. Production hosts: `app.disruptcyprus.com` (PWA + API) and `disruptcyprus.com` (landing, share pages, admin). ✅ confirmed.
 2. Latest stable versions as of today: **Laravel 13**, **Filament 5**, PHP 8.4, React 19.3, Vite 8, React Router 8, TanStack Query 5, Tailwind 4.3, vite-plugin-pwa 2. If a key package isn't compatible yet, I'll pin and note it.
 3. Default UI language is Greek when the browser isn't `en*`. `users.locale` defaults to `el`.
 4. **Digest timing**: Daily News draft generated at **06:00** for the window `[yesterday 06:00, today 06:00)`; Weekly Events Sunday **18:00** for Mon–Sun of the coming week;
