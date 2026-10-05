@@ -55,6 +55,33 @@ return [
     'url' => env('APP_URL', 'http://localhost'),
 
     /*
+    | Origin of the React PWA. Password-reset, verification and OAuth flows
+    | redirect users here.
+    */
+    'frontend_url' => env('FRONTEND_URL', 'http://localhost:5173'),
+
+    /*
+    | Timezone used for business periods: digests, "this week", scheduler.
+    | Timestamps are always stored in UTC.
+    */
+    'business_timezone' => env('APP_BUSINESS_TIMEZONE', 'Asia/Nicosia'),
+
+    /*
+    | Version of the Terms/Privacy Policy users consent to at sign-up.
+    */
+    'consent_version' => env('APP_CONSENT_VERSION', '2026-10'),
+
+    /*
+    | Accounts created by the database seeder (local and demo environments only).
+    */
+    'seed_accounts' => [
+        'admin' => env('SEED_ADMIN_EMAIL', 'admin@disruptcyprus.test'),
+        'editor' => env('SEED_EDITOR_EMAIL', 'editor@disruptcyprus.test'),
+        'reader' => env('SEED_READER_EMAIL', 'reader@disruptcyprus.test'),
+        'password' => env('SEED_PASSWORD', 'password'),
+    ],
+
+    /*
     |--------------------------------------------------------------------------
     | Application Timezone
     |--------------------------------------------------------------------------
@@ -78,11 +105,11 @@ return [
     |
     */
 
-    'locale' => env('APP_LOCALE', 'en'),
+    'locale' => env('APP_LOCALE', 'el'),
 
     'fallback_locale' => env('APP_FALLBACK_LOCALE', 'en'),
 
-    'faker_locale' => env('APP_FAKER_LOCALE', 'en_US'),
+    'faker_locale' => env('APP_FAKER_LOCALE', 'el_GR'),
 
     /*
     |--------------------------------------------------------------------------
