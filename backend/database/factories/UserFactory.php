@@ -2,6 +2,7 @@
 
 namespace Database\Factories;
 
+use App\Enums\UserRole;
 use App\Models\User;
 use Illuminate\Database\Eloquent\Factories\Factory;
 use Illuminate\Support\Facades\Hash;
@@ -30,6 +31,13 @@ class UserFactory extends Factory
             'email_verified_at' => now(),
             'password' => static::$password ??= Hash::make('password'),
             'remember_token' => Str::random(10),
+            'role' => UserRole::Reader,
+            'locale' => 'el',
+            'content_locales' => ['el', 'en'],
+            'timezone' => 'Asia/Nicosia',
+            'consent_at' => now(),
+            'consent_version' => config('app.consent_version'),
+            'onboarded_at' => now(),
         ];
     }
 
@@ -41,5 +49,28 @@ class UserFactory extends Factory
         return $this->state(fn (array $attributes) => [
             'email_verified_at' => null,
         ]);
+    }
+
+    public function editor(): static
+    {
+        return $this->state(fn (array $attributes) => ['role' => UserRole::Editor]);
+    }
+
+    public function admin(): static
+    {
+        return $this->state(fn (array $attributes) => ['role' => UserRole::Admin]);
+    }
+
+    /**
+     * Social-only account without a password.
+     */
+    public function withoutPassword(): static
+    {
+        return $this->state(fn (array $attributes) => ['password' => null]);
+    }
+
+    public function notOnboarded(): static
+    {
+        return $this->state(fn (array $attributes) => ['onboarded_at' => null]);
     }
 }

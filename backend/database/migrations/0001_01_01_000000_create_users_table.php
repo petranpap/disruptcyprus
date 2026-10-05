@@ -16,9 +16,18 @@ return new class extends Migration
             $table->string('name');
             $table->string('email')->unique();
             $table->timestamp('email_verified_at')->nullable();
-            $table->string('password');
+            // Nullable for social-only accounts.
+            $table->string('password')->nullable();
+            $table->string('role', 16)->default('reader')->index();
+            $table->char('locale', 2)->default('el');
+            $table->json('content_locales');
+            $table->string('timezone', 64)->default('Asia/Nicosia');
+            $table->timestamp('consent_at')->nullable();
+            $table->string('consent_version', 32)->nullable();
+            $table->timestamp('onboarded_at')->nullable();
             $table->rememberToken();
             $table->timestamps();
+            $table->softDeletes();
         });
 
         Schema::create('password_reset_tokens', function (Blueprint $table) {
