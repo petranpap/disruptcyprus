@@ -16,8 +16,8 @@ Status: **Phase 0 draft**. Items marked ❓ are waiting for product-owner confir
  editors         │  /admin            → Filament                                                │
                  │  /privacy, /terms, /sitemap.xml                                               │
                  └──────────────────────────────────────────────────────────────────────────────┘
- Laravel ── MySQL 8 (data, Scout database engine) ── Redis (cache, queues, rate limits)
-         └─ queue workers (Supervisor): notifications, web push, digests, exports
+ Laravel ── MariaDB 10.11 (data, Scout database engine, cache, queue, sessions)
+         └─ queue worker (systemd): notifications, web push, digests, exports
          └─ scheduler (cron, Asia/Nicosia): digest drafts, event reminders, scheduled publishing
 ```
 
@@ -199,7 +199,7 @@ backend/app/
   `Accept-Language` (`en` | `el`, default `el`). Resources return the requested locale, falling back to the other locale
   when the user's `content_locales` allow it, plus `locale` and `is_fallback` per item.
 - **Search**: Scout database engine over a denormalized `search_text` column per article/event (both
-  locales, HTML stripped, `utf8mb4_0900_ai_ci` collation, FULLTEXT index). Searching translatable JSON columns directly
+  locales, HTML stripped, `utf8mb4_unicode_ci` collation, FULLTEXT index). Searching translatable JSON columns directly
   would be case- and accent-sensitive, so "κυπρος" would not match "Κύπρος". Phase 2 tests verify this.
 - **Feed ranking** (`FeedService`): `score = recencyDecay(age, half-life 36h) × (1 + 0.25·featured + 0.15·original) × industryMatch`.
   Events only if `starts_at ≤ now + 14d`. Section diversity is enforced by interleaving (no more than 3 consecutive items from one section).

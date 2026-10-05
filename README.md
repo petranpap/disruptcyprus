@@ -6,7 +6,8 @@ React PWA + Laravel API + Filament admin. See `docs/ARCHITECTURE.md` for the big
 ## Local setup (≈10 minutes)
 
 Requirements: Podman with `podman-compose` (or Docker with Compose on Linux) and Git.
-Everything — PHP, Composer, MySQL, Redis, Nginx, Mailpit — runs in containers.
+Everything — PHP 8.4, Composer, MariaDB 10.11, Nginx, Mailpit — runs in containers, pinned to the production versions.
+Production runs on Apache + PHP-FPM + MariaDB without Docker: see `docs/DEPLOYMENT.md`.
 
 ```bash
 # 1. Start the stack (first run builds the PHP image; a few minutes)
@@ -35,14 +36,14 @@ podman compose restart queue scheduler
 Demo accounts (password `password`): `admin@disruptcyprus.test`, `editor@disruptcyprus.test`, `reader@disruptcyprus.test`.
 
 ### Notes
-- Services use host networking bound to `127.0.0.1` (rootless podman bridge networking fails on some Fedora setups). MySQL listens on **3307**.
+- Services use host networking bound to `127.0.0.1` (rootless podman bridge networking fails on some Fedora setups). MariaDB listens on **3307**.
 - Docker users: delete the `userns_mode: keep-id` lines in `docker-compose.yml`.
 - After `composer require` or changes to service providers, run `podman compose restart queue scheduler`.
 
 ## Tests & quality
 
 ```bash
-podman compose exec app php artisan test          # Pest (uses the disrupt_testing database)
+podman compose exec app php artisan test          # Pest (MariaDB disrupt_testing database)
 podman compose exec app vendor/bin/pint           # code style
 podman compose exec app vendor/bin/phpstan analyse --memory-limit=1G   # Larastan level 6
 ```

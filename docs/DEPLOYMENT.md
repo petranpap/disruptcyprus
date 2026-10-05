@@ -1,0 +1,264 @@
+# Deployment — Ubuntu 24.04, Apache, PHP-FPM 8.4, MariaDB 10.11
+
+Target: the existing shared server (other sites keep running untouched). No Docker in production.
+Docker is the **local** development environment only, and it mirrors these versions.
+
+| Component | Production | Local (docker-compose) |
+|---|---|---|
+| OS | Ubuntu 24.04 | Debian containers |
+| Web server | Apache 2.4 + proxy_fcgi | nginx |
+| PHP | 8.4 (FPM) | 8.4 (FPM), same extensions |
+| Database | MariaDB 10.11 | MariaDB 10.11 |
+| Cache / queue / sessions | database | database |
+| Node (PWA build) | 20.x (≥ 20.19, required by Vite 8) | host Node |
+
+Workflow: develop and test locally → `git push` → on the server, `./deploy.sh`.
+
+---
+
+## 1. One-time server setup
+
+All commands as a sudo user unless noted.
+
+### 1.1 App user and code
+A dedicated user keeps this app isolated from the other sites on the server.
+
+```bash
+sudo adduser --system --group --home /var/www/disruptcyprus --shell /bin/bash disrupt
+sudo usermod -aG disrupt www-data            # Apache can read public files
+sudo -u disrupt git clone <REPO_URL> /var/www/disruptcyprus/app
+```
+
+Paths used below: `APP=/var/www/disruptcyprus/app`.
+
+### 1.2 PHP extensions and FPM pool
+The server already has every extension we need (intl, gd, exif, pdo_mysql, mbstring, zip, fileinfo, opcache).
+Check that GD supports WebP: `php -r 'var_dump(function_exists("imagewebp"));'` → `bool(true)`.
+
+```bash
+sudo apt install php8.4-fpm            # if not installed yet
+sudo tee /etc/php/8.4/fpm/pool.d/disrupt.conf >/dev/null <<'EOF'
+[disrupt]
+user = disrupt
+group = disrupt
+listen = /run/php/php8.4-fpm-disrupt.sock
+listen.owner = www-data
+listen.group = www-data
+pm = ondemand
+pm.max_children = 10
+pm.process_idle_timeout = 30s
+php_admin_value[upload_max_filesize] = 25M
+php_admin_value[post_max_size] = 26M
+php_admin_value[memory_limit] = 256M
+EOF
+sudo systemctl reload php8.4-fpm
+```
+
+### 1.3 Database
+```bash
+sudo mariadb <<'EOF'
+CREATE DATABASE disrupt CHARACTER SET utf8mb4 COLLATE utf8mb4_unicode_ci;
+CREATE USER 'disrupt'@'localhost' IDENTIFIED BY '<STRONG_PASSWORD>';
+GRANT ALL PRIVILEGES ON disrupt.* TO 'disrupt'@'localhost';
+FLUSH PRIVILEGES;
+EOF
+```
+
+### 1.4 Environment file
+```bash
+sudo -u disrupt cp $APP/backend/.env.example $APP/backend/.env
+sudo -u disrupt nano $APP/backend/.env
+```
+
+Production values (everything else as in `.env.example`):
+
+```dotenv
+APP_ENV=production
+APP_DEBUG=false
+APP_URL=https://disruptcyprus.com
+FRONTEND_URL=https://app.disruptcyprus.com
+LOG_LEVEL=warning
+
+DB_CONNECTION=mariadb
+DB_HOST=127.0.0.1
+DB_PORT=3306
+DB_DATABASE=disrupt
+DB_USERNAME=disrupt
+DB_PASSWORD=<STRONG_PASSWORD>
+
+SESSION_DRIVER=database
+SESSION_SECURE_COOKIE=true
+SANCTUM_STATEFUL_DOMAINS=app.disruptcyprus.com
+QUEUE_CONNECTION=database
+CACHE_STORE=database
+
+MAIL_MAILER=smtp
+MAIL_HOST=<smtp host>
+MAIL_PORT=587
+MAIL_USERNAME=<user>
+MAIL_PASSWORD=<password>
+MAIL_FROM_ADDRESS=hello@disruptcyprus.com
+
+GOOGLE_CLIENT_ID=<from Google Cloud console>
+GOOGLE_CLIENT_SECRET=<from Google Cloud console>
+GOOGLE_REDIRECT_URI=https://app.disruptcyprus.com/api/v1/auth/social/google/callback
+```
+
+Then:
+```bash
+cd $APP/backend
+sudo -u disrupt composer install --no-dev --optimize-autoloader
+sudo -u disrupt php artisan key:generate
+sudo -u disrupt php artisan migrate --force
+sudo -u disrupt php artisan db:seed --class=SectionSeeder --force
+sudo -u disrupt php artisan db:seed --class=IndustrySeeder --force
+sudo chmod -R ug+rwX storage bootstrap/cache
+```
+
+> Do **not** run the full `db:seed` in production: `DemoContentSeeder` is skipped automatically when `APP_ENV=production`,
+> but `UserSeeder` would create demo accounts. Admin accounts are created with `php artisan make:filament-user` (Phase 3).
+
+### 1.5 Apache virtual hosts
+```bash
+sudo a2enmod proxy_fcgi rewrite headers ssl
+```
+
+`/etc/apache2/sites-available/disruptcyprus.com.conf` — landing page, share pages, admin, media:
+
+```apache
+<VirtualHost *:80>
+    ServerName disruptcyprus.com
+    ServerAlias www.disruptcyprus.com
+    DocumentRoot /var/www/disruptcyprus/app/backend/public
+
+    <Directory /var/www/disruptcyprus/app/backend/public>
+        Options FollowSymLinks
+        AllowOverride All
+        Require all granted
+    </Directory>
+
+    <FilesMatch "\.php$">
+        SetHandler "proxy:unix:/run/php/php8.4-fpm-disrupt.sock|fcgi://disrupt"
+    </FilesMatch>
+
+    Header always set X-Content-Type-Options "nosniff"
+    Header always set Referrer-Policy "strict-origin-when-cross-origin"
+
+    ErrorLog ${APACHE_LOG_DIR}/disruptcyprus-error.log
+    CustomLog ${APACHE_LOG_DIR}/disruptcyprus-access.log combined
+</VirtualHost>
+```
+
+`/etc/apache2/sites-available/app.disruptcyprus.com.conf` — the PWA, with the API on the same origin:
+
+```apache
+<VirtualHost *:80>
+    ServerName app.disruptcyprus.com
+    DocumentRoot /var/www/disruptcyprus/app/web/dist
+
+    # API and Sanctum go to Laravel; REQUEST_URI stays /api/... so Laravel routing works.
+    ProxyPassMatch "^/(api|sanctum)/(.*)$" "unix:/run/php/php8.4-fpm-disrupt.sock|fcgi://disrupt/var/www/disruptcyprus/app/backend/public/index.php"
+
+    # Uploaded media served same-origin (service worker can cache it).
+    Alias /storage /var/www/disruptcyprus/app/backend/storage/app/public
+    <Directory /var/www/disruptcyprus/app/backend/storage/app/public>
+        Require all granted
+        Options -Indexes
+        Header set Cache-Control "public, max-age=2592000"
+    </Directory>
+
+    <Directory /var/www/disruptcyprus/app/web/dist>
+        Require all granted
+        Options -Indexes
+        # Client-side routing: unknown paths load the app shell.
+        FallbackResource /index.html
+    </Directory>
+
+    # Hashed build assets are immutable; the shell and service worker must revalidate.
+    <LocationMatch "^/assets/">
+        Header set Cache-Control "public, max-age=31536000, immutable"
+    </LocationMatch>
+    <LocationMatch "^/(index\.html|sw\.js|manifest\.webmanifest)$">
+        Header set Cache-Control "no-cache"
+    </LocationMatch>
+
+    Header always set X-Content-Type-Options "nosniff"
+    Header always set Referrer-Policy "strict-origin-when-cross-origin"
+
+    ErrorLog ${APACHE_LOG_DIR}/app.disruptcyprus-error.log
+    CustomLog ${APACHE_LOG_DIR}/app.disruptcyprus-access.log combined
+</VirtualHost>
+```
+
+The PWA (`web/dist`) exists from Phase 4. Until then the app host serves only `/api`.
+
+```bash
+sudo a2ensite disruptcyprus.com app.disruptcyprus.com
+sudo apache2ctl configtest && sudo systemctl reload apache2
+```
+
+### 1.6 HTTPS
+```bash
+sudo apt install certbot python3-certbot-apache
+sudo certbot --apache -d disruptcyprus.com -d www.disruptcyprus.com -d app.disruptcyprus.com
+```
+Certbot creates the `:443` vhosts and the HTTP→HTTPS redirect, and renews automatically.
+
+### 1.7 Queue worker (systemd) and scheduler (cron)
+```bash
+sudo tee /etc/systemd/system/disrupt-queue.service >/dev/null <<'EOF'
+[Unit]
+Description=Disrupt Cyprus queue worker
+After=network.target mariadb.service
+
+[Service]
+User=disrupt
+Group=disrupt
+WorkingDirectory=/var/www/disruptcyprus/app/backend
+ExecStart=/usr/bin/php artisan queue:work --sleep=3 --tries=3 --backoff=10 --max-time=3600
+Restart=always
+RestartSec=5
+
+[Install]
+WantedBy=multi-user.target
+EOF
+sudo systemctl daemon-reload
+sudo systemctl enable --now disrupt-queue
+```
+
+```bash
+sudo -u disrupt crontab -e
+# add:
+* * * * * cd /var/www/disruptcyprus/app/backend && php artisan schedule:run >> /dev/null 2>&1
+```
+
+---
+
+## 2. Every deploy
+
+```bash
+# local
+git push
+
+# server
+sudo -u disrupt -i
+cd /var/www/disruptcyprus/app && ./deploy.sh
+```
+
+`deploy.sh` checks PHP and extensions, pulls (fast-forward only), runs `composer install --no-dev`, migrates in maintenance mode,
+rebuilds Laravel caches, builds the PWA (once `web/` exists) and restarts queue workers.
+
+Rollback: `git checkout <previous-commit> && ./deploy.sh` (migrations that changed data may need a manual `php artisan migrate:rollback`).
+
+## 3. Backups
+
+```bash
+sudo -u disrupt mkdir -p /var/www/disruptcyprus/backups
+# /etc/cron.d/disrupt-backup — nightly DB dump + media, keep 14 days
+30 3 * * * disrupt mysqldump --single-transaction disrupt | gzip > /var/www/disruptcyprus/backups/db-$(date +\%F).sql.gz && find /var/www/disruptcyprus/backups -name 'db-*.sql.gz' -mtime +14 -delete
+```
+Store DB credentials for that cron in `/var/www/disruptcyprus/.my.cnf` (`chmod 600`). Copy backups off the server (e.g. a Hetzner Storage Box).
+
+## 4. Still to come
+- VAPID keys for Web Push (Phase 6): `php artisan webpush:vapid`, then add them to `.env`.
+- Lighthouse checks, CSP header and the final security checklist (Phase 7).

@@ -22,7 +22,8 @@ UI/                  Stitch design exports (read-only)
 backend/             Laravel 13 + Filament 5 + Blade landing/share pages
 web/                 React 19 + Vite 8 PWA (TypeScript strict)
 docs/                ARCHITECTURE.md, API.md, DESIGN_TOKENS.md, DEPLOYMENT.md
-docker-compose.yml   local dev: php-fpm, nginx, mysql, redis, mailpit
+docker-compose.yml   local dev only: php-fpm 8.4, nginx, mariadb 10.11, mailpit
+deploy.sh            production deploy (run on the server)
 ```
 
 ## Commands
@@ -37,13 +38,18 @@ to silence the provider banner; use `exec -T` in non-interactive scripts).
 | Composer | `podman compose exec app composer require …`, then `podman compose restart queue scheduler` |
 | Migrate + seed | `podman compose exec app php artisan migrate --seed` |
 | Fresh DB with demo content | `podman compose exec app php artisan migrate:fresh --seed` |
-| Tests (Pest, MySQL `disrupt_testing`) | `podman compose exec app php artisan test --compact` |
+| Tests (Pest, MariaDB `disrupt_testing`) | `podman compose exec app php artisan test --compact` |
 | Code style | `podman compose exec app vendor/bin/pint` |
 | Static analysis (level 6) | `podman compose exec app vendor/bin/phpstan analyse --memory-limit=1G` |
 | Failed jobs | `podman compose exec app php artisan queue:failed` / `queue:retry all` |
 | Web (Phase 4) | `npm --prefix web run dev` · `npm --prefix web test` · `npm --prefix web run lint` |
 
-Ports (host network, 127.0.0.1): nginx 8080, php-fpm 9000, MySQL 3307 (a host MySQL owns 3306), Redis 6379, Mailpit 1025/8025.
+Ports (host network, 127.0.0.1): nginx 8080, php-fpm 9000, MariaDB 3307 (a host MySQL owns 3306), Mailpit 1025/8025.
+
+Production (see docs/DEPLOYMENT.md): shared Ubuntu 24.04 server, Apache 2.4 + PHP-FPM 8.4 pool, MariaDB 10.11, Node 20,
+no Redis, no Docker. Deploy = `git push`, then `./deploy.sh` on the server as the `disrupt` user.
+**Local must mirror production**: never use features that need Redis, MySQL-only syntax/collations (`utf8mb4_0900_*`),
+or PHP extensions the server lacks (no redis, no bcmath).
 
 Environment quirks on this machine:
 - `docker` is podman (podman-docker). `podman-compose` is installed in `~/.local/bin` (pip --user).
@@ -79,7 +85,7 @@ Environment quirks on this machine:
 | 2026-10-05 | Sanctum SPA cookies, API served same-origin under `app.<domain>/api` | No CORS, first-party cookies, iOS PWA safe. Token endpoint kept for native |
 | 2026-10-05 | SEO via Blade share pages `/a/{slug}`, `/e/{slug}`, `/d/{slug}` on the main domain; PWA shares those URLs | Simplest path to OG previews + indexing without SSR |
 | 2026-10-05 | One slug per item (not per locale) | Stable share URLs, simple routing |
-| 2026-10-05 | Search: Scout database engine over denormalized `search_text` (ai_ci collation, FULLTEXT) | Accent/case-insensitive Greek search; JSON columns can't do it |
+| 2026-10-05 | Search: Scout database engine over denormalized `search_text` (`utf8mb4_unicode_ci`, FULLTEXT) | Accent/case-insensitive Greek search; JSON columns can't do it |
 | 2026-10-05 | Greek headline fallback: Noto Serif Display | Playfair Display lacks Greek glyphs |
 | 2026-10-05 | Bottom nav = 4 tabs (Home, Explore, Saved, Profile) | Matches home export + brief; DESIGN.md text outdated |
 | 2026-10-05 | Accessible color adjustments approved (filled buttons `#0077B6`, see DESIGN_TOKENS §1.4) | WCAG AA |
@@ -90,7 +96,10 @@ Environment quirks on this machine:
 | 2026-10-05 | `POST /me/export` (not GET) and separate `POST /me/avatar` | Side-effect-free GETs; PHP can't parse multipart PATCH |
 | 2026-10-05 | Digests opt-in by default; event reminders on by default | GDPR-friendly; reminders only concern items the user saved |
 | 2026-10-05 | `push_subscriptions` table deferred to Phase 6 | Comes with the web-push package migration |
-| 2026-10-05 | Tests run on MySQL (`disrupt_testing`), not SQLite | JSON columns, FULLTEXT and collations must behave like production |
+| 2026-10-05 | Tests run on MariaDB 10.11 (`disrupt_testing`), not SQLite | JSON columns, FULLTEXT and collations must behave like production |
+| 2026-10-05 | Production = existing shared server (Apache, PHP-FPM 8.4, MariaDB 10.11), deployed with git + `deploy.sh`; Docker only for local dev, pinned to the same versions | Product owner; server already hosts other sites |
+| 2026-10-05 | No Redis: cache, queue and sessions use the database | Not installed on the shared server; volume is small |
+| 2026-10-05 | Collation `utf8mb4_unicode_ci` (verified accent/case-insensitive for Greek on MariaDB) | `utf8mb4_0900_ai_ci` is MySQL-only |
 | 2026-10-05 | Account deletion = anonymize + soft delete immediately (hard purge job in Phase 7) | GDPR erasure without breaking FKs |
 | 2026-10-05 | Everything runs in containers (podman + podman-compose locally; compose file stays Docker-compatible) | Product owner |
 
