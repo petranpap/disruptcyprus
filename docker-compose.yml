@@ -3,8 +3,11 @@
 # Networking: every service uses host networking and binds to 127.0.0.1 only.
 # Reason: rootless podman's bridge networking (pasta) fails on this machine
 # ("Failed to remount /: Permission denied"). Host networking needs no helper.
-# Ports: nginx 8080, php-fpm 9000, mysql 3307 (3306 is taken by a host MySQL),
-# redis 6379, mailpit SMTP 1025 / UI 8025.
+# Ports: nginx 8080, php-fpm 9000, mariadb 3307 (3306 is taken by a host MySQL),
+# mailpit SMTP 1025 / UI 8025.
+#
+# Versions mirror production (Ubuntu 24.04): PHP 8.4, MariaDB 10.11, no Redis
+# (cache, queue and sessions use the database).
 #
 # Docker users: remove the `userns_mode` lines (podman-only).
 name: disrupt
@@ -24,8 +27,7 @@ x-php: &php
   volumes:
     - ./backend:/var/www/html:z
   depends_on:
-    - mysql
-    - redis
+    - mariadb
 
 services:
   app:
@@ -51,27 +53,20 @@ services:
     depends_on:
       - app
 
-  mysql:
-    image: docker.io/library/mysql:8.4
+  mariadb:
+    image: docker.io/library/mariadb:10.11
     network_mode: host
     environment:
-      MYSQL_DATABASE: disrupt
-      MYSQL_USER: disrupt
-      MYSQL_PASSWORD: secret
-      MYSQL_ROOT_PASSWORD: root
+      MARIADB_DATABASE: disrupt
+      MARIADB_USER: disrupt
+      MARIADB_PASSWORD: secret
+      MARIADB_ROOT_PASSWORD: root
     command: >-
-      --port=3307 --bind-address=127.0.0.1 --mysqlx=OFF
-      --character-set-server=utf8mb4 --collation-server=utf8mb4_0900_ai_ci
+      --port=3307 --bind-address=127.0.0.1
+      --character-set-server=utf8mb4 --collation-server=utf8mb4_unicode_ci
     volumes:
-      - mysql-data:/var/lib/mysql
+      - mariadb-data:/var/lib/mysql
       - ./docker/mysql/init.sql:/docker-entrypoint-initdb.d/init.sql:ro,z
-
-  redis:
-    image: docker.io/library/redis:7-alpine
-    network_mode: host
-    command: redis-server --bind 127.0.0.1 --port 6379
-    volumes:
-      - redis-data:/data
 
   mailpit:
     image: docker.io/axllent/mailpit:latest
@@ -79,5 +74,4 @@ services:
     command: --smtp 127.0.0.1:1025 --listen 127.0.0.1:8025
 
 volumes:
-  mysql-data:
-  redis-data:
+  mariadb-data:

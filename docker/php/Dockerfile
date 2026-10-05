@@ -1,5 +1,6 @@
 # Development image for the Laravel backend (php-fpm, queue worker, scheduler).
-FROM docker.io/library/php:8.5-fpm-trixie
+# Mirrors the production server: PHP 8.4 with the same extension set (no redis, no bcmath).
+FROM docker.io/library/php:8.4-fpm-bookworm
 
 ARG UID=1000
 ARG GID=1000
@@ -15,11 +16,9 @@ RUN apt-get update \
 
 # Low parallelism keeps peak memory small on modest dev machines.
 RUN docker-php-ext-configure gd --with-jpeg --with-webp --with-freetype \
-    && docker-php-ext-install -j2 pdo_mysql zip gd bcmath exif pcntl
+    && docker-php-ext-install -j2 pdo_mysql mysqli zip gd exif pcntl
 
 RUN docker-php-ext-install -j2 intl
-
-RUN pecl install redis && docker-php-ext-enable redis && rm -rf /tmp/pear
 
 COPY --from=docker.io/library/composer:2 /usr/bin/composer /usr/bin/composer
 COPY php.ini /usr/local/etc/php/conf.d/zz-app.ini
