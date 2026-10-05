@@ -1,0 +1,12 @@
+includes:
+    - vendor/larastan/larastan/extension.neon
+
+parameters:
+    level: 6
+    paths:
+        - app
+        - database/seeders
+        - routes
+    tmpDir: storage/framework/cache/phpstan
+    # Read real cast types from the models' casts() methods.
+    parseModelCastsMethod: true
