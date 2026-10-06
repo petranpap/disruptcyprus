@@ -204,7 +204,24 @@ sudo certbot --apache -d disruptcyprus.com -d www.disruptcyprus.com -d app.disru
 ```
 Certbot creates the `:443` vhosts and the HTTP→HTTPS redirect, and renews automatically.
 
-### 1.7 Queue worker (systemd) and scheduler (cron)
+### 1.7 Ports and firewall
+Public traffic uses only **443** (HTTPS). **80** stays open solely for the HTTP→HTTPS redirect and certbot renewals.
+PHP-FPM uses a Unix socket (no port) and MariaDB listens on localhost only.
+
+```bash
+# MariaDB must not listen publicly: expect 127.0.0.1:3306 (or a socket), never 0.0.0.0:3306
+sudo ss -ltnp | grep -E ':3306|:80 |:443 '
+
+# Firewall (if ufw is not already managed for the other sites, review existing rules first: sudo ufw status)
+sudo ufw allow OpenSSH
+sudo ufw allow 'Apache Full'      # 80 + 443
+sudo ufw enable
+```
+
+If MariaDB shows `0.0.0.0:3306`, set `bind-address = 127.0.0.1` in `/etc/mysql/mariadb.conf.d/50-server.cnf`
+and restart MariaDB, after checking that no other site connects to it remotely.
+
+### 1.8 Queue worker (systemd) and scheduler (cron)
 ```bash
 sudo tee /etc/systemd/system/disrupt-queue.service >/dev/null <<'EOF'
 [Unit]
