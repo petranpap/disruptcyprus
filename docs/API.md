@@ -1,18 +1,21 @@
 # API — Disrupt Cyprus v1
 
 Base path: `/api/v1`. In production the PWA calls it **same-origin** (`https://app.disruptcyprus.com/api/v1`).
-Status: Phase 1 endpoints. Content endpoints arrive in Phase 2, along with generated OpenAPI docs.
+Status: Phases 1–2. Generated OpenAPI 3.1 spec: `docs/openapi.json` (re-export with
+`php artisan scramble:export --path=storage/app/private/openapi.json`); interactive docs at `http://localhost:8080/docs/api` (local only).
 
 ## Conventions
 
 | Topic | Rule |
 |---|---|
 | Language | `Accept-Language: el` or `en` selects translated fields and messages. Anything else falls back to `el`. Responses carry `Content-Language` and `Vary: Accept-Language` |
-| Envelope | Single resources and lists: `{ "data": … }`. Lists are cursor-paginated from Phase 2 |
+| Envelope | Single resources and lists: `{ "data": … }`. Lists are cursor-paginated: `meta.next_cursor` → pass back as `?cursor=` |
 | Errors | `{ "message": string, "code": string, "errors"?: { field: [messages] } }` |
 | Error codes | `validation_failed` 422 · `unauthenticated` 401 · `forbidden` 403 · `not_found` 404 · `csrf_mismatch` 419 · `too_many_requests` 429 · `http_error` (other 4xx) · `server_error` 500 |
 | Rate limits | 120 req/min per user or IP. Login: 5/min per email+IP and 20/min per IP. Register/forgot/reset: 10/min per IP. Data export: 1/hour per user |
-| Caching | Public taxonomy GETs: `Cache-Control: public, max-age=300` + `ETag` (send `If-None-Match` to get a 304) |
+| Caching | Taxonomy: `public, max-age=300`. Content GETs: guests `public, max-age=60`, signed-in `private, no-cache`. All send `ETag` (send `If-None-Match` → 304) and `Vary: Accept-Language, Cookie, Authorization` |
+| Content language | Each item is rendered in the UI language if available, else in another of the reader's `content_locales` (guests: both). Cards carry `locale` and `is_fallback`. Lists hide items not readable in any accepted language; opening an item directly always works |
+| Optional auth | Public endpoints also recognise a signed-in reader (cookie or bearer) to fill `is_bookmarked` and apply content languages |
 | Times | ISO 8601, UTC |
 
 ## Authentication
@@ -62,10 +65,61 @@ On failure it redirects to `FRONTEND_URL/sign-in?error=social_failed`.
 | GET | `/me/notification-preferences` | ✓ | — | `data: Preferences` |
 | PUT | `/me/notification-preferences` | ✓ | any subset of the fields below | `data: Preferences` |
 
+## Endpoints (Phase 2 — content)
+
+| Method | Path | Auth | Query / body | Response |
+|---|---|---|---|---|
+| GET | `/feed/for-you` | ✓ | `cursor?` | `data: (ArticleCard\|EventCard)[]`, `meta.next_cursor`, `meta.fallback` (`"trending"` when the reader follows no industries) |
+| GET | `/feed/trending` | — | — | Up to 10 `ArticleCard`, order = rank. Score = views + 3 × saves in the last 48h, topped up with the most-read articles of the last 14 days |
+| GET | `/sections/{slug}/articles` | — | `industry?` (`a,b` or `industry[]=`), `cursor?` | `ArticleCard[]`, newest first. 404 for `events` |
+| GET | `/industries/{slug}/feed` | — | `cursor?` | Articles newest first; first page has up to 3 upcoming events woven in at positions 2, 5, 8. `meta.industry` |
+| GET | `/articles/{slug}` | — | — | `Article` (sanitized `body`, author, attachment, `share_url`) |
+| GET | `/articles/{slug}/related` | — | — | Up to 6 `ArticleCard`, most shared industries first |
+| POST | `/articles/{id}/view` | — | — | 204. Counted once per viewer per 30 min (session, or hashed IP+UA per day); 60/min per IP |
+| GET | `/events` | — | `range?=upcoming\|week\|month`, `industry?`, `city?`, `online?`, `cursor?` | `EventCard[]` by start time. `upcoming` includes running events; `week`/`month` are Nicosia calendar periods. `meta.digest` = published Weekly/Monthly Events digest for the period (`{slug,title,intro}` or null) |
+| GET | `/events/calendar` | — | `month?=YYYY-MM` | `{ month, timezone, days: [{ date, events: EventCard[] }] }`. Multi-day events appear on each day (max 14) |
+| GET | `/events/{slug}` | — | — | `Event` (+ `registration_url`, `online_url`, `address`, `ics_url`, `share_url`) |
+| GET | `/events/{slug}/ics` | — | — | `text/calendar` file (UTC times, RFC 5545 folding) |
+| GET | `/digests` | — | `kind?=news\|events`, `cadence?=daily\|weekly\|monthly`, `cursor?` | `DigestCard[]` (published only, newest period first, `items_count`, `cover_url`) |
+| GET | `/digests/latest` | — | `kind`, `cadence` (required) | `Digest`. 404 if none published |
+| GET | `/digests/{slug}` | — | — | `Digest` with `items: [{ id, position, editor_note, is_highlighted, item: ArticleCard\|EventCard }]` in editor order. Unpublished/unreadable items are dropped; `is_highlighted` = item in an industry the reader follows |
+| GET | `/search` | — | `q` (2–100 chars) | `{ articles: ArticleCard[≤10], events: EventCard[≤5] (upcoming first), industries: Industry[] }`. 30/min |
+| GET | `/bookmarks` | ✓ | `type?=article\|event`, `cursor?` | Cards + `bookmarked_at`, newest first; unpublished items hidden |
+| POST | `/bookmarks` | ✓ | `{ type, id }` | 201 (new) or 200 (already saved). 404 if not published |
+| DELETE | `/bookmarks` | ✓ | `{ type, id }` | 204 (idempotent) |
+
+### Content resources
+
+```jsonc
+// ArticleCard
+{ "type": "article", "id": 1, "slug": "…", "title": "…", "excerpt": "…",
+  "section": { "slug": "news", "name": "Ειδήσεις" },
+  "primary_industry": { "slug": "fintech", "name": "FinTech", "color": "#00A5E6" },
+  "industries": [{ "slug": "fintech", "name": "FinTech", "color": "#00A5E6", "is_primary": true }],
+  "author": { "id": 1, "name": "Elena Vassiliou", "is_verified": true },
+  "is_original": true, "is_featured": true, "published_at": "…", "reading_time_minutes": 4, "reads": 12400,
+  "image": { "thumb": "…320²", "card": "…800×500", "hero": "…≤1600" },   // WebP; null when no image
+  "locale": "el", "is_fallback": false, "is_bookmarked": false }
+
+// EventCard
+{ "type": "event", "id": 4, "slug": "…", "title": "…", "excerpt": "…", "starts_at": "…", "ends_at": "…",
+  "timezone": "Asia/Nicosia", "is_online": false, "city": "Larnaca", "location_name": "…", "price_info": "Δωρεάν",
+  "primary_industry": {…}, "industries": […], "is_featured": true, "image": {…}, "locale": "el", "is_fallback": false, "is_bookmarked": true }
+```
+
+### Search behaviour
+MariaDB FULLTEXT over a `search_text` column holding both languages (`utf8mb4_unicode_ci`): accent- and case-insensitive
+(`κυπρος` finds `Κύπρος`), every word must match, prefixes match (`καινοτ` → `καινοτομία`). Words under 3 characters
+(e.g. `AI`, below MariaDB's minimum token size) are matched as whole words. Industries match by name in either language,
+slug words or acronym (`AI` → Artificial Intelligence).
+
 ### Deviations from the brief
 
 - **`POST /me/export`** instead of `GET`: it starts a background job, and a GET with side effects can be triggered by prefetching and link scanners.
 - **Avatar** has its own `POST /me/avatar`, because PHP does not parse multipart bodies on `PATCH /me`.
+- **No Laravel Scout.** Its database engine only does `LIKE` or plain FULLTEXT and can't handle prefixes or short words like "AI".
+  `SearchService` queries MariaDB directly. Scout becomes worthwhile only with a dedicated engine (e.g. Meilisearch) later.
+- **Industry filters use slugs** (`industry=fintech,ai`), so filters are readable in shareable URLs.
 
 ## Resources
 

@@ -1,0 +1,4108 @@
+{
+    "openapi": "3.1.0",
+    "info": {
+        "title": "Disrupt Cyprus API",
+        "version": "1.0.0",
+        "description": "Disrupt Cyprus API v1. Conventions, authentication flows and deviations are documented in docs/API.md. Send `Accept-Language: el|en`. Errors use `{message, code, errors?}`."
+    },
+    "servers": [
+        {
+            "url": "http://localhost:8080/api"
+        }
+    ],
+    "paths": {
+        "/v1/articles/{slug}": {
+            "get": {
+                "operationId": "articles.show",
+                "summary": "Opening an article shows it even outside the reader's content languages (falls back to any available)",
+                "tags": [
+                    "Article"
+                ],
+                "parameters": [
+                    {
+                        "name": "slug",
+                        "in": "path",
+                        "required": true,
+                        "schema": {
+                            "type": "string"
+                        }
+                    }
+                ],
+                "responses": {
+                    "200": {
+                        "description": "`ArticleResource`",
+                        "content": {
+                            "application/json": {
+                                "schema": {
+                                    "type": "object",
+                                    "properties": {
+                                        "data": {
+                                            "$ref": "#/components/schemas/ArticleResource"
+                                        }
+                                    },
+                                    "required": [
+                                        "data"
+                                    ]
+                                }
+                            }
+                        }
+                    }
+                }
+            }
+        },
+        "/v1/articles/{slug}/related": {
+            "get": {
+                "operationId": "articles.related",
+                "tags": [
+                    "Article"
+                ],
+                "parameters": [
+                    {
+                        "name": "slug",
+                        "in": "path",
+                        "required": true,
+                        "schema": {
+                            "type": "string"
+                        }
+                    }
+                ],
+                "responses": {
+                    "200": {
+                        "description": "Array of `ArticleCardResource`",
+                        "content": {
+                            "application/json": {
+                                "schema": {
+                                    "type": "object",
+                                    "properties": {
+                                        "data": {
+                                            "type": "array",
+                                            "items": {
+                                                "$ref": "#/components/schemas/ArticleCardResource"
+                                            }
+                                        }
+                                    },
+                                    "required": [
+                                        "data"
+                                    ]
+                                }
+                            }
+                        }
+                    }
+                }
+            }
+        },
+        "/v1/articles/{id}/view": {
+            "post": {
+                "operationId": "articles.view",
+                "tags": [
+                    "Article"
+                ],
+                "parameters": [
+                    {
+                        "name": "id",
+                        "in": "path",
+                        "required": true,
+                        "schema": {
+                            "type": "integer"
+                        }
+                    }
+                ],
+                "responses": {
+                    "204": {
+                        "description": "No content"
+                    }
+                }
+            }
+        },
+        "/v1/me/avatar": {
+            "post": {
+                "operationId": "me.avatar.store",
+                "tags": [
+                    "Avatar"
+                ],
+                "requestBody": {
+                    "required": true,
+                    "content": {
+                        "multipart/form-data": {
+                            "schema": {
+                                "$ref": "#/components/schemas/UploadAvatarRequest"
+                            }
+                        }
+                    }
+                },
+                "responses": {
+                    "200": {
+                        "description": "`UserResource`",
+                        "content": {
+                            "application/json": {
+                                "schema": {
+                                    "type": "object",
+                                    "properties": {
+                                        "data": {
+                                            "$ref": "#/components/schemas/UserResource"
+                                        }
+                                    },
+                                    "required": [
+                                        "data"
+                                    ]
+                                }
+                            }
+                        }
+                    },
+                    "401": {
+                        "$ref": "#/components/responses/AuthenticationException"
+                    },
+                    "422": {
+                        "$ref": "#/components/responses/ValidationException"
+                    }
+                }
+            },
+            "delete": {
+                "operationId": "me.avatar.destroy",
+                "tags": [
+                    "Avatar"
+                ],
+                "responses": {
+                    "200": {
+                        "description": "`UserResource`",
+                        "content": {
+                            "application/json": {
+                                "schema": {
+                                    "type": "object",
+                                    "properties": {
+                                        "data": {
+                                            "$ref": "#/components/schemas/UserResource"
+                                        }
+                                    },
+                                    "required": [
+                                        "data"
+                                    ]
+                                }
+                            }
+                        }
+                    },
+                    "401": {
+                        "$ref": "#/components/responses/AuthenticationException"
+                    }
+                }
+            }
+        },
+        "/v1/bookmarks": {
+            "get": {
+                "operationId": "bookmarks.index",
+                "summary": "Saved items, newest first. Items unpublished since saving are hidden",
+                "tags": [
+                    "Bookmark"
+                ],
+                "parameters": [
+                    {
+                        "name": "cursor",
+                        "in": "query",
+                        "schema": {
+                            "type": [
+                                "string",
+                                "null"
+                            ],
+                            "maxLength": 512
+                        }
+                    },
+                    {
+                        "name": "type",
+                        "in": "query",
+                        "schema": {
+                            "type": "string",
+                            "enum": [
+                                "article",
+                                "event"
+                            ]
+                        }
+                    }
+                ],
+                "responses": {
+                    "200": {
+                        "description": "",
+                        "content": {
+                            "application/json": {
+                                "schema": {
+                                    "type": "string"
+                                }
+                            }
+                        }
+                    },
+                    "401": {
+                        "$ref": "#/components/responses/AuthenticationException"
+                    },
+                    "422": {
+                        "$ref": "#/components/responses/ValidationException"
+                    }
+                }
+            },
+            "post": {
+                "operationId": "bookmarks.store",
+                "tags": [
+                    "Bookmark"
+                ],
+                "requestBody": {
+                    "required": true,
+                    "content": {
+                        "application/json": {
+                            "schema": {
+                                "$ref": "#/components/schemas/BookmarkRequest"
+                            }
+                        }
+                    }
+                },
+                "responses": {
+                    "200": {
+                        "description": "",
+                        "content": {
+                            "application/json": {
+                                "schema": {
+                                    "type": "string"
+                                }
+                            }
+                        }
+                    },
+                    "401": {
+                        "$ref": "#/components/responses/AuthenticationException"
+                    },
+                    "422": {
+                        "$ref": "#/components/responses/ValidationException"
+                    }
+                }
+            },
+            "delete": {
+                "operationId": "bookmarks.destroy",
+                "tags": [
+                    "Bookmark"
+                ],
+                "parameters": [
+                    {
+                        "name": "type",
+                        "in": "query",
+                        "required": true,
+                        "schema": {
+                            "type": "string",
+                            "enum": [
+                                "article",
+                                "event"
+                            ]
+                        }
+                    },
+                    {
+                        "name": "id",
+                        "in": "query",
+                        "required": true,
+                        "schema": {
+                            "type": "integer",
+                            "minimum": 1
+                        }
+                    }
+                ],
+                "responses": {
+                    "204": {
+                        "description": "No content"
+                    },
+                    "401": {
+                        "$ref": "#/components/responses/AuthenticationException"
+                    },
+                    "422": {
+                        "$ref": "#/components/responses/ValidationException"
+                    }
+                }
+            }
+        },
+        "/v1/me/export/{user}/{file}": {
+            "get": {
+                "operationId": "me.export.download",
+                "summary": "Reached through a temporary signed URL, so it does not require a session",
+                "tags": [
+                    "DataExport"
+                ],
+                "parameters": [
+                    {
+                        "name": "user",
+                        "in": "path",
+                        "required": true,
+                        "description": "The user ID",
+                        "schema": {
+                            "type": "integer"
+                        }
+                    },
+                    {
+                        "name": "file",
+                        "in": "path",
+                        "required": true,
+                        "schema": {
+                            "type": "string"
+                        }
+                    }
+                ],
+                "responses": {
+                    "200": {
+                        "description": "",
+                        "content": {
+                            "application/json": {
+                                "schema": {
+                                    "type": "string"
+                                }
+                            }
+                        },
+                        "headers": {
+                            "Transfer-Encoding": {
+                                "required": true,
+                                "schema": {
+                                    "type": "string",
+                                    "enum": [
+                                        "chunked"
+                                    ]
+                                }
+                            }
+                        }
+                    },
+                    "404": {
+                        "$ref": "#/components/responses/ModelNotFoundException"
+                    }
+                }
+            }
+        },
+        "/v1/me/export": {
+            "post": {
+                "operationId": "me.export.store",
+                "summary": "Queues the export; the user gets a mail + in-app notification with a signed download link",
+                "tags": [
+                    "DataExport"
+                ],
+                "responses": {
+                    "202": {
+                        "description": "",
+                        "content": {
+                            "application/json": {
+                                "schema": {
+                                    "type": "object",
+                                    "properties": {
+                                        "message": {
+                                            "type": "string",
+                                            "const": "\u0395\u03c4\u03bf\u03b9\u03bc\u03ac\u03b6\u03bf\u03c5\u03bc\u03b5 \u03c4\u03bf \u03b1\u03c1\u03c7\u03b5\u03af\u03bf \u03bc\u03b5 \u03c4\u03b1 \u03b4\u03b5\u03b4\u03bf\u03bc\u03ad\u03bd\u03b1 \u03c3\u03bf\u03c5. \u03a3\u03cd\u03bd\u03c4\u03bf\u03bc\u03b1 \u03b8\u03b1 \u03bb\u03ac\u03b2\u03b5\u03b9\u03c2 \u03c3\u03cd\u03bd\u03b4\u03b5\u03c3\u03bc\u03bf \u03bb\u03ae\u03c8\u03b7\u03c2."
+                                        }
+                                    },
+                                    "required": [
+                                        "message"
+                                    ]
+                                }
+                            }
+                        }
+                    },
+                    "401": {
+                        "$ref": "#/components/responses/AuthenticationException"
+                    }
+                }
+            }
+        },
+        "/v1/digests": {
+            "get": {
+                "operationId": "digests.index",
+                "tags": [
+                    "Digest"
+                ],
+                "parameters": [
+                    {
+                        "name": "cursor",
+                        "in": "query",
+                        "schema": {
+                            "type": [
+                                "string",
+                                "null"
+                            ],
+                            "maxLength": 512
+                        }
+                    },
+                    {
+                        "name": "kind",
+                        "in": "query",
+                        "schema": {
+                            "$ref": "#/components/schemas/DigestKind"
+                        }
+                    },
+                    {
+                        "name": "cadence",
+                        "in": "query",
+                        "schema": {
+                            "$ref": "#/components/schemas/DigestCadence"
+                        }
+                    }
+                ],
+                "responses": {
+                    "200": {
+                        "description": "Paginated set of `DigestCardResource`",
+                        "content": {
+                            "application/json": {
+                                "schema": {
+                                    "type": "object",
+                                    "properties": {
+                                        "data": {
+                                            "type": "array",
+                                            "items": {
+                                                "allOf": [
+                                                    {
+                                                        "$ref": "#/components/schemas/DigestCardResource"
+                                                    },
+                                                    {
+                                                        "type": "object",
+                                                        "required": [
+                                                            "cover_url"
+                                                        ]
+                                                    }
+                                                ]
+                                            }
+                                        },
+                                        "links": {
+                                            "type": "object",
+                                            "properties": {
+                                                "first": {
+                                                    "type": [
+                                                        "string",
+                                                        "null"
+                                                    ]
+                                                },
+                                                "last": {
+                                                    "type": [
+                                                        "string",
+                                                        "null"
+                                                    ]
+                                                },
+                                                "prev": {
+                                                    "type": [
+                                                        "string",
+                                                        "null"
+                                                    ]
+                                                },
+                                                "next": {
+                                                    "type": [
+                                                        "string",
+                                                        "null"
+                                                    ]
+                                                }
+                                            },
+                                            "required": [
+                                                "first",
+                                                "last",
+                                                "prev",
+                                                "next"
+                                            ]
+                                        },
+                                        "meta": {
+                                            "type": "object",
+                                            "properties": {
+                                                "path": {
+                                                    "type": [
+                                                        "string",
+                                                        "null"
+                                                    ],
+                                                    "description": "Base path for paginator generated URLs."
+                                                },
+                                                "per_page": {
+                                                    "type": "integer",
+                                                    "description": "Number of items shown per page.",
+                                                    "minimum": 0
+                                                },
+                                                "next_cursor": {
+                                                    "type": [
+                                                        "string",
+                                                        "null"
+                                                    ],
+                                                    "description": "The \"cursor\" that points to the next set of items."
+                                                },
+                                                "prev_cursor": {
+                                                    "type": [
+                                                        "string",
+                                                        "null"
+                                                    ],
+                                                    "description": "The \"cursor\" that points to the previous set of items."
+                                                }
+                                            },
+                                            "required": [
+                                                "path",
+                                                "per_page",
+                                                "next_cursor",
+                                                "prev_cursor"
+                                            ]
+                                        }
+                                    },
+                                    "required": [
+                                        "data",
+                                        "links",
+                                        "meta"
+                                    ]
+                                }
+                            }
+                        }
+                    },
+                    "422": {
+                        "$ref": "#/components/responses/ValidationException"
+                    }
+                }
+            }
+        },
+        "/v1/digests/latest": {
+            "get": {
+                "operationId": "digests.latest",
+                "tags": [
+                    "Digest"
+                ],
+                "parameters": [
+                    {
+                        "name": "cursor",
+                        "in": "query",
+                        "schema": {
+                            "type": [
+                                "string",
+                                "null"
+                            ],
+                            "maxLength": 512
+                        }
+                    },
+                    {
+                        "name": "kind",
+                        "in": "query",
+                        "required": true,
+                        "schema": {
+                            "$ref": "#/components/schemas/DigestKind"
+                        }
+                    },
+                    {
+                        "name": "cadence",
+                        "in": "query",
+                        "required": true,
+                        "schema": {
+                            "$ref": "#/components/schemas/DigestCadence"
+                        }
+                    }
+                ],
+                "responses": {
+                    "200": {
+                        "description": "`DigestResource`",
+                        "content": {
+                            "application/json": {
+                                "schema": {
+                                    "type": "object",
+                                    "properties": {
+                                        "data": {
+                                            "allOf": [
+                                                {
+                                                    "$ref": "#/components/schemas/DigestResource"
+                                                },
+                                                {
+                                                    "type": "object",
+                                                    "required": [
+                                                        "cover_url"
+                                                    ]
+                                                }
+                                            ]
+                                        }
+                                    },
+                                    "required": [
+                                        "data"
+                                    ]
+                                }
+                            }
+                        }
+                    },
+                    "422": {
+                        "$ref": "#/components/responses/ValidationException"
+                    }
+                }
+            }
+        },
+        "/v1/digests/{slug}": {
+            "get": {
+                "operationId": "digests.show",
+                "tags": [
+                    "Digest"
+                ],
+                "parameters": [
+                    {
+                        "name": "slug",
+                        "in": "path",
+                        "required": true,
+                        "schema": {
+                            "type": "string"
+                        }
+                    }
+                ],
+                "responses": {
+                    "200": {
+                        "description": "`DigestResource`",
+                        "content": {
+                            "application/json": {
+                                "schema": {
+                                    "type": "object",
+                                    "properties": {
+                                        "data": {
+                                            "allOf": [
+                                                {
+                                                    "$ref": "#/components/schemas/DigestResource"
+                                                },
+                                                {
+                                                    "type": "object",
+                                                    "required": [
+                                                        "cover_url"
+                                                    ]
+                                                }
+                                            ]
+                                        }
+                                    },
+                                    "required": [
+                                        "data"
+                                    ]
+                                }
+                            }
+                        }
+                    }
+                }
+            }
+        },
+        "/v1/auth/email/verification-notification": {
+            "post": {
+                "operationId": "auth.verification.send",
+                "tags": [
+                    "EmailVerification"
+                ],
+                "responses": {
+                    "202": {
+                        "description": "",
+                        "content": {
+                            "application/json": {
+                                "schema": {
+                                    "type": "object",
+                                    "properties": {
+                                        "message": {
+                                            "type": "string",
+                                            "const": "\u0391\u03bd \u03c4\u03bf email \u03c3\u03bf\u03c5 \u03b4\u03b5\u03bd \u03ad\u03c7\u03b5\u03b9 \u03b5\u03c0\u03b1\u03bb\u03b7\u03b8\u03b5\u03c5\u03c4\u03b5\u03af \u03b1\u03ba\u03cc\u03bc\u03b7, \u03c3\u03bf\u03c5 \u03c3\u03c4\u03b5\u03af\u03bb\u03b1\u03bc\u03b5 \u03bd\u03ad\u03bf \u03c3\u03cd\u03bd\u03b4\u03b5\u03c3\u03bc\u03bf \u03b5\u03c0\u03b1\u03bb\u03ae\u03b8\u03b5\u03c5\u03c3\u03b7\u03c2."
+                                        }
+                                    },
+                                    "required": [
+                                        "message"
+                                    ]
+                                }
+                            }
+                        }
+                    },
+                    "401": {
+                        "$ref": "#/components/responses/AuthenticationException"
+                    }
+                }
+            }
+        },
+        "/v1/auth/email/verify/{id}/{hash}": {
+            "get": {
+                "operationId": "verification.verify",
+                "summary": "Target of the signed link in the verification mail; redirects into the PWA",
+                "tags": [
+                    "EmailVerification"
+                ],
+                "parameters": [
+                    {
+                        "name": "id",
+                        "in": "path",
+                        "required": true,
+                        "schema": {
+                            "type": "integer"
+                        }
+                    },
+                    {
+                        "name": "hash",
+                        "in": "path",
+                        "required": true,
+                        "schema": {
+                            "type": "string"
+                        }
+                    }
+                ],
+                "responses": {
+                    "200": {
+                        "description": "",
+                        "content": {
+                            "application/json": {
+                                "schema": {
+                                    "type": "object"
+                                }
+                            }
+                        }
+                    },
+                    "403": {
+                        "description": "An error",
+                        "content": {
+                            "application/json": {
+                                "schema": {
+                                    "type": "object",
+                                    "properties": {
+                                        "message": {
+                                            "type": "string",
+                                            "description": "Error overview.",
+                                            "examples": [
+                                                ""
+                                            ]
+                                        }
+                                    },
+                                    "required": [
+                                        "message"
+                                    ]
+                                }
+                            }
+                        }
+                    },
+                    "404": {
+                        "$ref": "#/components/responses/ModelNotFoundException"
+                    }
+                }
+            }
+        },
+        "/v1/events": {
+            "get": {
+                "operationId": "events.index",
+                "tags": [
+                    "Event"
+                ],
+                "parameters": [
+                    {
+                        "name": "cursor",
+                        "in": "query",
+                        "schema": {
+                            "type": [
+                                "string",
+                                "null"
+                            ],
+                            "maxLength": 512
+                        }
+                    },
+                    {
+                        "name": "industry[]",
+                        "in": "query",
+                        "schema": {
+                            "type": "array",
+                            "items": {
+                                "type": "string"
+                            }
+                        }
+                    },
+                    {
+                        "name": "range",
+                        "in": "query",
+                        "schema": {
+                            "$ref": "#/components/schemas/EventRange"
+                        }
+                    },
+                    {
+                        "name": "city",
+                        "in": "query",
+                        "schema": {
+                            "type": "string",
+                            "maxLength": 96
+                        }
+                    },
+                    {
+                        "name": "online",
+                        "in": "query",
+                        "schema": {
+                            "type": "boolean"
+                        }
+                    }
+                ],
+                "responses": {
+                    "200": {
+                        "description": "Paginated set of `EventCardResource`",
+                        "content": {
+                            "application/json": {
+                                "schema": {
+                                    "type": "object",
+                                    "properties": {
+                                        "data": {
+                                            "type": "array",
+                                            "items": {
+                                                "$ref": "#/components/schemas/EventCardResource"
+                                            }
+                                        },
+                                        "links": {
+                                            "type": "object",
+                                            "properties": {
+                                                "first": {
+                                                    "type": [
+                                                        "string",
+                                                        "null"
+                                                    ]
+                                                },
+                                                "last": {
+                                                    "type": [
+                                                        "string",
+                                                        "null"
+                                                    ]
+                                                },
+                                                "prev": {
+                                                    "type": [
+                                                        "string",
+                                                        "null"
+                                                    ]
+                                                },
+                                                "next": {
+                                                    "type": [
+                                                        "string",
+                                                        "null"
+                                                    ]
+                                                }
+                                            },
+                                            "required": [
+                                                "first",
+                                                "last",
+                                                "prev",
+                                                "next"
+                                            ]
+                                        },
+                                        "meta": {
+                                            "type": "object",
+                                            "properties": {
+                                                "path": {
+                                                    "type": [
+                                                        "string",
+                                                        "null"
+                                                    ],
+                                                    "description": "Base path for paginator generated URLs."
+                                                },
+                                                "per_page": {
+                                                    "type": "integer",
+                                                    "description": "Number of items shown per page.",
+                                                    "minimum": 0
+                                                },
+                                                "next_cursor": {
+                                                    "type": [
+                                                        "string",
+                                                        "null"
+                                                    ],
+                                                    "description": "The \"cursor\" that points to the next set of items."
+                                                },
+                                                "prev_cursor": {
+                                                    "type": [
+                                                        "string",
+                                                        "null"
+                                                    ],
+                                                    "description": "The \"cursor\" that points to the previous set of items."
+                                                },
+                                                "digest": {
+                                                    "type": [
+                                                        "object",
+                                                        "null"
+                                                    ],
+                                                    "properties": {
+                                                        "slug": {
+                                                            "type": "string"
+                                                        },
+                                                        "title": {
+                                                            "type": "array",
+                                                            "items": {}
+                                                        },
+                                                        "intro": {
+                                                            "type": [
+                                                                "array",
+                                                                "null"
+                                                            ],
+                                                            "items": {}
+                                                        }
+                                                    },
+                                                    "required": [
+                                                        "slug",
+                                                        "title",
+                                                        "intro"
+                                                    ]
+                                                }
+                                            },
+                                            "required": [
+                                                "path",
+                                                "per_page",
+                                                "next_cursor",
+                                                "prev_cursor",
+                                                "digest"
+                                            ]
+                                        }
+                                    },
+                                    "required": [
+                                        "data",
+                                        "links",
+                                        "meta"
+                                    ]
+                                }
+                            }
+                        }
+                    },
+                    "422": {
+                        "$ref": "#/components/responses/ValidationException"
+                    }
+                }
+            }
+        },
+        "/v1/events/calendar": {
+            "get": {
+                "operationId": "events.calendar",
+                "summary": "Month grid: every day an event touches (multi-day events appear on each day, capped)",
+                "tags": [
+                    "Event"
+                ],
+                "parameters": [
+                    {
+                        "name": "month",
+                        "in": "query",
+                        "schema": {
+                            "type": "string"
+                        }
+                    }
+                ],
+                "responses": {
+                    "200": {
+                        "description": "",
+                        "content": {
+                            "application/json": {
+                                "schema": {
+                                    "type": "object",
+                                    "properties": {
+                                        "data": {
+                                            "type": "object",
+                                            "properties": {
+                                                "month": {
+                                                    "type": "string"
+                                                },
+                                                "timezone": {
+                                                    "type": "string"
+                                                },
+                                                "days": {
+                                                    "type": "array",
+                                                    "items": {}
+                                                }
+                                            },
+                                            "required": [
+                                                "month",
+                                                "timezone",
+                                                "days"
+                                            ]
+                                        }
+                                    },
+                                    "required": [
+                                        "data"
+                                    ]
+                                }
+                            }
+                        }
+                    },
+                    "422": {
+                        "$ref": "#/components/responses/ValidationException"
+                    }
+                }
+            }
+        },
+        "/v1/events/{slug}": {
+            "get": {
+                "operationId": "events.show",
+                "tags": [
+                    "Event"
+                ],
+                "parameters": [
+                    {
+                        "name": "slug",
+                        "in": "path",
+                        "required": true,
+                        "schema": {
+                            "type": "string"
+                        }
+                    }
+                ],
+                "responses": {
+                    "200": {
+                        "description": "`EventResource`",
+                        "content": {
+                            "application/json": {
+                                "schema": {
+                                    "type": "object",
+                                    "properties": {
+                                        "data": {
+                                            "$ref": "#/components/schemas/EventResource"
+                                        }
+                                    },
+                                    "required": [
+                                        "data"
+                                    ]
+                                }
+                            }
+                        }
+                    }
+                }
+            }
+        },
+        "/v1/events/{slug}/ics": {
+            "get": {
+                "operationId": "events.ics",
+                "tags": [
+                    "Event"
+                ],
+                "parameters": [
+                    {
+                        "name": "slug",
+                        "in": "path",
+                        "required": true,
+                        "schema": {
+                            "type": "string"
+                        }
+                    }
+                ],
+                "responses": {
+                    "200": {
+                        "description": "",
+                        "content": {
+                            "text/calendar; charset=utf-8": {
+                                "schema": {
+                                    "type": "string"
+                                }
+                            }
+                        },
+                        "headers": {
+                            "Content-Disposition": {
+                                "schema": {
+                                    "type": "string"
+                                }
+                            }
+                        }
+                    }
+                }
+            }
+        },
+        "/v1/feed/trending": {
+            "get": {
+                "operationId": "feed.trending",
+                "summary": "Ranked list for the \"Trending today\" carousel; order = rank",
+                "tags": [
+                    "Feed"
+                ],
+                "responses": {
+                    "200": {
+                        "description": "",
+                        "content": {
+                            "application/json": {
+                                "schema": {
+                                    "type": "object",
+                                    "properties": {
+                                        "data": {
+                                            "type": "array",
+                                            "items": {}
+                                        },
+                                        "meta": {
+                                            "type": "object",
+                                            "properties": {
+                                                "per_page": {
+                                                    "anyOf": [
+                                                        {
+                                                            "type": "integer",
+                                                            "const": 10
+                                                        },
+                                                        {}
+                                                    ]
+                                                },
+                                                "next_cursor": {},
+                                                "prev_cursor": {}
+                                            },
+                                            "required": [
+                                                "per_page",
+                                                "next_cursor",
+                                                "prev_cursor"
+                                            ],
+                                            "additionalProperties": {}
+                                        }
+                                    },
+                                    "required": [
+                                        "data",
+                                        "meta"
+                                    ]
+                                }
+                            }
+                        }
+                    }
+                }
+            }
+        },
+        "/v1/feed/for-you": {
+            "get": {
+                "operationId": "feed.for-you",
+                "tags": [
+                    "Feed"
+                ],
+                "parameters": [
+                    {
+                        "name": "cursor",
+                        "in": "query",
+                        "schema": {
+                            "type": [
+                                "string",
+                                "null"
+                            ],
+                            "maxLength": 512
+                        }
+                    }
+                ],
+                "responses": {
+                    "200": {
+                        "description": "",
+                        "content": {
+                            "application/json": {
+                                "schema": {
+                                    "type": "object",
+                                    "properties": {
+                                        "data": {
+                                            "type": "array",
+                                            "items": {}
+                                        },
+                                        "meta": {
+                                            "type": "object",
+                                            "properties": {
+                                                "per_page": {
+                                                    "type": "integer",
+                                                    "const": 20
+                                                },
+                                                "next_cursor": {
+                                                    "type": [
+                                                        "string",
+                                                        "null"
+                                                    ]
+                                                },
+                                                "prev_cursor": {
+                                                    "type": "null"
+                                                },
+                                                "fallback": {
+                                                    "type": [
+                                                        "string",
+                                                        "null"
+                                                    ],
+                                                    "enum": [
+                                                        "trending",
+                                                        null
+                                                    ]
+                                                }
+                                            },
+                                            "required": [
+                                                "per_page",
+                                                "next_cursor",
+                                                "prev_cursor",
+                                                "fallback"
+                                            ]
+                                        }
+                                    },
+                                    "required": [
+                                        "data",
+                                        "meta"
+                                    ]
+                                }
+                            }
+                        }
+                    },
+                    "401": {
+                        "$ref": "#/components/responses/AuthenticationException"
+                    },
+                    "422": {
+                        "$ref": "#/components/responses/ValidationException"
+                    }
+                }
+            }
+        },
+        "/v1/me/industries": {
+            "get": {
+                "operationId": "me.industries.show",
+                "tags": [
+                    "Industries"
+                ],
+                "responses": {
+                    "200": {
+                        "description": "",
+                        "content": {
+                            "application/json": {
+                                "schema": {
+                                    "type": "object",
+                                    "properties": {
+                                        "data": {
+                                            "type": "object",
+                                            "properties": {
+                                                "industry_ids": {
+                                                    "type": "string"
+                                                },
+                                                "notify_ids": {
+                                                    "type": "string"
+                                                }
+                                            },
+                                            "required": [
+                                                "industry_ids",
+                                                "notify_ids"
+                                            ]
+                                        }
+                                    },
+                                    "required": [
+                                        "data"
+                                    ]
+                                }
+                            }
+                        }
+                    },
+                    "401": {
+                        "$ref": "#/components/responses/AuthenticationException"
+                    }
+                }
+            },
+            "put": {
+                "operationId": "me.industries.update",
+                "tags": [
+                    "Industries"
+                ],
+                "requestBody": {
+                    "required": true,
+                    "content": {
+                        "application/json": {
+                            "schema": {
+                                "$ref": "#/components/schemas/UpdateIndustriesRequest"
+                            }
+                        }
+                    }
+                },
+                "responses": {
+                    "200": {
+                        "description": "",
+                        "content": {
+                            "application/json": {
+                                "schema": {
+                                    "type": "object",
+                                    "properties": {
+                                        "data": {
+                                            "type": "object",
+                                            "properties": {
+                                                "industry_ids": {
+                                                    "type": "string"
+                                                },
+                                                "notify_ids": {
+                                                    "type": "string"
+                                                }
+                                            },
+                                            "required": [
+                                                "industry_ids",
+                                                "notify_ids"
+                                            ]
+                                        }
+                                    },
+                                    "required": [
+                                        "data"
+                                    ]
+                                }
+                            }
+                        }
+                    },
+                    "401": {
+                        "$ref": "#/components/responses/AuthenticationException"
+                    },
+                    "422": {
+                        "$ref": "#/components/responses/ValidationException"
+                    }
+                }
+            }
+        },
+        "/v1/industries": {
+            "get": {
+                "operationId": "industries.index",
+                "tags": [
+                    "Industry"
+                ],
+                "responses": {
+                    "200": {
+                        "description": "Array of `IndustryResource`",
+                        "content": {
+                            "application/json": {
+                                "schema": {
+                                    "type": "object",
+                                    "properties": {
+                                        "data": {
+                                            "type": "array",
+                                            "items": {
+                                                "$ref": "#/components/schemas/IndustryResource"
+                                            }
+                                        }
+                                    },
+                                    "required": [
+                                        "data"
+                                    ]
+                                }
+                            }
+                        }
+                    }
+                }
+            }
+        },
+        "/v1/industries/{slug}/feed": {
+            "get": {
+                "operationId": "industries.feed",
+                "tags": [
+                    "IndustryFeed"
+                ],
+                "parameters": [
+                    {
+                        "name": "slug",
+                        "in": "path",
+                        "required": true,
+                        "schema": {
+                            "type": "string"
+                        }
+                    },
+                    {
+                        "name": "cursor",
+                        "in": "query",
+                        "schema": {
+                            "type": [
+                                "string",
+                                "null"
+                            ],
+                            "maxLength": 512
+                        }
+                    }
+                ],
+                "responses": {
+                    "200": {
+                        "description": "",
+                        "content": {
+                            "application/json": {
+                                "schema": {
+                                    "type": "object",
+                                    "properties": {
+                                        "data": {
+                                            "type": "array",
+                                            "items": {}
+                                        },
+                                        "meta": {
+                                            "type": "object",
+                                            "properties": {
+                                                "per_page": {
+                                                    "type": "integer",
+                                                    "const": 20
+                                                },
+                                                "next_cursor": {
+                                                    "type": [
+                                                        "string",
+                                                        "null"
+                                                    ]
+                                                },
+                                                "prev_cursor": {
+                                                    "type": "null"
+                                                },
+                                                "industry": {
+                                                    "type": "object",
+                                                    "properties": {
+                                                        "id": {
+                                                            "type": "integer"
+                                                        },
+                                                        "slug": {
+                                                            "type": "string"
+                                                        },
+                                                        "name": {
+                                                            "type": "array",
+                                                            "items": {}
+                                                        },
+                                                        "group": {
+                                                            "type": "string"
+                                                        },
+                                                        "color": {
+                                                            "type": "string"
+                                                        },
+                                                        "image_url": {
+                                                            "type": [
+                                                                "string",
+                                                                "null"
+                                                            ]
+                                                        },
+                                                        "sort_order": {
+                                                            "type": "integer"
+                                                        }
+                                                    },
+                                                    "required": [
+                                                        "id",
+                                                        "slug",
+                                                        "name",
+                                                        "group",
+                                                        "color",
+                                                        "image_url",
+                                                        "sort_order"
+                                                    ]
+                                                }
+                                            },
+                                            "required": [
+                                                "per_page",
+                                                "next_cursor",
+                                                "prev_cursor",
+                                                "industry"
+                                            ]
+                                        }
+                                    },
+                                    "required": [
+                                        "data",
+                                        "meta"
+                                    ]
+                                }
+                            }
+                        }
+                    },
+                    "422": {
+                        "$ref": "#/components/responses/ValidationException"
+                    }
+                }
+            }
+        },
+        "/v1/me/notification-preferences": {
+            "get": {
+                "operationId": "me.preferences.show",
+                "tags": [
+                    "NotificationPreferences"
+                ],
+                "responses": {
+                    "200": {
+                        "description": "`NotificationPreferenceResource`",
+                        "content": {
+                            "application/json": {
+                                "schema": {
+                                    "type": "object",
+                                    "properties": {
+                                        "data": {
+                                            "$ref": "#/components/schemas/NotificationPreferenceResource"
+                                        }
+                                    },
+                                    "required": [
+                                        "data"
+                                    ]
+                                }
+                            }
+                        }
+                    },
+                    "401": {
+                        "$ref": "#/components/responses/AuthenticationException"
+                    }
+                }
+            },
+            "put": {
+                "operationId": "me.preferences.update",
+                "tags": [
+                    "NotificationPreferences"
+                ],
+                "requestBody": {
+                    "content": {
+                        "application/json": {
+                            "schema": {
+                                "$ref": "#/components/schemas/UpdateNotificationPreferencesRequest"
+                            }
+                        }
+                    }
+                },
+                "responses": {
+                    "200": {
+                        "description": "`NotificationPreferenceResource`",
+                        "content": {
+                            "application/json": {
+                                "schema": {
+                                    "type": "object",
+                                    "properties": {
+                                        "data": {
+                                            "$ref": "#/components/schemas/NotificationPreferenceResource"
+                                        }
+                                    },
+                                    "required": [
+                                        "data"
+                                    ]
+                                }
+                            }
+                        }
+                    },
+                    "401": {
+                        "$ref": "#/components/responses/AuthenticationException"
+                    },
+                    "422": {
+                        "$ref": "#/components/responses/ValidationException"
+                    }
+                }
+            }
+        },
+        "/v1/me/password": {
+            "put": {
+                "operationId": "me.password.update",
+                "tags": [
+                    "Password"
+                ],
+                "requestBody": {
+                    "required": true,
+                    "content": {
+                        "application/json": {
+                            "schema": {
+                                "$ref": "#/components/schemas/UpdatePasswordRequest"
+                            }
+                        }
+                    }
+                },
+                "responses": {
+                    "200": {
+                        "description": "",
+                        "content": {
+                            "application/json": {
+                                "schema": {
+                                    "type": "object",
+                                    "properties": {
+                                        "message": {
+                                            "type": "string",
+                                            "const": "\u039f \u03ba\u03c9\u03b4\u03b9\u03ba\u03cc\u03c2 \u03c0\u03c1\u03cc\u03c3\u03b2\u03b1\u03c3\u03b7\u03c2 \u03b5\u03bd\u03b7\u03bc\u03b5\u03c1\u03ce\u03b8\u03b7\u03ba\u03b5."
+                                        }
+                                    },
+                                    "required": [
+                                        "message"
+                                    ]
+                                }
+                            }
+                        }
+                    },
+                    "401": {
+                        "$ref": "#/components/responses/AuthenticationException"
+                    },
+                    "422": {
+                        "$ref": "#/components/responses/ValidationException"
+                    }
+                }
+            }
+        },
+        "/v1/auth/forgot-password": {
+            "post": {
+                "operationId": "auth.password.forgot",
+                "summary": "Always answers the same way so the endpoint cannot be used to discover accounts",
+                "tags": [
+                    "PasswordReset"
+                ],
+                "requestBody": {
+                    "required": true,
+                    "content": {
+                        "application/json": {
+                            "schema": {
+                                "$ref": "#/components/schemas/ForgotPasswordRequest"
+                            }
+                        }
+                    }
+                },
+                "responses": {
+                    "200": {
+                        "description": "",
+                        "content": {
+                            "application/json": {
+                                "schema": {
+                                    "type": "object",
+                                    "properties": {
+                                        "message": {
+                                            "type": "string",
+                                            "const": "\u0391\u03bd \u03c5\u03c0\u03ac\u03c1\u03c7\u03b5\u03b9 \u03bb\u03bf\u03b3\u03b1\u03c1\u03b9\u03b1\u03c3\u03bc\u03cc\u03c2 \u03bc\u03b5 \u03b1\u03c5\u03c4\u03cc \u03c4\u03bf email, \u03c3\u03bf\u03c5 \u03c3\u03c4\u03b5\u03af\u03bb\u03b1\u03bc\u03b5 \u03c3\u03cd\u03bd\u03b4\u03b5\u03c3\u03bc\u03bf \u03b5\u03c0\u03b1\u03bd\u03b1\u03c6\u03bf\u03c1\u03ac\u03c2 \u03ba\u03c9\u03b4\u03b9\u03ba\u03bf\u03cd."
+                                        }
+                                    },
+                                    "required": [
+                                        "message"
+                                    ]
+                                }
+                            }
+                        }
+                    },
+                    "422": {
+                        "$ref": "#/components/responses/ValidationException"
+                    }
+                }
+            }
+        },
+        "/v1/auth/reset-password": {
+            "post": {
+                "operationId": "auth.password.reset",
+                "tags": [
+                    "PasswordReset"
+                ],
+                "requestBody": {
+                    "required": true,
+                    "content": {
+                        "application/json": {
+                            "schema": {
+                                "$ref": "#/components/schemas/ResetPasswordRequest"
+                            }
+                        }
+                    }
+                },
+                "responses": {
+                    "200": {
+                        "description": "",
+                        "content": {
+                            "application/json": {
+                                "schema": {
+                                    "type": "object",
+                                    "properties": {
+                                        "message": {}
+                                    },
+                                    "required": [
+                                        "message"
+                                    ]
+                                }
+                            }
+                        }
+                    },
+                    "422": {
+                        "$ref": "#/components/responses/ValidationException"
+                    }
+                }
+            }
+        },
+        "/v1/me": {
+            "get": {
+                "operationId": "me.show",
+                "tags": [
+                    "Profile"
+                ],
+                "responses": {
+                    "200": {
+                        "description": "`UserResource`",
+                        "content": {
+                            "application/json": {
+                                "schema": {
+                                    "type": "object",
+                                    "properties": {
+                                        "data": {
+                                            "$ref": "#/components/schemas/UserResource"
+                                        }
+                                    },
+                                    "required": [
+                                        "data"
+                                    ]
+                                }
+                            }
+                        }
+                    },
+                    "401": {
+                        "$ref": "#/components/responses/AuthenticationException"
+                    }
+                }
+            },
+            "patch": {
+                "operationId": "me.update",
+                "tags": [
+                    "Profile"
+                ],
+                "requestBody": {
+                    "content": {
+                        "application/json": {
+                            "schema": {
+                                "$ref": "#/components/schemas/UpdateProfileRequest"
+                            }
+                        }
+                    }
+                },
+                "responses": {
+                    "200": {
+                        "description": "`UserResource`",
+                        "content": {
+                            "application/json": {
+                                "schema": {
+                                    "type": "object",
+                                    "properties": {
+                                        "data": {
+                                            "$ref": "#/components/schemas/UserResource"
+                                        }
+                                    },
+                                    "required": [
+                                        "data"
+                                    ]
+                                }
+                            }
+                        }
+                    },
+                    "401": {
+                        "$ref": "#/components/responses/AuthenticationException"
+                    },
+                    "422": {
+                        "$ref": "#/components/responses/ValidationException"
+                    }
+                }
+            },
+            "delete": {
+                "operationId": "me.destroy",
+                "tags": [
+                    "Profile"
+                ],
+                "responses": {
+                    "204": {
+                        "description": "No content"
+                    },
+                    "401": {
+                        "$ref": "#/components/responses/AuthenticationException"
+                    },
+                    "422": {
+                        "$ref": "#/components/responses/ValidationException"
+                    }
+                }
+            }
+        },
+        "/v1/auth/register": {
+            "post": {
+                "operationId": "auth.register",
+                "tags": [
+                    "Register"
+                ],
+                "requestBody": {
+                    "required": true,
+                    "content": {
+                        "application/json": {
+                            "schema": {
+                                "$ref": "#/components/schemas/RegisterRequest"
+                            }
+                        }
+                    }
+                },
+                "responses": {
+                    "201": {
+                        "description": "`UserResource`",
+                        "content": {
+                            "application/json": {
+                                "schema": {
+                                    "type": "object",
+                                    "properties": {
+                                        "data": {
+                                            "$ref": "#/components/schemas/UserResource"
+                                        }
+                                    },
+                                    "required": [
+                                        "data"
+                                    ]
+                                }
+                            }
+                        }
+                    },
+                    "422": {
+                        "$ref": "#/components/responses/ValidationException"
+                    }
+                }
+            }
+        },
+        "/v1/search": {
+            "get": {
+                "operationId": "search",
+                "tags": [
+                    "Search"
+                ],
+                "parameters": [
+                    {
+                        "name": "q",
+                        "in": "query",
+                        "required": true,
+                        "schema": {
+                            "type": "string",
+                            "minLength": 2,
+                            "maxLength": 100
+                        }
+                    }
+                ],
+                "responses": {
+                    "200": {
+                        "description": "",
+                        "content": {
+                            "application/json": {
+                                "schema": {
+                                    "type": "object",
+                                    "properties": {
+                                        "data": {
+                                            "type": "object",
+                                            "properties": {
+                                                "articles": {
+                                                    "type": "array",
+                                                    "items": {
+                                                        "$ref": "#/components/schemas/ArticleCardResource"
+                                                    }
+                                                },
+                                                "events": {
+                                                    "type": "array",
+                                                    "items": {
+                                                        "$ref": "#/components/schemas/EventCardResource"
+                                                    }
+                                                },
+                                                "industries": {
+                                                    "type": "array",
+                                                    "items": {
+                                                        "$ref": "#/components/schemas/IndustryResource"
+                                                    }
+                                                }
+                                            },
+                                            "required": [
+                                                "articles",
+                                                "events",
+                                                "industries"
+                                            ]
+                                        }
+                                    },
+                                    "required": [
+                                        "data"
+                                    ]
+                                }
+                            }
+                        }
+                    },
+                    "422": {
+                        "$ref": "#/components/responses/ValidationException"
+                    }
+                }
+            }
+        },
+        "/v1/sections": {
+            "get": {
+                "operationId": "sections.index",
+                "tags": [
+                    "Section"
+                ],
+                "responses": {
+                    "200": {
+                        "description": "Array of `SectionResource`",
+                        "content": {
+                            "application/json": {
+                                "schema": {
+                                    "type": "object",
+                                    "properties": {
+                                        "data": {
+                                            "type": "array",
+                                            "items": {
+                                                "$ref": "#/components/schemas/SectionResource"
+                                            }
+                                        }
+                                    },
+                                    "required": [
+                                        "data"
+                                    ]
+                                }
+                            }
+                        }
+                    }
+                }
+            }
+        },
+        "/v1/sections/{slug}/articles": {
+            "get": {
+                "operationId": "sections.articles",
+                "tags": [
+                    "SectionArticles"
+                ],
+                "parameters": [
+                    {
+                        "name": "slug",
+                        "in": "path",
+                        "required": true,
+                        "schema": {
+                            "type": "string"
+                        }
+                    },
+                    {
+                        "name": "cursor",
+                        "in": "query",
+                        "schema": {
+                            "type": [
+                                "string",
+                                "null"
+                            ],
+                            "maxLength": 512
+                        }
+                    },
+                    {
+                        "name": "industry[]",
+                        "in": "query",
+                        "schema": {
+                            "type": "array",
+                            "items": {
+                                "type": "string"
+                            }
+                        }
+                    }
+                ],
+                "responses": {
+                    "200": {
+                        "description": "Paginated set of `ArticleCardResource`",
+                        "content": {
+                            "application/json": {
+                                "schema": {
+                                    "type": "object",
+                                    "properties": {
+                                        "data": {
+                                            "type": "array",
+                                            "items": {
+                                                "$ref": "#/components/schemas/ArticleCardResource"
+                                            }
+                                        },
+                                        "links": {
+                                            "type": "object",
+                                            "properties": {
+                                                "first": {
+                                                    "type": [
+                                                        "string",
+                                                        "null"
+                                                    ]
+                                                },
+                                                "last": {
+                                                    "type": [
+                                                        "string",
+                                                        "null"
+                                                    ]
+                                                },
+                                                "prev": {
+                                                    "type": [
+                                                        "string",
+                                                        "null"
+                                                    ]
+                                                },
+                                                "next": {
+                                                    "type": [
+                                                        "string",
+                                                        "null"
+                                                    ]
+                                                }
+                                            },
+                                            "required": [
+                                                "first",
+                                                "last",
+                                                "prev",
+                                                "next"
+                                            ]
+                                        },
+                                        "meta": {
+                                            "type": "object",
+                                            "properties": {
+                                                "path": {
+                                                    "type": [
+                                                        "string",
+                                                        "null"
+                                                    ],
+                                                    "description": "Base path for paginator generated URLs."
+                                                },
+                                                "per_page": {
+                                                    "type": "integer",
+                                                    "description": "Number of items shown per page.",
+                                                    "minimum": 0
+                                                },
+                                                "next_cursor": {
+                                                    "type": [
+                                                        "string",
+                                                        "null"
+                                                    ],
+                                                    "description": "The \"cursor\" that points to the next set of items."
+                                                },
+                                                "prev_cursor": {
+                                                    "type": [
+                                                        "string",
+                                                        "null"
+                                                    ],
+                                                    "description": "The \"cursor\" that points to the previous set of items."
+                                                }
+                                            },
+                                            "required": [
+                                                "path",
+                                                "per_page",
+                                                "next_cursor",
+                                                "prev_cursor"
+                                            ]
+                                        }
+                                    },
+                                    "required": [
+                                        "data",
+                                        "links",
+                                        "meta"
+                                    ]
+                                }
+                            }
+                        }
+                    },
+                    "422": {
+                        "$ref": "#/components/responses/ValidationException"
+                    }
+                }
+            }
+        },
+        "/v1/auth/login": {
+            "post": {
+                "operationId": "auth.login",
+                "tags": [
+                    "Session"
+                ],
+                "requestBody": {
+                    "required": true,
+                    "content": {
+                        "application/json": {
+                            "schema": {
+                                "$ref": "#/components/schemas/LoginRequest"
+                            }
+                        }
+                    }
+                },
+                "responses": {
+                    "200": {
+                        "description": "`UserResource`",
+                        "content": {
+                            "application/json": {
+                                "schema": {
+                                    "type": "object",
+                                    "properties": {
+                                        "data": {
+                                            "$ref": "#/components/schemas/UserResource"
+                                        }
+                                    },
+                                    "required": [
+                                        "data"
+                                    ]
+                                }
+                            }
+                        }
+                    },
+                    "400": {
+                        "description": "An error",
+                        "content": {
+                            "application/json": {
+                                "schema": {
+                                    "type": "object",
+                                    "properties": {
+                                        "message": {
+                                            "type": "string",
+                                            "description": "Error overview.",
+                                            "examples": [
+                                                "\u0397 \u03c3\u03cd\u03bd\u03b4\u03b5\u03c3\u03b7 \u03bc\u03b5 cookie \u03b1\u03c0\u03b1\u03b9\u03c4\u03b5\u03af \u03c3\u03c5\u03bd\u03b5\u03b4\u03c1\u03af\u03b1 \u03c0\u03c1\u03bf\u03b3\u03c1\u03ac\u03bc\u03bc\u03b1\u03c4\u03bf\u03c2 \u03c0\u03b5\u03c1\u03b9\u03ae\u03b3\u03b7\u03c3\u03b7\u03c2. \u039f\u03b9 \u03b5\u03c6\u03b1\u03c1\u03bc\u03bf\u03b3\u03ad\u03c2 API \u03c7\u03c1\u03b7\u03c3\u03b9\u03bc\u03bf\u03c0\u03bf\u03b9\u03bf\u03cd\u03bd \u03c4\u03bf /api/v1/auth/token."
+                                            ]
+                                        }
+                                    },
+                                    "required": [
+                                        "message"
+                                    ]
+                                }
+                            }
+                        }
+                    },
+                    "422": {
+                        "$ref": "#/components/responses/ValidationException"
+                    }
+                }
+            }
+        },
+        "/v1/auth/logout": {
+            "post": {
+                "operationId": "auth.logout",
+                "tags": [
+                    "Session"
+                ],
+                "responses": {
+                    "204": {
+                        "description": "No content"
+                    },
+                    "401": {
+                        "$ref": "#/components/responses/AuthenticationException"
+                    }
+                }
+            }
+        },
+        "/v1/auth/social/{provider}/redirect": {
+            "get": {
+                "operationId": "auth.social.redirect",
+                "tags": [
+                    "SocialAuth"
+                ],
+                "parameters": [
+                    {
+                        "name": "provider",
+                        "in": "path",
+                        "required": true,
+                        "schema": {
+                            "type": "string"
+                        }
+                    }
+                ],
+                "responses": {
+                    "200": {
+                        "description": "",
+                        "content": {
+                            "application/json": {
+                                "schema": {
+                                    "type": "object"
+                                }
+                            }
+                        }
+                    }
+                }
+            }
+        },
+        "/v1/auth/social/{provider}/callback": {
+            "get": {
+                "operationId": "auth.social.callback",
+                "tags": [
+                    "SocialAuth"
+                ],
+                "parameters": [
+                    {
+                        "name": "provider",
+                        "in": "path",
+                        "required": true,
+                        "schema": {
+                            "type": "string"
+                        }
+                    }
+                ],
+                "responses": {
+                    "200": {
+                        "description": "",
+                        "content": {
+                            "application/json": {
+                                "schema": {
+                                    "type": "object"
+                                }
+                            }
+                        }
+                    }
+                }
+            }
+        },
+        "/v1/auth/token": {
+            "post": {
+                "operationId": "auth.token.store",
+                "tags": [
+                    "Token"
+                ],
+                "requestBody": {
+                    "required": true,
+                    "content": {
+                        "application/json": {
+                            "schema": {
+                                "$ref": "#/components/schemas/IssueTokenRequest"
+                            }
+                        }
+                    }
+                },
+                "responses": {
+                    "201": {
+                        "description": "",
+                        "content": {
+                            "application/json": {
+                                "schema": {
+                                    "type": "object",
+                                    "properties": {
+                                        "token": {
+                                            "type": "string"
+                                        },
+                                        "user": {
+                                            "$ref": "#/components/schemas/UserResource"
+                                        }
+                                    },
+                                    "required": [
+                                        "token",
+                                        "user"
+                                    ]
+                                }
+                            }
+                        }
+                    },
+                    "422": {
+                        "$ref": "#/components/responses/ValidationException"
+                    }
+                }
+            },
+            "delete": {
+                "operationId": "auth.token.destroy",
+                "tags": [
+                    "Token"
+                ],
+                "responses": {
+                    "204": {
+                        "description": "No content"
+                    },
+                    "401": {
+                        "$ref": "#/components/responses/AuthenticationException"
+                    }
+                }
+            }
+        }
+    },
+    "components": {
+        "schemas": {
+            "ArticleCardResource": {
+                "type": "object",
+                "properties": {
+                    "type": {
+                        "type": "string",
+                        "const": "article"
+                    },
+                    "id": {
+                        "type": "integer"
+                    },
+                    "slug": {
+                        "type": "string"
+                    },
+                    "title": {
+                        "type": [
+                            "string",
+                            "null"
+                        ]
+                    },
+                    "excerpt": {
+                        "type": [
+                            "string",
+                            "null"
+                        ]
+                    },
+                    "section": {
+                        "type": "object",
+                        "properties": {
+                            "slug": {
+                                "type": "string"
+                            },
+                            "name": {
+                                "type": "array",
+                                "items": {}
+                            }
+                        },
+                        "required": [
+                            "slug",
+                            "name"
+                        ]
+                    },
+                    "primary_industry": {
+                        "type": [
+                            "object",
+                            "null"
+                        ],
+                        "properties": {
+                            "slug": {
+                                "type": "string"
+                            },
+                            "name": {
+                                "type": "array",
+                                "items": {}
+                            },
+                            "color": {
+                                "type": "string"
+                            }
+                        },
+                        "required": [
+                            "slug",
+                            "name",
+                            "color"
+                        ]
+                    },
+                    "industries": {
+                        "type": "array",
+                        "items": {
+                            "type": "object",
+                            "properties": {
+                                "slug": {
+                                    "type": "string"
+                                },
+                                "name": {
+                                    "type": "array",
+                                    "items": {}
+                                },
+                                "color": {
+                                    "type": "string"
+                                },
+                                "is_primary": {
+                                    "type": "boolean"
+                                }
+                            },
+                            "required": [
+                                "slug",
+                                "name",
+                                "color",
+                                "is_primary"
+                            ]
+                        }
+                    },
+                    "author": {
+                        "type": "object",
+                        "properties": {
+                            "id": {
+                                "type": "integer"
+                            },
+                            "name": {
+                                "type": "string"
+                            },
+                            "is_verified": {
+                                "type": "boolean"
+                            }
+                        },
+                        "required": [
+                            "id",
+                            "name",
+                            "is_verified"
+                        ]
+                    },
+                    "is_original": {
+                        "type": "boolean"
+                    },
+                    "is_featured": {
+                        "type": "boolean"
+                    },
+                    "published_at": {
+                        "type": [
+                            "string",
+                            "null"
+                        ]
+                    },
+                    "reading_time_minutes": {},
+                    "reads": {
+                        "type": "integer"
+                    },
+                    "image": {
+                        "type": [
+                            "object",
+                            "null"
+                        ],
+                        "properties": {
+                            "thumb": {
+                                "type": "string"
+                            },
+                            "card": {
+                                "type": "string"
+                            },
+                            "hero": {
+                                "type": "string"
+                            }
+                        },
+                        "required": [
+                            "thumb",
+                            "card",
+                            "hero"
+                        ]
+                    },
+                    "locale": {
+                        "type": "string"
+                    },
+                    "is_fallback": {
+                        "type": "boolean"
+                    },
+                    "is_bookmarked": {
+                        "type": "boolean"
+                    }
+                },
+                "required": [
+                    "type",
+                    "id",
+                    "slug",
+                    "title",
+                    "excerpt",
+                    "section",
+                    "primary_industry",
+                    "industries",
+                    "author",
+                    "is_original",
+                    "is_featured",
+                    "published_at",
+                    "reading_time_minutes",
+                    "reads",
+                    "image",
+                    "locale",
+                    "is_fallback",
+                    "is_bookmarked"
+                ],
+                "title": "ArticleCardResource"
+            },
+            "ArticleResource": {
+                "type": "object",
+                "properties": {
+                    "type": {
+                        "type": "string",
+                        "const": "article"
+                    },
+                    "id": {
+                        "type": "integer"
+                    },
+                    "slug": {
+                        "type": "string"
+                    },
+                    "title": {
+                        "type": [
+                            "string",
+                            "null"
+                        ]
+                    },
+                    "excerpt": {
+                        "type": [
+                            "string",
+                            "null"
+                        ]
+                    },
+                    "section": {
+                        "type": "object",
+                        "properties": {
+                            "slug": {
+                                "type": "string"
+                            },
+                            "name": {
+                                "type": "array",
+                                "items": {}
+                            }
+                        },
+                        "required": [
+                            "slug",
+                            "name"
+                        ]
+                    },
+                    "primary_industry": {
+                        "type": [
+                            "object",
+                            "null"
+                        ],
+                        "properties": {
+                            "slug": {
+                                "type": "string"
+                            },
+                            "name": {
+                                "type": "array",
+                                "items": {}
+                            },
+                            "color": {
+                                "type": "string"
+                            }
+                        },
+                        "required": [
+                            "slug",
+                            "name",
+                            "color"
+                        ]
+                    },
+                    "industries": {
+                        "type": "array",
+                        "items": {
+                            "type": "object",
+                            "properties": {
+                                "slug": {
+                                    "type": "string"
+                                },
+                                "name": {
+                                    "type": "array",
+                                    "items": {}
+                                },
+                                "color": {
+                                    "type": "string"
+                                },
+                                "is_primary": {
+                                    "type": "boolean"
+                                }
+                            },
+                            "required": [
+                                "slug",
+                                "name",
+                                "color",
+                                "is_primary"
+                            ]
+                        }
+                    },
+                    "author": {
+                        "type": "object",
+                        "properties": {
+                            "id": {
+                                "type": "integer"
+                            },
+                            "name": {
+                                "type": "string"
+                            },
+                            "title": {
+                                "type": [
+                                    "array",
+                                    "null"
+                                ],
+                                "items": {}
+                            },
+                            "bio": {
+                                "type": [
+                                    "array",
+                                    "null"
+                                ],
+                                "items": {}
+                            },
+                            "avatar_url": {
+                                "type": [
+                                    "string",
+                                    "null"
+                                ]
+                            },
+                            "is_verified": {
+                                "type": "boolean"
+                            }
+                        },
+                        "required": [
+                            "id",
+                            "name",
+                            "title",
+                            "bio",
+                            "avatar_url",
+                            "is_verified"
+                        ]
+                    },
+                    "is_original": {
+                        "type": "boolean"
+                    },
+                    "is_featured": {
+                        "type": "boolean"
+                    },
+                    "published_at": {
+                        "type": [
+                            "string",
+                            "null"
+                        ]
+                    },
+                    "reading_time_minutes": {},
+                    "reads": {
+                        "type": "integer"
+                    },
+                    "image": {
+                        "type": [
+                            "object",
+                            "null"
+                        ],
+                        "properties": {
+                            "thumb": {
+                                "type": "string"
+                            },
+                            "card": {
+                                "type": "string"
+                            },
+                            "hero": {
+                                "type": "string"
+                            }
+                        },
+                        "required": [
+                            "thumb",
+                            "card",
+                            "hero"
+                        ]
+                    },
+                    "locale": {
+                        "type": "string"
+                    },
+                    "is_fallback": {
+                        "type": "boolean"
+                    },
+                    "is_bookmarked": {
+                        "type": "boolean"
+                    },
+                    "body": {
+                        "type": "string"
+                    },
+                    "hero_caption": {
+                        "type": [
+                            "string",
+                            "null"
+                        ]
+                    },
+                    "attachment": {
+                        "type": [
+                            "object",
+                            "null"
+                        ],
+                        "properties": {
+                            "url": {
+                                "type": "string"
+                            },
+                            "file_name": {
+                                "type": "string"
+                            },
+                            "size": {
+                                "type": "string"
+                            },
+                            "mime_type": {
+                                "type": "string"
+                            }
+                        },
+                        "required": [
+                            "url",
+                            "file_name",
+                            "size",
+                            "mime_type"
+                        ]
+                    },
+                    "available_locales": {
+                        "type": "array",
+                        "items": {}
+                    },
+                    "share_url": {
+                        "type": "string"
+                    }
+                },
+                "required": [
+                    "type",
+                    "id",
+                    "slug",
+                    "title",
+                    "excerpt",
+                    "section",
+                    "primary_industry",
+                    "industries",
+                    "author",
+                    "is_original",
+                    "is_featured",
+                    "published_at",
+                    "reading_time_minutes",
+                    "reads",
+                    "image",
+                    "locale",
+                    "is_fallback",
+                    "is_bookmarked",
+                    "body",
+                    "hero_caption",
+                    "attachment",
+                    "available_locales",
+                    "share_url"
+                ],
+                "title": "ArticleResource"
+            },
+            "BookmarkRequest": {
+                "type": "object",
+                "properties": {
+                    "type": {
+                        "type": "string",
+                        "enum": [
+                            "article",
+                            "event"
+                        ]
+                    },
+                    "id": {
+                        "type": "integer",
+                        "minimum": 1
+                    }
+                },
+                "required": [
+                    "type",
+                    "id"
+                ],
+                "title": "BookmarkRequest"
+            },
+            "DigestCadence": {
+                "type": "string",
+                "enum": [
+                    "daily",
+                    "weekly",
+                    "monthly"
+                ],
+                "title": "DigestCadence"
+            },
+            "DigestCardResource": {
+                "type": "object",
+                "properties": {
+                    "id": {
+                        "type": "integer"
+                    },
+                    "slug": {
+                        "type": "string"
+                    },
+                    "kind": {
+                        "type": "string"
+                    },
+                    "cadence": {
+                        "type": "string"
+                    },
+                    "period_start": {
+                        "type": "string"
+                    },
+                    "period_end": {
+                        "type": "string"
+                    },
+                    "title": {
+                        "type": "array",
+                        "items": {}
+                    },
+                    "intro": {
+                        "type": [
+                            "array",
+                            "null"
+                        ],
+                        "items": {}
+                    },
+                    "published_at": {
+                        "type": [
+                            "string",
+                            "null"
+                        ]
+                    },
+                    "items_count": {
+                        "type": "integer"
+                    },
+                    "cover_url": {
+                        "type": "null"
+                    },
+                    "share_url": {
+                        "type": "string"
+                    }
+                },
+                "required": [
+                    "id",
+                    "slug",
+                    "kind",
+                    "cadence",
+                    "period_start",
+                    "period_end",
+                    "title",
+                    "intro",
+                    "published_at",
+                    "share_url"
+                ],
+                "title": "DigestCardResource"
+            },
+            "DigestKind": {
+                "type": "string",
+                "enum": [
+                    "news",
+                    "events"
+                ],
+                "title": "DigestKind"
+            },
+            "DigestResource": {
+                "type": "object",
+                "properties": {
+                    "id": {
+                        "type": "integer"
+                    },
+                    "slug": {
+                        "type": "string"
+                    },
+                    "kind": {
+                        "type": "string"
+                    },
+                    "cadence": {
+                        "type": "string"
+                    },
+                    "period_start": {
+                        "type": "string"
+                    },
+                    "period_end": {
+                        "type": "string"
+                    },
+                    "title": {
+                        "type": "array",
+                        "items": {}
+                    },
+                    "intro": {
+                        "type": [
+                            "array",
+                            "null"
+                        ],
+                        "items": {}
+                    },
+                    "published_at": {
+                        "type": [
+                            "string",
+                            "null"
+                        ]
+                    },
+                    "items_count": {
+                        "type": "integer"
+                    },
+                    "cover_url": {
+                        "type": "null"
+                    },
+                    "share_url": {
+                        "type": "string"
+                    },
+                    "items": {
+                        "type": "array",
+                        "items": {
+                            "type": "object",
+                            "properties": {
+                                "id": {
+                                    "type": "integer"
+                                },
+                                "position": {
+                                    "type": "integer"
+                                },
+                                "editor_note": {
+                                    "type": [
+                                        "array",
+                                        "null"
+                                    ],
+                                    "items": {}
+                                },
+                                "is_highlighted": {
+                                    "type": "boolean"
+                                },
+                                "item": {
+                                    "anyOf": [
+                                        {
+                                            "type": "object",
+                                            "properties": {
+                                                "type": {
+                                                    "type": "string",
+                                                    "const": "article"
+                                                },
+                                                "id": {
+                                                    "type": "integer"
+                                                },
+                                                "slug": {
+                                                    "type": "string"
+                                                },
+                                                "title": {
+                                                    "type": [
+                                                        "string",
+                                                        "null"
+                                                    ]
+                                                },
+                                                "excerpt": {
+                                                    "type": [
+                                                        "string",
+                                                        "null"
+                                                    ]
+                                                },
+                                                "section": {
+                                                    "type": "object",
+                                                    "properties": {
+                                                        "slug": {
+                                                            "type": "string"
+                                                        },
+                                                        "name": {
+                                                            "type": "array",
+                                                            "items": {}
+                                                        }
+                                                    },
+                                                    "required": [
+                                                        "slug",
+                                                        "name"
+                                                    ]
+                                                },
+                                                "primary_industry": {
+                                                    "type": [
+                                                        "object",
+                                                        "null"
+                                                    ],
+                                                    "properties": {
+                                                        "slug": {
+                                                            "type": "string"
+                                                        },
+                                                        "name": {
+                                                            "type": "array",
+                                                            "items": {}
+                                                        },
+                                                        "color": {
+                                                            "type": "string"
+                                                        }
+                                                    },
+                                                    "required": [
+                                                        "slug",
+                                                        "name",
+                                                        "color"
+                                                    ]
+                                                },
+                                                "industries": {
+                                                    "type": "array",
+                                                    "items": {
+                                                        "type": "object",
+                                                        "properties": {
+                                                            "slug": {
+                                                                "type": "string"
+                                                            },
+                                                            "name": {
+                                                                "type": "array",
+                                                                "items": {}
+                                                            },
+                                                            "color": {
+                                                                "type": "string"
+                                                            },
+                                                            "is_primary": {
+                                                                "type": "boolean"
+                                                            }
+                                                        },
+                                                        "required": [
+                                                            "slug",
+                                                            "name",
+                                                            "color",
+                                                            "is_primary"
+                                                        ]
+                                                    }
+                                                },
+                                                "author": {
+                                                    "type": "object",
+                                                    "properties": {
+                                                        "id": {
+                                                            "type": "integer"
+                                                        },
+                                                        "name": {
+                                                            "type": "string"
+                                                        },
+                                                        "is_verified": {
+                                                            "type": "boolean"
+                                                        }
+                                                    },
+                                                    "required": [
+                                                        "id",
+                                                        "name",
+                                                        "is_verified"
+                                                    ]
+                                                },
+                                                "is_original": {
+                                                    "type": "boolean"
+                                                },
+                                                "is_featured": {
+                                                    "type": "boolean"
+                                                },
+                                                "published_at": {
+                                                    "type": [
+                                                        "string",
+                                                        "null"
+                                                    ]
+                                                },
+                                                "reading_time_minutes": {},
+                                                "reads": {
+                                                    "type": "integer"
+                                                },
+                                                "image": {
+                                                    "type": [
+                                                        "object",
+                                                        "null"
+                                                    ],
+                                                    "properties": {
+                                                        "thumb": {
+                                                            "type": "string"
+                                                        },
+                                                        "card": {
+                                                            "type": "string"
+                                                        },
+                                                        "hero": {
+                                                            "type": "string"
+                                                        }
+                                                    },
+                                                    "required": [
+                                                        "thumb",
+                                                        "card",
+                                                        "hero"
+                                                    ]
+                                                },
+                                                "locale": {
+                                                    "type": "string"
+                                                },
+                                                "is_fallback": {
+                                                    "type": "boolean"
+                                                },
+                                                "is_bookmarked": {
+                                                    "type": "boolean"
+                                                }
+                                            },
+                                            "required": [
+                                                "type",
+                                                "id",
+                                                "slug",
+                                                "title",
+                                                "excerpt",
+                                                "section",
+                                                "primary_industry",
+                                                "industries",
+                                                "author",
+                                                "is_original",
+                                                "is_featured",
+                                                "published_at",
+                                                "reading_time_minutes",
+                                                "reads",
+                                                "image",
+                                                "locale",
+                                                "is_fallback",
+                                                "is_bookmarked"
+                                            ]
+                                        },
+                                        {
+                                            "type": "object",
+                                            "properties": {
+                                                "type": {
+                                                    "type": "string",
+                                                    "const": "event"
+                                                },
+                                                "id": {
+                                                    "type": "integer"
+                                                },
+                                                "slug": {
+                                                    "type": "string"
+                                                },
+                                                "title": {
+                                                    "type": [
+                                                        "string",
+                                                        "null"
+                                                    ]
+                                                },
+                                                "excerpt": {
+                                                    "type": [
+                                                        "string",
+                                                        "null"
+                                                    ]
+                                                },
+                                                "starts_at": {
+                                                    "type": "string"
+                                                },
+                                                "ends_at": {
+                                                    "type": [
+                                                        "string",
+                                                        "null"
+                                                    ]
+                                                },
+                                                "timezone": {
+                                                    "type": "string"
+                                                },
+                                                "is_online": {
+                                                    "type": "boolean"
+                                                },
+                                                "city": {
+                                                    "type": [
+                                                        "string",
+                                                        "null"
+                                                    ]
+                                                },
+                                                "location_name": {
+                                                    "type": [
+                                                        "string",
+                                                        "null"
+                                                    ]
+                                                },
+                                                "price_info": {
+                                                    "type": [
+                                                        "string",
+                                                        "null"
+                                                    ]
+                                                },
+                                                "primary_industry": {
+                                                    "type": [
+                                                        "object",
+                                                        "null"
+                                                    ],
+                                                    "properties": {
+                                                        "slug": {
+                                                            "type": "string"
+                                                        },
+                                                        "name": {
+                                                            "type": "array",
+                                                            "items": {}
+                                                        },
+                                                        "color": {
+                                                            "type": "string"
+                                                        }
+                                                    },
+                                                    "required": [
+                                                        "slug",
+                                                        "name",
+                                                        "color"
+                                                    ]
+                                                },
+                                                "industries": {
+                                                    "type": "array",
+                                                    "items": {
+                                                        "type": "object",
+                                                        "properties": {
+                                                            "slug": {
+                                                                "type": "string"
+                                                            },
+                                                            "name": {
+                                                                "type": "array",
+                                                                "items": {}
+                                                            },
+                                                            "color": {
+                                                                "type": "string"
+                                                            },
+                                                            "is_primary": {
+                                                                "type": "boolean"
+                                                            }
+                                                        },
+                                                        "required": [
+                                                            "slug",
+                                                            "name",
+                                                            "color",
+                                                            "is_primary"
+                                                        ]
+                                                    }
+                                                },
+                                                "is_featured": {
+                                                    "type": "boolean"
+                                                },
+                                                "image": {
+                                                    "type": [
+                                                        "object",
+                                                        "null"
+                                                    ],
+                                                    "properties": {
+                                                        "thumb": {
+                                                            "type": "string"
+                                                        },
+                                                        "card": {
+                                                            "type": "string"
+                                                        },
+                                                        "hero": {
+                                                            "type": "string"
+                                                        }
+                                                    },
+                                                    "required": [
+                                                        "thumb",
+                                                        "card",
+                                                        "hero"
+                                                    ]
+                                                },
+                                                "locale": {
+                                                    "type": "string"
+                                                },
+                                                "is_fallback": {
+                                                    "type": "boolean"
+                                                },
+                                                "is_bookmarked": {
+                                                    "type": "boolean"
+                                                }
+                                            },
+                                            "required": [
+                                                "type",
+                                                "id",
+                                                "slug",
+                                                "title",
+                                                "excerpt",
+                                                "starts_at",
+                                                "ends_at",
+                                                "timezone",
+                                                "is_online",
+                                                "city",
+                                                "location_name",
+                                                "price_info",
+                                                "primary_industry",
+                                                "industries",
+                                                "is_featured",
+                                                "image",
+                                                "locale",
+                                                "is_fallback",
+                                                "is_bookmarked"
+                                            ]
+                                        }
+                                    ]
+                                }
+                            },
+                            "required": [
+                                "id",
+                                "position",
+                                "editor_note",
+                                "is_highlighted",
+                                "item"
+                            ]
+                        }
+                    }
+                },
+                "required": [
+                    "id",
+                    "slug",
+                    "kind",
+                    "cadence",
+                    "period_start",
+                    "period_end",
+                    "title",
+                    "intro",
+                    "published_at",
+                    "share_url",
+                    "items"
+                ],
+                "title": "DigestResource"
+            },
+            "EventCardResource": {
+                "type": "object",
+                "properties": {
+                    "type": {
+                        "type": "string",
+                        "const": "event"
+                    },
+                    "id": {
+                        "type": "integer"
+                    },
+                    "slug": {
+                        "type": "string"
+                    },
+                    "title": {
+                        "type": [
+                            "string",
+                            "null"
+                        ]
+                    },
+                    "excerpt": {
+                        "type": [
+                            "string",
+                            "null"
+                        ]
+                    },
+                    "starts_at": {
+                        "type": "string"
+                    },
+                    "ends_at": {
+                        "type": [
+                            "string",
+                            "null"
+                        ]
+                    },
+                    "timezone": {
+                        "type": "string"
+                    },
+                    "is_online": {
+                        "type": "boolean"
+                    },
+                    "city": {
+                        "type": [
+                            "string",
+                            "null"
+                        ]
+                    },
+                    "location_name": {
+                        "type": [
+                            "string",
+                            "null"
+                        ]
+                    },
+                    "price_info": {
+                        "type": [
+                            "string",
+                            "null"
+                        ]
+                    },
+                    "primary_industry": {
+                        "type": [
+                            "object",
+                            "null"
+                        ],
+                        "properties": {
+                            "slug": {
+                                "type": "string"
+                            },
+                            "name": {
+                                "type": "array",
+                                "items": {}
+                            },
+                            "color": {
+                                "type": "string"
+                            }
+                        },
+                        "required": [
+                            "slug",
+                            "name",
+                            "color"
+                        ]
+                    },
+                    "industries": {
+                        "type": "array",
+                        "items": {
+                            "type": "object",
+                            "properties": {
+                                "slug": {
+                                    "type": "string"
+                                },
+                                "name": {
+                                    "type": "array",
+                                    "items": {}
+                                },
+                                "color": {
+                                    "type": "string"
+                                },
+                                "is_primary": {
+                                    "type": "boolean"
+                                }
+                            },
+                            "required": [
+                                "slug",
+                                "name",
+                                "color",
+                                "is_primary"
+                            ]
+                        }
+                    },
+                    "is_featured": {
+                        "type": "boolean"
+                    },
+                    "image": {
+                        "type": [
+                            "object",
+                            "null"
+                        ],
+                        "properties": {
+                            "thumb": {
+                                "type": "string"
+                            },
+                            "card": {
+                                "type": "string"
+                            },
+                            "hero": {
+                                "type": "string"
+                            }
+                        },
+                        "required": [
+                            "thumb",
+                            "card",
+                            "hero"
+                        ]
+                    },
+                    "locale": {
+                        "type": "string"
+                    },
+                    "is_fallback": {
+                        "type": "boolean"
+                    },
+                    "is_bookmarked": {
+                        "type": "boolean"
+                    }
+                },
+                "required": [
+                    "type",
+                    "id",
+                    "slug",
+                    "title",
+                    "excerpt",
+                    "starts_at",
+                    "ends_at",
+                    "timezone",
+                    "is_online",
+                    "city",
+                    "location_name",
+                    "price_info",
+                    "primary_industry",
+                    "industries",
+                    "is_featured",
+                    "image",
+                    "locale",
+                    "is_fallback",
+                    "is_bookmarked"
+                ],
+                "title": "EventCardResource"
+            },
+            "EventRange": {
+                "type": "string",
+                "description": "Date windows for the Events tabs, in the business timezone, as UTC instants [from, to).\n",
+                "enum": [
+                    "upcoming",
+                    "week",
+                    "month"
+                ],
+                "title": "EventRange"
+            },
+            "EventResource": {
+                "type": "object",
+                "properties": {
+                    "type": {
+                        "type": "string",
+                        "const": "event"
+                    },
+                    "id": {
+                        "type": "integer"
+                    },
+                    "slug": {
+                        "type": "string"
+                    },
+                    "title": {
+                        "type": [
+                            "string",
+                            "null"
+                        ]
+                    },
+                    "excerpt": {
+                        "type": [
+                            "string",
+                            "null"
+                        ]
+                    },
+                    "starts_at": {
+                        "type": "string"
+                    },
+                    "ends_at": {
+                        "type": [
+                            "string",
+                            "null"
+                        ]
+                    },
+                    "timezone": {
+                        "type": "string"
+                    },
+                    "is_online": {
+                        "type": "boolean"
+                    },
+                    "city": {
+                        "type": [
+                            "string",
+                            "null"
+                        ]
+                    },
+                    "location_name": {
+                        "type": [
+                            "string",
+                            "null"
+                        ]
+                    },
+                    "price_info": {
+                        "type": [
+                            "string",
+                            "null"
+                        ]
+                    },
+                    "primary_industry": {
+                        "type": [
+                            "object",
+                            "null"
+                        ],
+                        "properties": {
+                            "slug": {
+                                "type": "string"
+                            },
+                            "name": {
+                                "type": "array",
+                                "items": {}
+                            },
+                            "color": {
+                                "type": "string"
+                            }
+                        },
+                        "required": [
+                            "slug",
+                            "name",
+                            "color"
+                        ]
+                    },
+                    "industries": {
+                        "type": "array",
+                        "items": {
+                            "type": "object",
+                            "properties": {
+                                "slug": {
+                                    "type": "string"
+                                },
+                                "name": {
+                                    "type": "array",
+                                    "items": {}
+                                },
+                                "color": {
+                                    "type": "string"
+                                },
+                                "is_primary": {
+                                    "type": "boolean"
+                                }
+                            },
+                            "required": [
+                                "slug",
+                                "name",
+                                "color",
+                                "is_primary"
+                            ]
+                        }
+                    },
+                    "is_featured": {
+                        "type": "boolean"
+                    },
+                    "image": {
+                        "type": [
+                            "object",
+                            "null"
+                        ],
+                        "properties": {
+                            "thumb": {
+                                "type": "string"
+                            },
+                            "card": {
+                                "type": "string"
+                            },
+                            "hero": {
+                                "type": "string"
+                            }
+                        },
+                        "required": [
+                            "thumb",
+                            "card",
+                            "hero"
+                        ]
+                    },
+                    "locale": {
+                        "type": "string"
+                    },
+                    "is_fallback": {
+                        "type": "boolean"
+                    },
+                    "is_bookmarked": {
+                        "type": "boolean"
+                    },
+                    "description": {
+                        "type": "string"
+                    },
+                    "address": {
+                        "type": [
+                            "string",
+                            "null"
+                        ]
+                    },
+                    "online_url": {
+                        "type": [
+                            "string",
+                            "null"
+                        ]
+                    },
+                    "registration_url": {
+                        "type": [
+                            "string",
+                            "null"
+                        ]
+                    },
+                    "organizer_name": {
+                        "type": [
+                            "string",
+                            "null"
+                        ]
+                    },
+                    "available_locales": {
+                        "type": "array",
+                        "items": {}
+                    },
+                    "ics_url": {
+                        "type": "string"
+                    },
+                    "share_url": {
+                        "type": "string"
+                    }
+                },
+                "required": [
+                    "type",
+                    "id",
+                    "slug",
+                    "title",
+                    "excerpt",
+                    "starts_at",
+                    "ends_at",
+                    "timezone",
+                    "is_online",
+                    "city",
+                    "location_name",
+                    "price_info",
+                    "primary_industry",
+                    "industries",
+                    "is_featured",
+                    "image",
+                    "locale",
+                    "is_fallback",
+                    "is_bookmarked",
+                    "description",
+                    "address",
+                    "online_url",
+                    "registration_url",
+                    "organizer_name",
+                    "available_locales",
+                    "ics_url",
+                    "share_url"
+                ],
+                "title": "EventResource"
+            },
+            "ForgotPasswordRequest": {
+                "type": "object",
+                "properties": {
+                    "email": {
+                        "type": "string",
+                        "format": "email"
+                    }
+                },
+                "required": [
+                    "email"
+                ],
+                "title": "ForgotPasswordRequest"
+            },
+            "IndustryResource": {
+                "type": "object",
+                "properties": {
+                    "id": {
+                        "type": "integer"
+                    },
+                    "slug": {
+                        "type": "string"
+                    },
+                    "name": {
+                        "type": "array",
+                        "items": {}
+                    },
+                    "group": {
+                        "type": "string"
+                    },
+                    "color": {
+                        "type": "string"
+                    },
+                    "image_url": {
+                        "type": [
+                            "string",
+                            "null"
+                        ]
+                    },
+                    "sort_order": {
+                        "type": "integer"
+                    }
+                },
+                "required": [
+                    "id",
+                    "slug",
+                    "name",
+                    "group",
+                    "color",
+                    "image_url",
+                    "sort_order"
+                ],
+                "title": "IndustryResource"
+            },
+            "IssueTokenRequest": {
+                "type": "object",
+                "properties": {
+                    "email": {
+                        "type": "string",
+                        "format": "email"
+                    },
+                    "password": {
+                        "type": "string"
+                    },
+                    "remember": {
+                        "type": "boolean"
+                    },
+                    "device_name": {
+                        "type": "string",
+                        "maxLength": 120
+                    }
+                },
+                "required": [
+                    "email",
+                    "password",
+                    "device_name"
+                ],
+                "title": "IssueTokenRequest"
+            },
+            "LoginRequest": {
+                "type": "object",
+                "properties": {
+                    "email": {
+                        "type": "string",
+                        "format": "email"
+                    },
+                    "password": {
+                        "type": "string"
+                    },
+                    "remember": {
+                        "type": "boolean"
+                    }
+                },
+                "required": [
+                    "email",
+                    "password"
+                ],
+                "title": "LoginRequest"
+            },
+            "NotificationPreferenceResource": {
+                "type": "object",
+                "properties": {
+                    "digest_news_daily": {
+                        "type": "boolean"
+                    },
+                    "digest_news_monthly": {
+                        "type": "boolean"
+                    },
+                    "digest_events_weekly": {
+                        "type": "boolean"
+                    },
+                    "digest_events_monthly": {
+                        "type": "boolean"
+                    },
+                    "event_reminders": {
+                        "type": "boolean"
+                    },
+                    "delivery_time": {
+                        "type": "string"
+                    }
+                },
+                "required": [
+                    "digest_news_daily",
+                    "digest_news_monthly",
+                    "digest_events_weekly",
+                    "digest_events_monthly",
+                    "event_reminders",
+                    "delivery_time"
+                ],
+                "title": "NotificationPreferenceResource"
+            },
+            "RegisterRequest": {
+                "type": "object",
+                "properties": {
+                    "name": {
+                        "type": "string",
+                        "maxLength": 120
+                    },
+                    "email": {
+                        "type": "string",
+                        "format": "email",
+                        "maxLength": 191
+                    },
+                    "password": {
+                        "type": "string"
+                    },
+                    "consent": {
+                        "enum": [
+                            "yes",
+                            "on",
+                            "1",
+                            1,
+                            "true",
+                            true
+                        ]
+                    },
+                    "locale": {
+                        "type": "string",
+                        "enum": [
+                            "el",
+                            "en"
+                        ]
+                    },
+                    "content_locales": {
+                        "type": "array",
+                        "items": {
+                            "type": "string",
+                            "enum": [
+                                "el",
+                                "en"
+                            ]
+                        },
+                        "minItems": 1,
+                        "uniqueItems": true
+                    },
+                    "timezone": {
+                        "type": "string"
+                    }
+                },
+                "required": [
+                    "name",
+                    "email",
+                    "password"
+                ],
+                "title": "RegisterRequest"
+            },
+            "ResetPasswordRequest": {
+                "type": "object",
+                "properties": {
+                    "token": {
+                        "type": "string"
+                    },
+                    "email": {
+                        "type": "string",
+                        "format": "email"
+                    },
+                    "password": {
+                        "type": "string"
+                    },
+                    "password_confirmation": {
+                        "type": "string"
+                    }
+                },
+                "required": [
+                    "token",
+                    "email",
+                    "password",
+                    "password_confirmation"
+                ],
+                "title": "ResetPasswordRequest"
+            },
+            "SectionResource": {
+                "type": "object",
+                "properties": {
+                    "id": {
+                        "type": "integer"
+                    },
+                    "slug": {
+                        "type": "string"
+                    },
+                    "name": {
+                        "type": "array",
+                        "items": {}
+                    },
+                    "has_articles": {
+                        "type": "boolean"
+                    },
+                    "sort_order": {
+                        "type": "integer"
+                    }
+                },
+                "required": [
+                    "id",
+                    "slug",
+                    "name",
+                    "has_articles",
+                    "sort_order"
+                ],
+                "title": "SectionResource"
+            },
+            "UpdateIndustriesRequest": {
+                "type": "object",
+                "properties": {
+                    "industry_ids": {
+                        "type": "array",
+                        "items": {
+                            "type": "integer"
+                        },
+                        "maxItems": 33,
+                        "uniqueItems": true
+                    },
+                    "notify_ids": {
+                        "type": "array",
+                        "items": {
+                            "type": "integer",
+                            "description": "Notifications only for industries the user follows.",
+                            "enum": [
+                                ""
+                            ]
+                        },
+                        "uniqueItems": true
+                    }
+                },
+                "required": [
+                    "industry_ids"
+                ],
+                "title": "UpdateIndustriesRequest"
+            },
+            "UpdateNotificationPreferencesRequest": {
+                "type": "object",
+                "properties": {
+                    "digest_news_daily": {
+                        "type": "boolean"
+                    },
+                    "digest_news_monthly": {
+                        "type": "boolean"
+                    },
+                    "digest_events_weekly": {
+                        "type": "boolean"
+                    },
+                    "digest_events_monthly": {
+                        "type": "boolean"
+                    },
+                    "event_reminders": {
+                        "type": "boolean"
+                    },
+                    "delivery_time": {
+                        "type": "string"
+                    }
+                },
+                "title": "UpdateNotificationPreferencesRequest"
+            },
+            "UpdatePasswordRequest": {
+                "type": "object",
+                "properties": {
+                    "current_password": {
+                        "type": [
+                            "string",
+                            "null"
+                        ],
+                        "description": "Social-only accounts can set a first password without one."
+                    },
+                    "password": {
+                        "type": "string"
+                    },
+                    "password_confirmation": {
+                        "type": "string"
+                    }
+                },
+                "required": [
+                    "password",
+                    "password_confirmation"
+                ],
+                "title": "UpdatePasswordRequest"
+            },
+            "UpdateProfileRequest": {
+                "type": "object",
+                "properties": {
+                    "name": {
+                        "type": "string",
+                        "maxLength": 120
+                    },
+                    "email": {
+                        "type": "string",
+                        "format": "email",
+                        "maxLength": 191
+                    },
+                    "current_password": {
+                        "type": [
+                            "string",
+                            "null"
+                        ],
+                        "description": "Changing the email of a password account requires the current password."
+                    },
+                    "locale": {
+                        "type": "string",
+                        "enum": [
+                            "el",
+                            "en"
+                        ]
+                    },
+                    "content_locales": {
+                        "type": "array",
+                        "items": {
+                            "type": "string",
+                            "enum": [
+                                "el",
+                                "en"
+                            ]
+                        },
+                        "minItems": 1,
+                        "uniqueItems": true
+                    },
+                    "timezone": {
+                        "type": "string"
+                    },
+                    "consent": {
+                        "enum": [
+                            "yes",
+                            "on",
+                            "1",
+                            1,
+                            "true",
+                            true
+                        ]
+                    },
+                    "onboarding_completed": {
+                        "type": "boolean"
+                    }
+                },
+                "title": "UpdateProfileRequest"
+            },
+            "UploadAvatarRequest": {
+                "type": "object",
+                "properties": {
+                    "avatar": {
+                        "type": "string",
+                        "format": "binary",
+                        "contentMediaType": "application/octet-stream",
+                        "description": "Maximum file size: 5120 kilobytes."
+                    }
+                },
+                "required": [
+                    "avatar"
+                ],
+                "title": "UploadAvatarRequest"
+            },
+            "UserResource": {
+                "type": "object",
+                "properties": {
+                    "id": {
+                        "type": "integer"
+                    },
+                    "name": {
+                        "type": "string"
+                    },
+                    "email": {
+                        "type": "string"
+                    },
+                    "email_verified": {
+                        "type": "boolean"
+                    },
+                    "avatar_url": {
+                        "type": [
+                            "string",
+                            "null"
+                        ]
+                    },
+                    "role": {
+                        "type": "string"
+                    },
+                    "locale": {
+                        "type": "string"
+                    },
+                    "content_locales": {
+                        "type": "array",
+                        "items": {}
+                    },
+                    "timezone": {
+                        "type": "string"
+                    },
+                    "has_password": {
+                        "type": "boolean"
+                    },
+                    "needs_consent": {
+                        "type": "boolean"
+                    },
+                    "onboarded": {
+                        "type": "boolean"
+                    },
+                    "created_at": {
+                        "type": [
+                            "string",
+                            "null"
+                        ]
+                    }
+                },
+                "required": [
+                    "id",
+                    "name",
+                    "email",
+                    "email_verified",
+                    "avatar_url",
+                    "role",
+                    "locale",
+                    "content_locales",
+                    "timezone",
+                    "has_password",
+                    "needs_consent",
+                    "onboarded",
+                    "created_at"
+                ],
+                "title": "UserResource"
+            }
+        },
+        "responses": {
+            "ValidationException": {
+                "description": "Validation error",
+                "content": {
+                    "application/json": {
+                        "schema": {
+                            "type": "object",
+                            "properties": {
+                                "message": {
+                                    "type": "string",
+                                    "description": "Errors overview."
+                                },
+                                "errors": {
+                                    "type": "object",
+                                    "description": "A detailed description of each field that failed validation.",
+                                    "additionalProperties": {
+                                        "type": "array",
+                                        "items": {
+                                            "type": "string"
+                                        }
+                                    }
+                                }
+                            },
+                            "required": [
+                                "message",
+                                "errors"
+                            ]
+                        }
+                    }
+                }
+            },
+            "AuthenticationException": {
+                "description": "Unauthenticated",
+                "content": {
+                    "application/json": {
+                        "schema": {
+                            "type": "object",
+                            "properties": {
+                                "message": {
+                                    "type": "string",
+                                    "description": "Error overview."
+                                }
+                            },
+                            "required": [
+                                "message"
+                            ]
+                        }
+                    }
+                }
+            },
+            "ModelNotFoundException": {
+                "description": "Not found",
+                "content": {
+                    "application/json": {
+                        "schema": {
+                            "type": "object",
+                            "properties": {
+                                "message": {
+                                    "type": "string",
+                                    "description": "Error overview."
+                                }
+                            },
+                            "required": [
+                                "message"
+                            ]
+                        }
+                    }
+                }
+            }
+        }
+    }
+}

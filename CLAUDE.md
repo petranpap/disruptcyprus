@@ -41,6 +41,7 @@ to silence the provider banner; use `exec -T` in non-interactive scripts).
 | Tests (Pest, MariaDB `disrupt_testing`) | `podman compose exec app php artisan test --compact` |
 | Code style | `podman compose exec app vendor/bin/pint` |
 | Static analysis (level 6) | `podman compose exec app vendor/bin/phpstan analyse --memory-limit=1G` |
+| OpenAPI export | `podman compose exec app php artisan scramble:export --path=storage/app/private/openapi.json && cp backend/storage/app/private/openapi.json docs/` |
 | Failed jobs | `podman compose exec app php artisan queue:failed` / `queue:retry all` |
 | Web (Phase 4) | `npm --prefix web run dev` · `npm --prefix web test` · `npm --prefix web run lint` |
 
@@ -69,6 +70,8 @@ Environment quirks on this machine:
 - Feed ranking lives only in `App\Services\FeedService` and is unit-tested.
 - Editor HTML is sanitized on output (allow-list), never trusted.
 - Every endpoint gets a Pest feature test. Pint + Larastan must stay clean.
+- Tests touching FULLTEXT search go in `tests/Search` (truncation, not transactions: InnoDB FTS only sees committed rows).
+- Test helpers: `reader()`, `newArticle()`, `newEvent()`, `section()` (`event()` is a Laravel helper — don't shadow it).
 
 **Web**
 - Feature folders under `web/src/features/*`. Server state = TanStack Query; client state = small Zustand stores.
@@ -85,7 +88,7 @@ Environment quirks on this machine:
 | 2026-10-05 | Sanctum SPA cookies, API served same-origin under `app.<domain>/api` | No CORS, first-party cookies, iOS PWA safe. Token endpoint kept for native |
 | 2026-10-05 | SEO via Blade share pages `/a/{slug}`, `/e/{slug}`, `/d/{slug}` on the main domain; PWA shares those URLs | Simplest path to OG previews + indexing without SSR |
 | 2026-10-05 | One slug per item (not per locale) | Stable share URLs, simple routing |
-| 2026-10-05 | Search: Scout database engine over denormalized `search_text` (`utf8mb4_unicode_ci`, FULLTEXT) | Accent/case-insensitive Greek search; JSON columns can't do it |
+| 2026-10-06 | Search: `SearchService` on MariaDB FULLTEXT (`search_text`, boolean prefix mode) + whole-word REGEXP for terms < 3 chars; Scout not used | Accent/case-insensitive Greek, prefixes, "AI"; Scout's database engine can't do these |
 | 2026-10-05 | Greek headline fallback: Noto Serif Display | Playfair Display lacks Greek glyphs |
 | 2026-10-05 | Bottom nav = 4 tabs (Home, Explore, Saved, Profile) | Matches home export + brief; DESIGN.md text outdated |
 | 2026-10-05 | Accessible color adjustments approved (filled buttons `#0077B6`, see DESIGN_TOKENS §1.4) | WCAG AA |
@@ -101,13 +104,17 @@ Environment quirks on this machine:
 | 2026-10-05 | No Redis: cache, queue and sessions use the database | Not installed on the shared server; volume is small |
 | 2026-10-05 | Collation `utf8mb4_unicode_ci` (verified accent/case-insensitive for Greek on MariaDB) | `utf8mb4_0900_ai_ci` is MySQL-only |
 | 2026-10-05 | Account deletion = anonymize + soft delete immediately (hard purge job in Phase 7) | GDPR erasure without breaking FKs |
+| 2026-10-06 | Feed ranking: recency half-life 36h, +25% featured, +15% original, +10% per extra followed industry (max 3), events within 14 days (half-life 96h), max 3 consecutive items per section; cursor pins ranking time | Deterministic, testable pages |
+| 2026-10-06 | Trending = views + 3 × saves in 48h (hourly `content_view_stats` buckets), cached 5 min | Brief |
+| 2026-10-06 | All datetimes normalized to UTC before storage (`StoresUtcTimestamps`) | Eloquent stores a Carbon's wall-clock time otherwise |
+| 2026-10-06 | Editor HTML sanitized on output with symfony/html-sanitizer (allow-list), cached per article/locale/updated_at | Brief: never trust stored HTML |
 | 2026-10-05 | Everything runs in containers (podman + podman-compose locally; compose file stays Docker-compatible) | Product owner |
 
 ## Phase status
 
 - [x] Phase 0 — Discovery & plan (docs/ARCHITECTURE.md, docs/DESIGN_TOKENS.md)
 - [x] Phase 1 — Backend foundation (schema, seeders, auth, account, taxonomy, preferences)
-- [ ] Phase 2 — Content API
+- [x] Phase 2 — Content API (feeds, sections, articles, events, digests, search, bookmarks, OpenAPI)
 - [ ] Phase 3 — Admin panel + digests + scheduler
 - [ ] Phase 4 — Web foundation
 - [ ] Phase 5 — Web features
