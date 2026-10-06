@@ -13,11 +13,13 @@ use App\Models\Event;
 use App\Models\Industry;
 use App\Models\Section;
 use App\Models\User;
+use App\Services\Feed\TrendingService;
 use App\Support\DigestPeriod;
 use Carbon\CarbonImmutable;
 use Database\Seeders\Support\PlaceholderImage;
 use Illuminate\Database\Eloquent\Collection;
 use Illuminate\Database\Seeder;
+use Illuminate\Support\Facades\DB;
 use Illuminate\Support\Str;
 
 /**
@@ -37,6 +39,7 @@ class DemoContentSeeder extends Seeder
         $events = $this->seedEvents();
         $this->seedDigests();
         $this->seedBookmarks($articles, $events);
+        $this->seedRecentViews($articles);
     }
 
     /**
@@ -264,6 +267,43 @@ class DemoContentSeeder extends Seeder
                 'bookmarkable_id' => $item->getKey(),
             ]);
         }
+    }
+
+    /**
+     * Hourly view buckets for the last 48 hours so "Trending today" has real signal after seeding.
+     *
+     * @param  list<Article>  $articles
+     */
+    private function seedRecentViews(array $articles): void
+    {
+        $rows = [];
+        $now = CarbonImmutable::now()->startOfHour();
+
+        foreach ($articles as $article) {
+            if ($article->published_at === null || $article->published_at->lessThan($now->subHours(TrendingService::WINDOW_HOURS * 2))) {
+                continue;
+            }
+
+            $peak = $article->is_featured ? 400 : 120;
+
+            for ($hoursAgo = 0; $hoursAgo < TrendingService::WINDOW_HOURS; $hoursAgo += 3) {
+                $bucket = $now->subHours($hoursAgo);
+
+                if ($bucket->lessThan($article->published_at)) {
+                    break;
+                }
+
+                $rows[] = [
+                    'viewable_type' => $article->getMorphClass(),
+                    'viewable_id' => $article->id,
+                    'bucket_at' => $bucket,
+                    'views' => random_int((int) ($peak / 4), $peak),
+                ];
+            }
+        }
+
+        DB::table('content_view_stats')->where('viewable_type', 'article')->delete();
+        DB::table('content_view_stats')->insert($rows);
     }
 
     /**

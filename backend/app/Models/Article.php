@@ -4,6 +4,8 @@ namespace App\Models;
 
 use App\Enums\ContentStatus;
 use App\Models\Concerns\HasHeroImage;
+use App\Models\Concerns\MaintainsSearchText;
+use App\Models\Concerns\StoresUtcTimestamps;
 use App\Models\Concerns\TracksLocaleAvailability;
 use App\Services\ReadingTimeCalculator;
 use Database\Factories\ArticleFactory;
@@ -23,7 +25,7 @@ use Spatie\Translatable\HasTranslations;
 class Article extends Model implements HasMedia
 {
     /** @use HasFactory<ArticleFactory> */
-    use HasFactory, HasHeroImage, HasTranslations, InteractsWithMedia, TracksLocaleAvailability;
+    use HasFactory, HasHeroImage, HasTranslations, InteractsWithMedia, MaintainsSearchText, StoresUtcTimestamps, TracksLocaleAvailability;
 
     public const ATTACHMENT_COLLECTION = 'attachment';
 
@@ -63,6 +65,11 @@ class Article extends Model implements HasMedia
             'status' => ContentStatus::class,
             'published_at' => 'datetime',
         ];
+    }
+
+    protected function searchableTranslatableFields(): array
+    {
+        return ['title', 'excerpt', 'body'];
     }
 
     protected function requiredTranslatableFields(): array
@@ -113,6 +120,14 @@ class Article extends Model implements HasMedia
     public function primaryIndustry(): ?Industry
     {
         return $this->industries->firstWhere('pivot.is_primary', true) ?? $this->industries->first();
+    }
+
+    /**
+     * In-memory equivalent of the published() scope.
+     */
+    public function isPublished(): bool
+    {
+        return $this->status === ContentStatus::Published && $this->published_at !== null && $this->published_at->lessThanOrEqualTo(now());
     }
 
     /**

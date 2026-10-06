@@ -5,6 +5,7 @@ namespace Database\Factories;
 use App\Enums\ContentStatus;
 use App\Models\Event;
 use Illuminate\Database\Eloquent\Factories\Factory;
+use Illuminate\Support\Carbon;
 use Illuminate\Support\Str;
 
 /**
@@ -25,7 +26,7 @@ class EventFactory extends Factory
             'title' => ['en' => $titleEn, 'el' => rtrim(fake('el_GR')->sentence(5), '.')],
             'description' => ['en' => fake('en_US')->paragraph(), 'el' => fake('el_GR')->paragraph()],
             'starts_at' => $startsAt,
-            'ends_at' => $startsAt->copy()->addHours(3),
+            'ends_at' => fn (array $attributes) => Carbon::parse($attributes['starts_at'])->addHours(3),
             'timezone' => 'Asia/Nicosia',
             'location_name' => 'Innovation Hub',
             'address' => fake()->streetAddress(),

@@ -4,6 +4,8 @@ namespace App\Models;
 
 use App\Enums\ContentStatus;
 use App\Models\Concerns\HasHeroImage;
+use App\Models\Concerns\MaintainsSearchText;
+use App\Models\Concerns\StoresUtcTimestamps;
 use App\Models\Concerns\TracksLocaleAvailability;
 use Database\Factories\EventFactory;
 use Illuminate\Database\Eloquent\Attributes\Fillable;
@@ -21,7 +23,7 @@ use Spatie\Translatable\HasTranslations;
 class Event extends Model implements HasMedia
 {
     /** @use HasFactory<EventFactory> */
-    use HasFactory, HasHeroImage, HasTranslations, InteractsWithMedia, TracksLocaleAvailability;
+    use HasFactory, HasHeroImage, HasTranslations, InteractsWithMedia, MaintainsSearchText, StoresUtcTimestamps, TracksLocaleAvailability;
 
     /** @var list<string> */
     public array $translatable = ['title', 'description', 'price_info'];
@@ -46,6 +48,19 @@ class Event extends Model implements HasMedia
             'status' => ContentStatus::class,
             'published_at' => 'datetime',
         ];
+    }
+
+    protected function searchableTranslatableFields(): array
+    {
+        return ['title', 'description'];
+    }
+
+    /**
+     * @return list<string|null>
+     */
+    protected function searchablePlainValues(): array
+    {
+        return [$this->location_name, $this->address, $this->city, $this->organizer_name];
     }
 
     protected function requiredTranslatableFields(): array
@@ -80,6 +95,14 @@ class Event extends Model implements HasMedia
     public function primaryIndustry(): ?Industry
     {
         return $this->industries->firstWhere('pivot.is_primary', true) ?? $this->industries->first();
+    }
+
+    /**
+     * In-memory equivalent of the published() scope.
+     */
+    public function isPublished(): bool
+    {
+        return $this->status === ContentStatus::Published && ($this->published_at === null || $this->published_at->lessThanOrEqualTo(now()));
     }
 
     /**
