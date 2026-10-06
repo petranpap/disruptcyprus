@@ -11,6 +11,10 @@
         <testsuite name="Feature">
             <directory>tests/Feature</directory>
         </testsuite>
+        <!-- FULLTEXT indexes only see committed rows, so search tests truncate instead of using transactions. -->
+        <testsuite name="Search">
+            <directory>tests/Search</directory>
+        </testsuite>
     </testsuites>
     <source>
         <include>
