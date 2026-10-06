@@ -42,6 +42,10 @@ to silence the provider banner; use `exec -T` in non-interactive scripts).
 | Code style | `podman compose exec app vendor/bin/pint` |
 | Static analysis (level 6) | `podman compose exec app vendor/bin/phpstan analyse --memory-limit=1G` |
 | OpenAPI export | `podman compose exec app php artisan scramble:export --path=storage/app/private/openapi.json && cp backend/storage/app/private/openapi.json docs/` |
+| Generate a digest draft | `podman compose exec app php artisan digests:generate news daily [--date=YYYY-MM-DD] [--refresh]` |
+| Create/promote staff | `podman compose exec app php artisan admin:user you@example.com [--role=editor]` |
+| Run the scheduler once | `podman compose exec app php artisan schedule:run` (the `scheduler` container runs `schedule:work`) |
+| Admin panel | http://localhost:8080/admin (demo: admin@ / editor@disruptcyprus.test, password `password`) |
 | Failed jobs | `podman compose exec app php artisan queue:failed` / `queue:retry all` |
 | Web (Phase 4) | `npm --prefix web run dev` · `npm --prefix web test` · `npm --prefix web run lint` |
 
@@ -70,6 +74,11 @@ Environment quirks on this machine:
 - Feed ranking lives only in `App\Services\FeedService` and is unit-tested.
 - Editor HTML is sanitized on output (allow-list), never trusted.
 - Every endpoint gets a Pest feature test. Pint + Larastan must stay clean.
+- Admin (Filament 5): resources live in `app/Filament/Resources/<Plural>/{Resource, Schemas, Tables, Pages}`. Translatable fields are
+  named `field.el` / `field.en` inside `Translatable::tabs()`; spatie reads/writes the per-locale array directly. Articles/events use
+  the virtual `industry_ids` + `primary_industry_id` fields (`IndustryFields`, `SavesEditorialContent`). All labels via `lang/{en,el}/admin.php`.
+- Admin tests use `Livewire::test()` (no pest-plugin-livewire) after `Filament::setCurrentPanel('admin')`.
+- Status/published_at are normalized in the models (`NormalizesPublication`); never set `scheduled` by hand elsewhere.
 - Tests touching FULLTEXT search go in `tests/Search` (truncation, not transactions: InnoDB FTS only sees committed rows).
 - Test helpers: `reader()`, `newArticle()`, `newEvent()`, `section()` (`event()` is a Laravel helper — don't shadow it).
 
@@ -108,6 +117,11 @@ Environment quirks on this machine:
 | 2026-10-06 | Trending = views + 3 × saves in 48h (hourly `content_view_stats` buckets), cached 5 min | Brief |
 | 2026-10-06 | All datetimes normalized to UTC before storage (`StoresUtcTimestamps`) | Eloquent stores a Carbon's wall-clock time otherwise |
 | 2026-10-06 | Editor HTML sanitized on output with symfony/html-sanitizer (allow-list), cached per article/locale/updated_at | Brief: never trust stored HTML |
+| 2026-10-06 | Admin roles: editors manage articles, events, digests, authors, push campaigns; only admins delete content and manage users, industries, sections. Section slugs are fixed | Brief; slugs are app routes |
+| 2026-10-06 | Digest drafts: Daily News 06:00, Weekly Events Sunday 18:00 (next Mon–Sun), Monthly News 1st 06:00 (previous month, top 5 per section), Monthly Events 1st 06:05 — all Asia/Nicosia | Brief; generator idempotent, never overwrites edited or published |
+| 2026-10-06 | Creating a digest in the admin runs the generator; any admin save marks a draft edited; "Regenerate draft" overwrites after confirmation | One code path, no duplicates |
+| 2026-10-06 | "Publish and notify" and push campaigns fire `DigestPublished` / `SendPushCampaign`; delivery is a logged stub until Phase 6. Campaigns: 3 sends/hour per staff member | Brief |
+| 2026-10-06 | `admin:user` command for staff accounts (Filament's make:filament-user creates readers) | Panel access is role-based |
 | 2026-10-05 | Everything runs in containers (podman + podman-compose locally; compose file stays Docker-compatible) | Product owner |
 
 ## Phase status
@@ -115,7 +129,7 @@ Environment quirks on this machine:
 - [x] Phase 0 — Discovery & plan (docs/ARCHITECTURE.md, docs/DESIGN_TOKENS.md)
 - [x] Phase 1 — Backend foundation (schema, seeders, auth, account, taxonomy, preferences)
 - [x] Phase 2 — Content API (feeds, sections, articles, events, digests, search, bookmarks, OpenAPI)
-- [ ] Phase 3 — Admin panel + digests + scheduler
+- [x] Phase 3 — Admin panel (Filament 5), digest generation + scheduler, push campaigns UI (delivery stubbed)
 - [ ] Phase 4 — Web foundation
 - [ ] Phase 5 — Web features
 - [ ] Phase 6 — Notifications

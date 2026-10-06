@@ -116,7 +116,14 @@ sudo chmod -R ug+rwX storage bootstrap/cache
 ```
 
 > Do **not** run the full `db:seed` in production: `DemoContentSeeder` is skipped automatically when `APP_ENV=production`,
-> but `UserSeeder` would create demo accounts. Admin accounts are created with `php artisan make:filament-user` (Phase 3).
+> but `UserSeeder` would create demo accounts.
+
+Create the first administrator (prompts for a password, or generates one):
+```bash
+sudo -u disrupt php artisan admin:user you@example.com --name="Your Name"          # admin
+sudo -u disrupt php artisan admin:user editor@example.com --role=editor            # editor
+```
+Then sign in at `https://disruptcyprus.com/admin`. (`make:filament-user` creates a reader, who cannot open the panel.)
 
 ### 1.5 Apache virtual hosts
 ```bash
