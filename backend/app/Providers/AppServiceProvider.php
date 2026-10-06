@@ -9,6 +9,7 @@ use App\Models\Event;
 use App\Models\Industry;
 use App\Models\Section;
 use App\Models\User;
+use App\Services\Content\BookmarkState;
 use Illuminate\Auth\Notifications\ResetPassword;
 use Illuminate\Cache\RateLimiting\Limit;
 use Illuminate\Database\Eloquent\Model;
@@ -23,7 +24,8 @@ class AppServiceProvider extends ServiceProvider
 {
     public function register(): void
     {
-        //
+        // Per-request cache of the reader's saved items (see BookmarkState).
+        $this->app->scoped(BookmarkState::class);
     }
 
     public function boot(): void
@@ -60,6 +62,10 @@ class AppServiceProvider extends ServiceProvider
         ]);
 
         RateLimiter::for('auth', fn (Request $request) => Limit::perMinute(10)->by($request->ip()));
+
+        RateLimiter::for('views', fn (Request $request) => Limit::perMinute(60)->by($request->ip()));
+
+        RateLimiter::for('search', fn (Request $request) => Limit::perMinute(30)->by($request->user()?->id ?: $request->ip()));
 
         RateLimiter::for('exports', fn (Request $request) => Limit::perHour(1)->by((string) $request->user()?->id));
     }
