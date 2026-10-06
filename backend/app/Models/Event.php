@@ -5,6 +5,7 @@ namespace App\Models;
 use App\Enums\ContentStatus;
 use App\Models\Concerns\HasHeroImage;
 use App\Models\Concerns\MaintainsSearchText;
+use App\Models\Concerns\NormalizesPublication;
 use App\Models\Concerns\StoresUtcTimestamps;
 use App\Models\Concerns\TracksLocaleAvailability;
 use Database\Factories\EventFactory;
@@ -23,7 +24,7 @@ use Spatie\Translatable\HasTranslations;
 class Event extends Model implements HasMedia
 {
     /** @use HasFactory<EventFactory> */
-    use HasFactory, HasHeroImage, HasTranslations, InteractsWithMedia, MaintainsSearchText, StoresUtcTimestamps, TracksLocaleAvailability;
+    use HasFactory, HasHeroImage, HasTranslations, InteractsWithMedia, MaintainsSearchText, NormalizesPublication, StoresUtcTimestamps, TracksLocaleAvailability;
 
     /** @var list<string> */
     public array $translatable = ['title', 'description', 'price_info'];

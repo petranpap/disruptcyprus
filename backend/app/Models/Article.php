@@ -5,6 +5,7 @@ namespace App\Models;
 use App\Enums\ContentStatus;
 use App\Models\Concerns\HasHeroImage;
 use App\Models\Concerns\MaintainsSearchText;
+use App\Models\Concerns\NormalizesPublication;
 use App\Models\Concerns\StoresUtcTimestamps;
 use App\Models\Concerns\TracksLocaleAvailability;
 use App\Services\ReadingTimeCalculator;
@@ -25,7 +26,7 @@ use Spatie\Translatable\HasTranslations;
 class Article extends Model implements HasMedia
 {
     /** @use HasFactory<ArticleFactory> */
-    use HasFactory, HasHeroImage, HasTranslations, InteractsWithMedia, MaintainsSearchText, StoresUtcTimestamps, TracksLocaleAvailability;
+    use HasFactory, HasHeroImage, HasTranslations, InteractsWithMedia, MaintainsSearchText, NormalizesPublication, StoresUtcTimestamps, TracksLocaleAvailability;
 
     public const ATTACHMENT_COLLECTION = 'attachment';
 

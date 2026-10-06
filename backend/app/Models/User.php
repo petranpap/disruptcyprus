@@ -5,6 +5,8 @@ namespace App\Models;
 use App\Enums\UserRole;
 use App\Models\Concerns\StoresUtcTimestamps;
 use Database\Factories\UserFactory;
+use Filament\Models\Contracts\FilamentUser;
+use Filament\Panel;
 use Illuminate\Contracts\Auth\MustVerifyEmail;
 use Illuminate\Contracts\Translation\HasLocalePreference;
 use Illuminate\Database\Eloquent\Attributes\Fillable;
@@ -24,7 +26,7 @@ use Spatie\MediaLibrary\MediaCollections\Models\Media;
 
 #[Fillable(['name', 'email', 'password', 'role', 'locale', 'content_locales', 'timezone', 'consent_at', 'consent_version', 'onboarded_at', 'email_verified_at'])]
 #[Hidden(['password', 'remember_token'])]
-class User extends Authenticatable implements HasLocalePreference, HasMedia, MustVerifyEmail
+class User extends Authenticatable implements FilamentUser, HasLocalePreference, HasMedia, MustVerifyEmail
 {
     /** @use HasFactory<UserFactory> */
     use HasApiTokens, HasFactory, InteractsWithMedia, Notifiable, SoftDeletes, StoresUtcTimestamps;
@@ -105,6 +107,14 @@ class User extends Authenticatable implements HasLocalePreference, HasMedia, Mus
     public function preferredLocale(): string
     {
         return $this->locale;
+    }
+
+    /**
+     * Only editors and admins may use the Filament panel.
+     */
+    public function canAccessPanel(Panel $panel): bool
+    {
+        return $this->role->canAccessAdmin();
     }
 
     public function hasPassword(): bool

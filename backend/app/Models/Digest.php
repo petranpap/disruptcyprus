@@ -48,6 +48,19 @@ class Digest extends Model
     }
 
     /**
+     * Morph type of the items this digest holds: news digests list articles, events digests list events.
+     */
+    public function itemMorphType(): string
+    {
+        return $this->kind === DigestKind::News ? 'article' : 'event';
+    }
+
+    public function isDraft(): bool
+    {
+        return $this->status === DigestStatus::Draft;
+    }
+
+    /**
      * @param  Builder<self>  $query
      * @return Builder<self>
      */
