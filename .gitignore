@@ -16,3 +16,6 @@ test-results/
 .idea/
 .vscode/
 *.log
+
+# Non-secret build settings for the PWA
+!web/.env.production

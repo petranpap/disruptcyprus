@@ -4,9 +4,9 @@
 # Reason: rootless podman's bridge networking (pasta) fails on this machine
 # ("Failed to remount /: Permission denied"). Host networking needs no helper.
 # Ports: nginx 8080, php-fpm 9000, mariadb 3307 (3306 is taken by a host MySQL),
-# mailpit SMTP 1025 / UI 8025.
+# mailpit SMTP 1025 / UI 8025, Vite dev server 5173.
 #
-# Versions mirror production (Ubuntu 24.04): PHP 8.4, MariaDB 10.11, no Redis
+# Versions mirror production (Ubuntu 24.04): PHP 8.4, MariaDB 10.11, Node 20, no Redis
 # (cache, queue and sessions use the database).
 #
 # Docker users: remove the `userns_mode` lines (podman-only).
@@ -72,6 +72,20 @@ services:
     image: docker.io/axllent/mailpit:latest
     network_mode: host
     command: --smtp 127.0.0.1:1025 --listen 127.0.0.1:8025
+
+  # React PWA dev server (Vite). Same Node major as the production server.
+  node:
+    image: docker.io/library/node:20-alpine
+    network_mode: host
+    userns_mode: keep-id
+    user: "${UID:-1000}:${GID:-1000}"
+    working_dir: /app
+    environment:
+      HOME: /tmp
+      npm_config_cache: /tmp/.npm
+    volumes:
+      - ./web:/app:z
+    command: sh -c "test -d node_modules || npm ci; npm run dev"
 
 volumes:
   mariadb-data:

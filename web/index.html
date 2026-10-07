@@ -1,0 +1,45 @@
+<!doctype html>
+<html lang="el">
+  <head>
+    <meta charset="UTF-8" />
+    <meta name="viewport" content="width=device-width, initial-scale=1.0, viewport-fit=cover" />
+    <title>Disrupt Cyprus</title>
+    <meta name="description" content="Startups και καινοτομία στην Κύπρο, επιλεγμένα για εσένα." />
+    <meta name="theme-color" content="#FAFAF8" media="(prefers-color-scheme: light)" />
+    <meta name="theme-color" content="#121316" media="(prefers-color-scheme: dark)" />
+    <meta name="theme-color" content="#FAFAF8" />
+    <meta name="apple-mobile-web-app-capable" content="yes" />
+    <meta name="mobile-web-app-capable" content="yes" />
+    <meta name="apple-mobile-web-app-status-bar-style" content="default" />
+    <meta name="apple-mobile-web-app-title" content="Disrupt" />
+    <link rel="icon" href="/favicon.ico" sizes="48x48" />
+    <link rel="icon" href="/favicon.svg" type="image/svg+xml" />
+    <link rel="apple-touch-icon" href="/apple-touch-icon-180x180.png" />
+    <link rel="manifest" href="/manifest.webmanifest" />
+    <script>
+      // Apply the saved/system theme before first paint to avoid a light flash in dark mode.
+      ;(function () {
+        try {
+          // ?theme=dark|light overrides for QA and screenshots.
+          var forced = new URLSearchParams(location.search).get('theme')
+          var saved = forced === 'dark' || forced === 'light' ? forced : localStorage.getItem('dc.theme')
+          var dark = saved ? saved === 'dark' : window.matchMedia('(prefers-color-scheme: dark)').matches
+          document.documentElement.dataset.theme = dark ? 'dark' : 'light'
+          var locale = localStorage.getItem('dc.locale')
+          if (locale === 'en' || locale === 'el') document.documentElement.lang = locale
+        } catch (e) {
+          document.documentElement.dataset.theme = 'light'
+        }
+      })()
+    </script>
+  </head>
+  <body>
+    <a
+      href="#main"
+      class="sr-only focus:not-sr-only focus:absolute focus:top-2 focus:left-2 focus:z-[100] focus:rounded-control focus:bg-surface-container-lowest focus:px-4 focus:py-2"
+      >Skip to content</a
+    >
+    <div id="root"></div>
+    <script type="module" src="/src/main.tsx"></script>
+  </body>
+</html>
