@@ -1,19 +1,31 @@
 import { http, HttpResponse } from 'msw'
 import { setupServer } from 'msw/node'
 import type { MyIndustries, NotificationPreferences, User } from '@/api/schemas'
-import { articleFixture, industriesFixture, preferencesFixture, userFixture } from './fixtures'
+import {
+  articleDetailFixture,
+  articleFixture,
+  calendarFixture,
+  digestFixture,
+  eventDetailFixture,
+  eventFixture,
+  industriesFixture,
+  preferencesFixture,
+  userFixture,
+} from './fixtures'
 
 /** In-memory backend used by component tests; tests mutate `db` to set up scenarios. */
 export const db: {
   user: User | null
   myIndustries: MyIndustries
   preferences: NotificationPreferences
-  requests: { method: string; path: string; body: unknown; headers: Headers }[]
+  requests: { method: string; path: string; body: unknown; headers: Headers; search: string }[]
+  bookmarks: Set<string>
 } = {
   user: null,
   myIndustries: { industry_ids: [], notify_ids: [] },
   preferences: { ...preferencesFixture },
   requests: [],
+  bookmarks: new Set(),
 }
 
 export function resetDb(): void {
@@ -21,6 +33,7 @@ export function resetDb(): void {
   db.myIndustries = { industry_ids: [], notify_ids: [] }
   db.preferences = { ...preferencesFixture }
   db.requests = []
+  db.bookmarks = new Set()
 }
 
 const unauthenticated = () =>
@@ -34,7 +47,8 @@ async function record(request: Request): Promise<unknown> {
           .clone()
           .json()
           .catch(() => null)
-  db.requests.push({ method: request.method, path: new URL(request.url).pathname, body, headers: request.headers })
+  const url = new URL(request.url)
+  db.requests.push({ method: request.method, path: url.pathname, body, headers: request.headers, search: url.search })
   return body
 }
 
@@ -121,8 +135,162 @@ export const handlers = [
   }),
 
   http.get('*/api/v1/feed/trending', () =>
-    HttpResponse.json({ data: [articleFixture()], meta: { next_cursor: null } }),
+    HttpResponse.json({
+      data: [
+        articleFixture(),
+        articleFixture({ id: 2, slug: 'second', title: 'Second trending story', is_original: false }),
+        articleFixture({ id: 3, slug: 'third', title: 'Third trending story', is_original: false }),
+      ].map(withBookmark),
+      meta: { next_cursor: null },
+    }),
   ),
+
+  http.get('*/api/v1/feed/for-you', async ({ request }) => {
+    await record(request)
+    if (!db.user) return unauthenticated()
+    const fallback = db.myIndustries.industry_ids.length === 0
+    return HttpResponse.json({
+      data: [articleFixture({ id: 31, slug: 'for-you-lead', title: 'Lead story for you' }), eventFixture()].map(
+        withBookmark,
+      ),
+      meta: { next_cursor: null, fallback: fallback ? 'trending' : null },
+    })
+  }),
+
+  http.get('*/api/v1/sections/:section/articles', async ({ request, params }) => {
+    await record(request)
+    return HttpResponse.json({
+      data: [articleFixture({ id: 41, slug: 'section-lead', title: `Lead in ${String(params.section)}` })].map(
+        withBookmark,
+      ),
+      meta: { next_cursor: null },
+    })
+  }),
+
+  http.get('*/api/v1/industries/:slug/feed', ({ params }) =>
+    HttpResponse.json({
+      data: [articleFixture({ id: 51, title: 'Industry story' })].map(withBookmark),
+      meta: { next_cursor: null, industry: { ...industriesFixture[0], slug: String(params.slug) } },
+    }),
+  ),
+
+  http.get('*/api/v1/articles/:slug/related', () =>
+    HttpResponse.json({ data: [articleFixture({ id: 61, slug: 'related-one', title: 'Related story' })] }),
+  ),
+  http.get('*/api/v1/articles/:slug', ({ params }) =>
+    HttpResponse.json({ data: withBookmark(articleDetailFixture({ slug: String(params.slug) })) }),
+  ),
+  http.post('*/api/v1/articles/:id/view', async ({ request }) => {
+    await record(request)
+    return new HttpResponse(null, { status: 204 })
+  }),
+
+  http.get('*/api/v1/events/calendar', () => HttpResponse.json({ data: calendarFixture })),
+  http.get('*/api/v1/events/:slug', ({ params }) =>
+    HttpResponse.json({ data: withBookmark(eventDetailFixture({ slug: String(params.slug) })) }),
+  ),
+  http.get('*/api/v1/events', async ({ request }) => {
+    await record(request)
+    const range = new URL(request.url).searchParams.get('range')
+    return HttpResponse.json({
+      data: [eventFixture()].map(withBookmark),
+      meta: {
+        next_cursor: null,
+        digest:
+          range === 'week'
+            ? { slug: 'weekly-events-2026-W41', title: 'Events this week — 5–11 October', intro: 'Where to be.' }
+            : null,
+      },
+    })
+  }),
+
+  http.get('*/api/v1/digests/latest', () => HttpResponse.json({ data: digestFixture() })),
+  http.get('*/api/v1/digests/:slug', ({ params }) =>
+    HttpResponse.json({ data: digestFixture({ slug: String(params.slug) }) }),
+  ),
+  http.get('*/api/v1/digests', () =>
+    HttpResponse.json({
+      data: [digestFixture({ slug: 'daily-news-2026-10-06', title: 'Daily News — 6 October 2026' })],
+      meta: { next_cursor: null },
+    }),
+  ),
+
+  http.get('*/api/v1/search', ({ request }) => {
+    const query = new URL(request.url).searchParams.get('q') ?? ''
+    return HttpResponse.json({
+      data: query.includes('none')
+        ? { articles: [], events: [], industries: [] }
+        : {
+            articles: [articleFixture({ id: 71, title: `Result for ${query}` })],
+            events: [],
+            industries: [industriesFixture[0]],
+          },
+    })
+  }),
+
+  http.get('*/api/v1/bookmarks', ({ request }) => {
+    if (!db.user) return unauthenticated()
+    const type = new URL(request.url).searchParams.get('type')
+    const items =
+      type === 'event'
+        ? []
+        : [...db.bookmarks]
+            .filter((key) => key.startsWith('article:'))
+            .map((key) => ({
+              ...articleFixture({ id: Number(key.split(':')[1]), title: 'Saved story' }),
+              is_bookmarked: true,
+              bookmarked_at: '2026-10-07T08:00:00+00:00',
+            }))
+    return HttpResponse.json({ data: items, meta: { next_cursor: null } })
+  }),
+  http.post('*/api/v1/bookmarks', async ({ request }) => {
+    const body = (await record(request)) as { type: string; id: number }
+    db.bookmarks.add(`${body.type}:${body.id}`)
+    return HttpResponse.json({ data: { ...body, is_bookmarked: true } }, { status: 201 })
+  }),
+  http.delete('*/api/v1/bookmarks', async ({ request }) => {
+    const body = (await record(request)) as { type: string; id: number }
+    db.bookmarks.delete(`${body.type}:${body.id}`)
+    return new HttpResponse(null, { status: 204 })
+  }),
+
+  http.put('*/api/v1/me/password', async ({ request }) => {
+    const body = (await record(request)) as { current_password?: string }
+    if (body.current_password !== 'password') {
+      return HttpResponse.json(
+        {
+          message: 'The password is incorrect.',
+          code: 'validation_failed',
+          errors: { current_password: ['The password is incorrect.'] },
+        },
+        { status: 422 },
+      )
+    }
+    return HttpResponse.json({ message: 'Your password has been updated.' })
+  }),
+  http.post('*/api/v1/me/export', async ({ request }) => {
+    await record(request)
+    return HttpResponse.json({ message: 'Queued' }, { status: 202 })
+  }),
+  http.delete('*/api/v1/me', async ({ request }) => {
+    const body = (await record(request)) as { password?: string }
+    if (body.password !== 'password') {
+      return HttpResponse.json(
+        {
+          message: 'The password is incorrect.',
+          code: 'validation_failed',
+          errors: { password: ['The password is incorrect.'] },
+        },
+        { status: 422 },
+      )
+    }
+    db.user = null
+    return new HttpResponse(null, { status: 204 })
+  }),
 ]
+
+function withBookmark<T extends { type: string; id: number }>(card: T): T {
+  return { ...card, is_bookmarked: db.bookmarks.has(`${card.type}:${card.id}`) }
+}
 
 export const server = setupServer(...handlers)

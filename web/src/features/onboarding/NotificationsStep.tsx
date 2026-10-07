@@ -13,18 +13,8 @@ import { Switch } from '@/components/ui/Switch'
 import { FormAlert } from '@/features/auth/AuthHeading'
 import { isIos, isStandalone } from '@/hooks/useStandalone'
 import { applyServerErrors } from '@/lib/forms'
-import { DELIVERY_TIMES, withSuggestions } from './constants'
+import { DELIVERY_TIMES, PREFERENCE_TOGGLES, withSuggestions } from './constants'
 import { OnboardingIntro } from './OnboardingIntro'
-
-type ToggleKey = Exclude<keyof NotificationPreferences, 'delivery_time'>
-
-const TOGGLES: { key: ToggleKey; label: string; hint: string }[] = [
-  { key: 'digest_news_daily', label: 'newsDaily', hint: 'newsDailyHint' },
-  { key: 'digest_events_weekly', label: 'eventsWeekly', hint: 'eventsWeeklyHint' },
-  { key: 'digest_news_monthly', label: 'newsMonthly', hint: 'newsMonthlyHint' },
-  { key: 'digest_events_monthly', label: 'eventsMonthly', hint: 'eventsMonthlyHint' },
-  { key: 'event_reminders', label: 'eventReminders', hint: 'eventRemindersHint' },
-]
 
 export function NotificationsStep() {
   const preferences = useNotificationPreferences()
@@ -79,7 +69,7 @@ function NotificationsForm({ initial }: { initial: NotificationPreferences | nul
           </h2>
           {draft ? (
             <div className="divide-y divide-hairline">
-              {TOGGLES.map((toggle) => (
+              {PREFERENCE_TOGGLES.map((toggle) => (
                 <Switch
                   key={toggle.key}
                   checked={draft[toggle.key]}
@@ -105,7 +95,7 @@ function NotificationsForm({ initial }: { initial: NotificationPreferences | nul
             </div>
           ) : (
             <div className="space-y-3 py-space-md">
-              {TOGGLES.map((toggle) => (
+              {PREFERENCE_TOGGLES.map((toggle) => (
                 <Skeleton key={toggle.key} className="h-12 w-full" />
               ))}
             </div>

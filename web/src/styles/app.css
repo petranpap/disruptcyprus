@@ -127,3 +127,92 @@
     transform: translateY(0);
   }
 }
+
+/* Article body (sanitized editor HTML): editorial rhythm from UI/article_detail_disrupt_original. */
+@layer components {
+  .reader-body {
+    font-family: var(--font-body);
+    color: var(--dc-on-surface);
+
+    & > * + * {
+      margin-top: 1.5rem;
+    }
+    & > p:first-of-type::first-letter {
+      float: left;
+      font-family: var(--font-headline);
+      font-size: 3.75em;
+      line-height: 0.8;
+      padding: 0.25rem 0.65rem 0.15rem 0;
+      color: var(--dc-primary);
+      font-weight: 700;
+    }
+    &.no-drop-cap > p:first-of-type::first-letter {
+      float: none;
+      font: inherit;
+      padding: 0;
+      color: inherit;
+    }
+    & h2,
+    & h3 {
+      font-family: var(--font-headline);
+      font-weight: 700;
+      line-height: 1.25;
+      margin-top: 2rem;
+    }
+    & h2 {
+      font-size: 1.4em;
+    }
+    & h3 {
+      font-size: 1.2em;
+    }
+    & a {
+      color: var(--dc-primary);
+      text-decoration: underline;
+      text-underline-offset: 3px;
+    }
+    & ul,
+    & ol {
+      padding-left: 1.25rem;
+    }
+    & ul {
+      list-style: disc;
+    }
+    & ol {
+      list-style: decimal;
+    }
+    & blockquote {
+      margin: 2rem 0;
+      padding: 0.25rem 1rem;
+      border-left: 4px solid var(--dc-brand-cyan);
+      border-radius: 0 0.75rem 0.75rem 0;
+      background: var(--dc-surface-container-lowest);
+      font-family: var(--font-headline);
+      font-style: italic;
+      font-weight: 600;
+      font-size: 1.15em;
+      line-height: 1.35;
+    }
+    & blockquote cite {
+      display: block;
+      margin-top: 0.6rem;
+      font-family: var(--font-ui);
+      font-size: 11px;
+      font-style: normal;
+      font-weight: 600;
+      letter-spacing: 0.06em;
+      color: var(--dc-on-surface-variant);
+    }
+    & img,
+    & figure {
+      border-radius: 0.75rem;
+      overflow: hidden;
+    }
+    & figcaption {
+      font-family: var(--font-ui);
+      font-size: 11px;
+      font-style: italic;
+      color: var(--dc-on-surface-variant);
+      margin-top: 0.5rem;
+    }
+  }
+}

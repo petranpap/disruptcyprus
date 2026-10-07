@@ -13,14 +13,17 @@ export function Splash() {
 }
 
 /**
- * Main app routes: send readers who have not finished onboarding back to it, and first-time guests to the Welcome screen.
+ * Main app routes: send readers who have not finished onboarding back to it, and first-time guests on the home page to Welcome.
  */
 export function AppGate({ children }: { children: ReactNode }) {
   const { data: user, isPending } = useMe()
+  const location = useLocation()
 
   if (isPending) return <Splash />
   if (user && !user.onboarded) return <Navigate to="/onboarding" replace />
-  if (!user && storage.get(STORAGE_KEYS.welcomed) !== '1') return <Navigate to="/welcome" replace />
+  // Only the home page sends first-time guests to Welcome; shared deep links open directly.
+  if (!user && location.pathname === '/' && storage.get(STORAGE_KEYS.welcomed) !== '1')
+    return <Navigate to="/welcome" replace />
 
   return children
 }

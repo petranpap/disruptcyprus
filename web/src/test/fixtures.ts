@@ -83,3 +83,109 @@ export function articleFixture(overrides: Partial<ArticleCard> = {}): ArticleCar
     ...overrides,
   }
 }
+
+import type { Article, Calendar, Digest, EventCard, Event as EventDetail } from '@/api/schemas'
+
+export function eventFixture(overrides: Partial<EventCard> = {}): EventCard {
+  return {
+    type: 'event',
+    id: 10,
+    slug: 'pitch-night',
+    title: 'Pitch Night: Seed Edition',
+    excerpt: 'Eight startups pitch to angels and funds.',
+    starts_at: '2026-10-08T15:00:00+00:00',
+    ends_at: '2026-10-08T18:00:00+00:00',
+    timezone: 'Asia/Nicosia',
+    is_online: false,
+    city: 'Larnaca',
+    location_name: 'Port Tech Quarter',
+    price_info: 'Free',
+    primary_industry: { slug: 'funding-venture-capital', name: 'Funding & Venture Capital', color: '#8B5CF6' },
+    industries: [
+      { slug: 'funding-venture-capital', name: 'Funding & Venture Capital', color: '#8B5CF6', is_primary: true },
+    ],
+    is_featured: true,
+    image: null,
+    locale: 'en',
+    is_fallback: false,
+    is_bookmarked: false,
+    ...overrides,
+  }
+}
+
+export function eventDetailFixture(overrides: Partial<EventDetail> = {}): EventDetail {
+  return {
+    ...eventFixture(),
+    description: '<p>Eight startups pitch.</p>',
+    address: 'Port Tech Quarter, Larnaca',
+    online_url: null,
+    registration_url: 'https://example.com/register',
+    organizer_name: 'Disrupt Cyprus Community',
+    available_locales: ['el', 'en'],
+    ics_url: 'http://localhost:3000/api/v1/events/pitch-night/ics',
+    share_url: 'http://localhost:8080/e/pitch-night',
+    ...overrides,
+  }
+}
+
+export function articleDetailFixture(overrides: Partial<Article> = {}): Article {
+  return {
+    ...articleFixture(),
+    body: '<p>First paragraph with a <a href="https://example.com" rel="noopener noreferrer nofollow">link</a>.</p><blockquote><p>A quote.</p><cite>Someone</cite></blockquote>',
+    hero_caption: 'Limassol Marina',
+    author: {
+      id: 1,
+      name: 'Elena Vassiliou',
+      title: 'Lead Tech Editor',
+      bio: null,
+      avatar_url: null,
+      is_verified: true,
+    },
+    attachment: null,
+    available_locales: ['el', 'en'],
+    share_url: 'http://localhost:8080/a/cyprus-records-eur450m-in-tech-venture-inflows',
+    ...overrides,
+  }
+}
+
+export function digestFixture(overrides: Partial<Digest> = {}): Digest {
+  return {
+    id: 1,
+    slug: 'daily-news-2026-10-07',
+    kind: 'news',
+    cadence: 'daily',
+    period_start: '2026-10-07',
+    period_end: '2026-10-07',
+    title: 'Daily News — 7 October 2026',
+    intro: 'The stories our editors picked for you.',
+    published_at: '2026-10-07T06:30:00+00:00',
+    items_count: 2,
+    share_url: 'http://localhost:8080/d/daily-news-2026-10-07',
+    items: [
+      {
+        id: 1,
+        position: 1,
+        editor_note: 'Our top pick.',
+        is_highlighted: false,
+        item: articleFixture({ id: 21, slug: 'top-pick', title: 'Top pick story' }),
+      },
+      {
+        id: 2,
+        position: 2,
+        editor_note: null,
+        is_highlighted: true,
+        item: articleFixture({ id: 22, slug: 'for-you-story', title: 'Story in your industry', is_original: false }),
+      },
+    ],
+    ...overrides,
+  }
+}
+
+export const calendarFixture: Calendar = {
+  month: '2026-10',
+  timezone: 'Asia/Nicosia',
+  days: [
+    { date: '2026-10-08', events: [eventFixture()] },
+    { date: '2026-10-19', events: [eventFixture({ id: 11, slug: 'hackathon', title: 'Smart Campus Hackathon' })] },
+  ],
+}

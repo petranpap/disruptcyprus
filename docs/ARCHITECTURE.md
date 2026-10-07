@@ -225,8 +225,10 @@ web/src/
   styles/       tokens.json → theme.css (generated)
 ```
 
-- Offline saved items: when an item is bookmarked, the SW stores its JSON (`/articles/{slug}`) and hero image in
-  dedicated caches. The Saved screen also reads an IndexedDB index so it works with no network.
+- Offline: saving an article stores its JSON (`/articles/{slug}`) and hero image in `saved-content-v1` (Cache API, from the page).
+  The SW answers feeds/lists/details network-first with a cached copy offline (falling back to saved copies), keeps `/me` and
+  `/bookmarks` so the Saved screen works offline, and serves industries/sections stale-while-revalidate. TanStack Query runs in
+  `offlineFirst` mode so requests reach the SW. Sign-out and account deletion delete every personal cache.
 - State: TanStack Query for server state; Zustand for theme, reader font size, install-prompt engagement, and the guest's
   local UI language.
 

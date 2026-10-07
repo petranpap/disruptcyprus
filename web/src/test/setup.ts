@@ -1,8 +1,11 @@
 import '@testing-library/jest-dom/vitest'
-import { cleanup } from '@testing-library/react'
+import { cleanup, configure } from '@testing-library/react'
 import { afterAll, afterEach, beforeAll, vi } from 'vitest'
 import i18n from '@/i18n'
 import { resetDb, server } from './server'
+
+// Lazy route chunks load on first use; give async queries room.
+configure({ asyncUtilTimeout: 5000 })
 
 // jsdom gaps.
 Object.defineProperty(window, 'matchMedia', {

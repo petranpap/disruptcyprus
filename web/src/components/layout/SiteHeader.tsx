@@ -20,8 +20,9 @@ interface SiteHeaderProps {
   unreadCount?: number
 }
 
+/** Shared icon-link look; each link adds its own display utility so responsive visibility never conflicts. */
 const iconLink =
-  'relative inline-flex size-tap items-center justify-center rounded-pill text-on-surface-variant transition-colors hover:text-primary'
+  'relative size-tap items-center justify-center rounded-pill text-on-surface-variant transition-colors hover:text-primary'
 
 /**
  * One header for every width (no duplicated navigation):
@@ -81,7 +82,7 @@ export function SiteHeader({ tabs, user, unreadCount = 0 }: SiteHeaderProps) {
         <div className="-mr-2 ml-auto flex items-center lg:mr-0 lg:gap-1">
           <form role="search" onSubmit={search} className="relative mr-2 hidden xl:block">
             <label htmlFor="site-search" className="sr-only">
-              {t('nav.search')}
+              {t('nav.searchPlaceholder')}
             </label>
             <Icon
               name="search"
@@ -97,7 +98,11 @@ export function SiteHeader({ tabs, user, unreadCount = 0 }: SiteHeaderProps) {
               className="h-10 w-52 rounded-pill border border-outline-variant/60 bg-surface-container-lowest pr-3 pl-9 text-body-sm text-on-surface placeholder:text-outline focus:border-brand-cyan focus:ring-2 focus:ring-brand-cyan/25 focus:outline-none"
             />
           </form>
-          <Link to="/explore?focus=search" aria-label={t('nav.search')} className={cn(iconLink, 'xl:hidden')}>
+          <Link
+            to="/explore?focus=search"
+            aria-label={t('nav.search')}
+            className={cn(iconLink, 'inline-flex xl:hidden')}
+          >
             <Icon name="search" size={22} />
           </Link>
 
@@ -119,7 +124,7 @@ export function SiteHeader({ tabs, user, unreadCount = 0 }: SiteHeaderProps) {
           <Link
             to="/notifications"
             aria-label={unreadCount > 0 ? t('nav.notificationsUnread', { count: unreadCount }) : t('nav.notifications')}
-            className={iconLink}
+            className={cn(iconLink, 'inline-flex')}
           >
             <Icon name="notifications" size={22} />
             {unreadCount > 0 && (

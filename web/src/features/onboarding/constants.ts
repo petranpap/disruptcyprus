@@ -22,3 +22,14 @@ export function withSuggestions(preferences: NotificationPreferences): Notificat
 
   return untouched ? { ...preferences, digest_news_daily: true, digest_events_weekly: true } : preferences
 }
+
+export type PreferenceToggleKey = Exclude<keyof NotificationPreferences, 'delivery_time'>
+
+/** Digest and reminder switches, shared by onboarding step 3 and Settings → Notifications. */
+export const PREFERENCE_TOGGLES: { key: PreferenceToggleKey; label: string; hint: string }[] = [
+  { key: 'digest_news_daily', label: 'newsDaily', hint: 'newsDailyHint' },
+  { key: 'digest_events_weekly', label: 'eventsWeekly', hint: 'eventsWeeklyHint' },
+  { key: 'digest_news_monthly', label: 'newsMonthly', hint: 'newsMonthlyHint' },
+  { key: 'digest_events_monthly', label: 'eventsMonthly', hint: 'eventsMonthlyHint' },
+  { key: 'event_reminders', label: 'eventReminders', hint: 'eventRemindersHint' },
+]

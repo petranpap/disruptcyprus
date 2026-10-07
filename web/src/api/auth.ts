@@ -111,3 +111,61 @@ export function useUpdateProfile() {
     onSuccess: setUser,
   })
 }
+
+export function useUploadAvatar() {
+  const setUser = useSetUser()
+
+  return useMutation({
+    mutationFn: async (file: File) => {
+      const form = new FormData()
+      form.append('avatar', file)
+      return (await api.post('/me/avatar', form, { schema: dataSchema(userSchema) })).data
+    },
+    onSuccess: setUser,
+  })
+}
+
+export function useRemoveAvatar() {
+  const setUser = useSetUser()
+
+  return useMutation({
+    mutationFn: async () => (await api.delete('/me/avatar', undefined, { schema: dataSchema(userSchema) })).data,
+    onSuccess: setUser,
+  })
+}
+
+export interface PasswordChange {
+  current_password?: string
+  password: string
+  password_confirmation: string
+}
+
+export function useChangePassword() {
+  return useMutation({ mutationFn: (input: PasswordChange) => api.put<{ message: string }>('/me/password', input) })
+}
+
+export function useUpdateEmail() {
+  const setUser = useSetUser()
+
+  return useMutation({
+    mutationFn: async (input: { email: string; current_password?: string }) =>
+      (await api.patch('/me', input, { schema: dataSchema(userSchema) })).data,
+    onSuccess: setUser,
+  })
+}
+
+export function useRequestDataExport() {
+  return useMutation({ mutationFn: () => api.post<{ message: string }>('/me/export') })
+}
+
+export function useDeleteAccount() {
+  const queryClient = useQueryClient()
+
+  return useMutation({
+    mutationFn: (input: { password?: string; confirmation?: string }) => api.delete<undefined>('/me', input),
+    onSuccess: () => {
+      queryClient.clear()
+      queryClient.setQueryData(meQueryKey, null)
+    },
+  })
+}

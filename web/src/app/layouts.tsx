@@ -1,31 +1,14 @@
-import { useMemo } from 'react'
 import { Link, Outlet } from 'react-router'
 import { useTranslation } from 'react-i18next'
 import { useMe } from '@/api/auth'
 import { BottomNav } from '@/components/layout/BottomNav'
 import { Container, Screen } from '@/components/layout/Screen'
 import { SiteFooter } from '@/components/layout/SiteFooter'
-import { SiteHeader, type SectionTab } from '@/components/layout/SiteHeader'
+import { SiteHeader } from '@/components/layout/SiteHeader'
+import { useSectionTabs } from '@/hooks/useSectionTabs'
 import { Icon, type IconName } from '@/components/ui/Icon'
 import { Logo } from '@/components/ui/Logo'
 import { AppGate } from './guards'
-
-function useSectionTabs(): SectionTab[] {
-  const { t } = useTranslation()
-  const { data: user } = useMe()
-
-  return useMemo(
-    () => [
-      { to: '/', label: user ? t('tabs.forYou') : t('tabs.trending'), end: true },
-      { to: '/news', label: t('tabs.news') },
-      { to: '/startups', label: t('tabs.startups') },
-      { to: '/research', label: t('tabs.research') },
-      { to: '/investors', label: t('tabs.investors') },
-      { to: '/events', label: t('tabs.events') },
-    ],
-    [t, user],
-  )
-}
 
 /**
  * Home, sections and account pages. Phones: app-style header with tab row + bottom navigation.

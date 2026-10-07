@@ -3,6 +3,7 @@ import { useTranslation } from 'react-i18next'
 import type { ArticleCard } from '@/api/schemas'
 import { Badge } from '@/components/ui/Badge'
 import { ArticleMeta } from './ArticleMeta'
+import { useBookmark } from '@/hooks/useBookmark'
 import { BookmarkButton } from './BookmarkButton'
 
 interface HeroCardProps {
@@ -12,6 +13,7 @@ interface HeroCardProps {
 
 /** Lead story: 4:3 image (16:9 on wider screens), scrim, badge, serif title on the image. */
 export function HeroCard({ article, onToggleBookmark }: HeroCardProps) {
+  const bookmark = useBookmark()
   const { t } = useTranslation()
 
   return (
@@ -46,7 +48,7 @@ export function HeroCard({ article, onToggleBookmark }: HeroCardProps) {
       </Link>
       <div className="mx-space-md flex items-center justify-between pt-1 pb-1 hairline-t">
         <ArticleMeta article={article} />
-        <BookmarkButton saved={article.is_bookmarked} onToggle={() => onToggleBookmark?.(article)} />
+        <BookmarkButton saved={article.is_bookmarked} onToggle={() => (onToggleBookmark ?? bookmark)(article)} />
       </div>
     </article>
   )

@@ -2,6 +2,7 @@ import { Link } from 'react-router'
 import type { ArticleCard } from '@/api/schemas'
 import { upper } from '@/lib/greek'
 import { ArticleMeta } from './ArticleMeta'
+import { useBookmark } from '@/hooks/useBookmark'
 import { BookmarkButton } from './BookmarkButton'
 
 interface CompactCardProps {
@@ -11,6 +12,7 @@ interface CompactCardProps {
 
 /** 80×80 thumbnail row with kicker, two-line title and meta. */
 export function CompactCard({ article, onToggleBookmark }: CompactCardProps) {
+  const bookmark = useBookmark()
   return (
     <article className="group flex items-center gap-3.5 rounded-card border border-card-stroke bg-surface-container-lowest p-3 transition-colors hover:border-card-stroke-hover">
       <Link
@@ -41,7 +43,11 @@ export function CompactCard({ article, onToggleBookmark }: CompactCardProps) {
         </Link>
         <div className="mt-1 flex items-center justify-between">
           <ArticleMeta article={article} />
-          <BookmarkButton saved={article.is_bookmarked} onToggle={() => onToggleBookmark?.(article)} size={18} />
+          <BookmarkButton
+            saved={article.is_bookmarked}
+            onToggle={() => (onToggleBookmark ?? bookmark)(article)}
+            size={18}
+          />
         </div>
       </div>
     </article>

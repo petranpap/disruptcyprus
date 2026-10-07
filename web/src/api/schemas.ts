@@ -125,3 +125,86 @@ export const cursorPageSchema = <T extends z.ZodType>(item: T) =>
     data: z.array(item),
     meta: z.object({ next_cursor: z.string().nullable() }).loose(),
   })
+
+export const articleSchema = articleCardSchema.extend({
+  body: z.string(),
+  hero_caption: z.string().nullable(),
+  author: z.object({
+    id: z.number(),
+    name: z.string(),
+    title: z.string().nullable(),
+    bio: z.string().nullable(),
+    avatar_url: z.string().nullable(),
+    is_verified: z.boolean(),
+  }),
+  attachment: z.object({ url: z.string(), file_name: z.string(), size: z.number(), mime_type: z.string() }).nullable(),
+  available_locales: z.array(localeSchema),
+  share_url: z.string(),
+})
+export type Article = z.infer<typeof articleSchema>
+
+export const eventSchema = eventCardSchema.extend({
+  description: z.string(),
+  address: z.string().nullable(),
+  online_url: z.string().nullable(),
+  registration_url: z.string().nullable(),
+  organizer_name: z.string().nullable(),
+  available_locales: z.array(localeSchema),
+  ics_url: z.string(),
+  share_url: z.string(),
+})
+export type Event = z.infer<typeof eventSchema>
+
+export const digestKindSchema = z.enum(['news', 'events'])
+export const digestCadenceSchema = z.enum(['daily', 'weekly', 'monthly'])
+export type DigestKind = z.infer<typeof digestKindSchema>
+export type DigestCadence = z.infer<typeof digestCadenceSchema>
+
+export const digestCardSchema = z.object({
+  id: z.number(),
+  slug: z.string(),
+  kind: digestKindSchema,
+  cadence: digestCadenceSchema,
+  period_start: z.string(),
+  period_end: z.string(),
+  title: z.string(),
+  intro: z.string().nullable(),
+  published_at: z.string().nullable(),
+  items_count: z.number().optional(),
+  cover_url: z.string().nullable().optional(),
+  share_url: z.string(),
+})
+export type DigestCard = z.infer<typeof digestCardSchema>
+
+export const digestSchema = digestCardSchema.extend({
+  items: z.array(
+    z.object({
+      id: z.number(),
+      position: z.number(),
+      editor_note: z.string().nullable(),
+      is_highlighted: z.boolean(),
+      item: contentCardSchema,
+    }),
+  ),
+})
+export type Digest = z.infer<typeof digestSchema>
+
+export const calendarSchema = z.object({
+  month: z.string(),
+  timezone: z.string(),
+  days: z.array(z.object({ date: z.string(), events: z.array(eventCardSchema) })),
+})
+export type Calendar = z.infer<typeof calendarSchema>
+
+export const searchResultsSchema = z.object({
+  articles: z.array(articleCardSchema),
+  events: z.array(eventCardSchema),
+  industries: z.array(industrySchema),
+})
+export type SearchResults = z.infer<typeof searchResultsSchema>
+
+export const bookmarkedCardSchema = z.discriminatedUnion('type', [
+  articleCardSchema.extend({ bookmarked_at: z.string() }),
+  eventCardSchema.extend({ bookmarked_at: z.string() }),
+])
+export type BookmarkedCard = z.infer<typeof bookmarkedCardSchema>

@@ -205,5 +205,185 @@
     "dailyBody": "The morning roundup our editors put together for you.",
     "eventsTitle": "The events calendar",
     "eventsBody": "Meetups, pitch nights and conferences across the island."
+  },
+  "saved": {
+    "title": "Saved",
+    "articles": "Articles",
+    "events": "Events",
+    "added": "Saved. Available offline on this device.",
+    "removed": "Removed from saved",
+    "emptyTitle": "Nothing saved yet",
+    "emptyBody": "Tap the bookmark on any story or event to find it here. Saved stories work offline too.",
+    "offlineReady": "Offline",
+    "guestTitle": "Save stories for later",
+    "guestBody": "Create a free account to save stories and events and read them offline."
+  },
+  "share": {
+    "copied": "Link copied"
+  },
+  "guest": {
+    "saveTitle": "Save it for later",
+    "saveBody": "Create a free account to save stories and events, and read them offline.",
+    "personalizeTitle": "Make the feed yours",
+    "personalizeBody": "Create a free account and choose the industries you follow.",
+    "followTitle": "Follow this industry",
+    "followBody": "Create a free account to follow industries and get alerts on major stories."
+  },
+  "offline": {
+    "banner": "You're offline. Showing what is saved on this device.",
+    "title": "You're offline",
+    "body": "Connect to the internet to load new stories. Your saved stories are still available.",
+    "openSaved": "Saved stories"
+  },
+  "feed": {
+    "loadMore": "Load more",
+    "end": "You're all caught up",
+    "updated": "Updated just now",
+    "pullToRefresh": "Pull to refresh",
+    "trendingToday": "Trending today",
+    "latest": "Latest coverage",
+    "upcomingEvents": "Upcoming events",
+    "personalizeTitle": "Make it yours",
+    "personalizeBody": "Pick the industries you follow and this page becomes your personal briefing.",
+    "personalizeCta": "Choose industries",
+    "fallbackTitle": "Here's what's trending",
+    "fallbackBody": "You don't follow any industries yet. Choose some to turn this into your personal feed.",
+    "emptyTitle": "No stories here yet",
+    "emptyBody": "Try another industry or check back soon."
+  },
+  "filters": {
+    "all": "All",
+    "more": "More",
+    "industries": "Industries",
+    "clear": "Clear",
+    "apply": "Show results"
+  },
+  "news": {
+    "latest": "Latest",
+    "daily": "Daily",
+    "monthly": "Monthly"
+  },
+  "digest": {
+    "previous": "Previous editions",
+    "forYou": "For you",
+    "empty": "This edition has no stories in your languages.",
+    "notPublished": "No edition has been published yet.",
+    "itemsCount_one": "{{count}} item",
+    "itemsCount_other": "{{count}} items",
+    "label": {
+      "news_daily": "Daily News",
+      "news_monthly": "Monthly News",
+      "events_weekly": "Weekly Events",
+      "events_monthly": "Monthly Events",
+      "news_weekly": "Weekly News",
+      "events_daily": "Daily Events"
+    }
+  },
+  "events": {
+    "upcoming": "Upcoming",
+    "week": "This week",
+    "month": "This month",
+    "view": "View",
+    "list": "List",
+    "calendar": "Calendar",
+    "onlineOnly": "Online only",
+    "emptyTitle": "No events here",
+    "emptyBody": "Try another period or industry.",
+    "register": "Register",
+    "addToCalendar": "Add to calendar",
+    "when": "When",
+    "where": "Where",
+    "price": "Price",
+    "organizer": "Organizer",
+    "openMaps": "Open in Maps",
+    "joinOnline": "Join online",
+    "timezoneNote": "Times shown in {{timezone}}",
+    "today": "Today",
+    "tomorrow": "Tomorrow",
+    "previousMonth": "Previous month",
+    "nextMonth": "Next month",
+    "noEventsDay": "No events on this day",
+    "selectedDay": "Events on {{date}}",
+    "allMonth": "All events this month",
+    "count_one": "{{count}} event",
+    "count_other": "{{count}} events"
+  },
+  "reader": {
+    "textSize": "Text size",
+    "textSizeStep": "Text size {{step}} of 3",
+    "listen": "Listen {{count}} min",
+    "pause": "Pause",
+    "resume": "Resume",
+    "stop": "Stop",
+    "player": "Audio player",
+    "relatedKicker": "Curated analysis",
+    "related": "Related stories",
+    "attachment": "Download the report",
+    "fallbackNotice": "This story is available only in {{language}}.",
+    "verified": "Verified author",
+    "progress": "Reading progress"
+  },
+  "explore": {
+    "title": "Explore",
+    "industries": "Industries",
+    "stories": "Stories",
+    "noResults": "Nothing matches “{{query}}”.",
+    "minChars": "Type at least 2 characters.",
+    "follow": "Follow",
+    "following": "Following"
+  },
+  "profile": {
+    "settings": "Settings",
+    "industries": "Your industries",
+    "edit": "Edit",
+    "noIndustries": "You don't follow any industries yet."
+  },
+  "settings": {
+    "saved": "Saved",
+    "industries": {
+      "title": "Industries & alerts",
+      "alertsTitle": "Alerts",
+      "alertsHint": "Get a notification when a featured story is published in these industries."
+    },
+    "notifications": {
+      "title": "Notifications",
+      "pushNote": "Push notifications on this device can be enabled once the notification centre launches."
+    },
+    "language": {
+      "title": "Language"
+    },
+    "appearance": {
+      "title": "Appearance",
+      "hint": "System follows your device's light or dark setting."
+    },
+    "account": {
+      "title": "Account",
+      "details": "Your details",
+      "photo": "Profile photo",
+      "upload": "Upload photo",
+      "remove": "Remove",
+      "currentPassword": "Current password",
+      "changePassword": "Change password",
+      "setPassword": "Set a password",
+      "passwordChanged": "Your password has been changed.",
+      "emailChangeNote": "We'll send a verification link to the new address.",
+      "emailChanged": "Saved. Check your inbox to verify the new email."
+    },
+    "privacy": {
+      "title": "Privacy & data",
+      "exportTitle": "Download your data",
+      "exportBody": "Get a copy of your account, followed industries, preferences, saved items and notifications as a JSON file. We'll email you a download link.",
+      "exportCta": "Request data export",
+      "exportQueued": "We're preparing your export. You'll receive an email with the download link shortly.",
+      "policies": "Policies",
+      "deleteTitle": "Delete account",
+      "deleteBody": "This permanently deletes your account, preferences, saved items and notifications. It cannot be undone.",
+      "deleteCta": "Delete my account",
+      "deleteConfirmTitle": "Delete your account?",
+      "deleteConfirmPassword": "Enter your password to confirm",
+      "deleteConfirmWord": "Type {{word}} to confirm",
+      "deleteFinal": "Permanently delete",
+      "deleted": "Your account has been deleted."
+    }
   }
 }

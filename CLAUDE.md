@@ -90,6 +90,8 @@ Environment quirks on this machine:
 - Design tokens: edit `web/src/styles/tokens.json`, then `npm run tokens` regenerates `src/styles/theme.css` (never edit it by hand). Tailwind's
   default palette is removed: only token colours exist (`bg-surface-container-lowest`, `text-on-surface-variant`, …).
 - API calls only through `src/api/client.ts` (CSRF cookie, `Accept-Language`, error envelope → `ApiError`) and zod-validated hooks in `src/api/*`.
+- After Prettier runs, multi-line code no longer matches single-line search strings: verify scripted edits actually applied (grep), as several silently missed in Phase 5.
+- Cards save themselves via `useBookmark()` (optimistic + guest gate); feeds use `FeedStream` (design rhythm) inside `FeedLayout` (desktop sidebar).
 - Never copy server data into state from an effect: load in a parent, initialise the form's state from props (see onboarding steps).
 - Constants/helpers shared across components live in non-component modules (fast refresh).
 - Tests: Vitest + RTL with MSW (`src/test/server.ts` in-memory backend, `renderApp(path)` mounts the real routes). Tests run in English.
@@ -141,6 +143,10 @@ Environment quirks on this machine:
 | 2026-10-07 | Logo mark drawn as SVG (bold "#") shared by app icon and header; wordmark stays Playfair until the SVG logo arrives | Thin font glyph was illegible at 28px |
 | 2026-10-07 | Route-level code splitting for welcome/auth/onboarding; precache only Latin + Greek font subsets | Main bundle 605→252 KB, precache 1.27 MB→0.88 MB |
 | 2026-10-07 | Desktop is a real website (top-bar nav, 1200px container, footer, split auth screens); app layout below 1024px | Product owner: "a website with PWA, not an app on desktop" (replaces the 480px column) |
+| 2026-10-07 | Service worker: network-first for feeds/lists/details (cache fallback offline), stale-while-revalidate only for industries/sections, saved articles in `saved-content-v1`; sign-out/deletion clears personal caches | SWR would show stale bookmark state after a toggle; offline still instant from cache |
+| 2026-10-07 | Bookmarks are optimistic across every cached query (`patchCards`) with rollback; guests get a sign-up sheet | Instant feedback everywhere a card appears |
+| 2026-10-07 | First-time guests are sent to Welcome only from `/`; deep links (shared articles/events) open directly | Shared links must land on the content |
+| 2026-10-07 | Reader "Listen" uses Web Speech behind `SpeechProvider`; hidden when the device has no voice for the story language | Brief; swappable for a TTS service later |
 | 2026-10-05 | Everything runs in containers (podman + podman-compose locally; compose file stays Docker-compatible) | Product owner |
 
 ## Phase status
@@ -150,6 +156,6 @@ Environment quirks on this machine:
 - [x] Phase 2 — Content API (feeds, sections, articles, events, digests, search, bookmarks, OpenAPI)
 - [x] Phase 3 — Admin panel (Filament 5), digest generation + scheduler, push campaigns UI (delivery stubbed)
 - [x] Phase 4 — Web foundation (shell, tokens, i18n, API client, auth, onboarding, component gallery, PWA base)
-- [ ] Phase 5 — Web features
+- [x] Phase 5 — Web features (feeds, sections, reader, events + calendar, digests, explore/search, saved + offline, settings, guest mode)
 - [ ] Phase 6 — Notifications
 - [ ] Phase 7 — Landing, share pages, GDPR, CI, Lighthouse, deployment, visual QA
