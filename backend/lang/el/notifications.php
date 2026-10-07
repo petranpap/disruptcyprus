@@ -7,4 +7,22 @@ return [
         'body' => 'Κατέβασε ένα αντίγραφο των δεδομένων σου στο Disrupt Cyprus. Ο σύνδεσμος ισχύει για :hours ώρες.',
         'action' => 'Λήψη δεδομένων',
     ],
+    'digest' => [
+        'title' => ':label: νέο τεύχος',
+        'body' => 'Κορυφαίο θέμα: :title',
+        'labels' => [
+            'news_daily' => 'Ημερήσιες Ειδήσεις',
+            'news_monthly' => 'Μηνιαίες Ειδήσεις',
+            'events_weekly' => 'Εβδομαδιαίες Εκδηλώσεις',
+            'events_monthly' => 'Μηνιαίες Εκδηλώσεις',
+        ],
+    ],
+    'featured' => [
+        'title' => 'Προβεβλημένο στην κατηγορία :industry',
+    ],
+    'event_reminder' => [
+        'title' => 'Υπενθύμιση: :title',
+        'body' => ':time · :place',
+        'online' => 'Διαδικτυακά',
+    ],
 ];

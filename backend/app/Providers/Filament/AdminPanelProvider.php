@@ -38,6 +38,8 @@ class AdminPanelProvider extends PanelProvider
             ->id('admin')
             ->path('admin')
             ->login()
+            // Saves (record + industries pivot) are atomic, so after-commit listeners see the complete record.
+            ->databaseTransactions()
             ->passwordReset()
             ->brandName('Disrupt Cyprus')
             ->colors([

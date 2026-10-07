@@ -13,4 +13,5 @@ Schedule::command('digests:generate news monthly')->monthlyOn(1, '06:00')->timez
 Schedule::command('digests:generate events monthly')->monthlyOn(1, '06:05')->timezone($timezone)->withoutOverlapping();
 
 Schedule::command('content:publish-scheduled')->everyMinute()->withoutOverlapping();
+Schedule::command('reminders:events')->hourly()->withoutOverlapping();
 Schedule::command('maintenance:prune')->dailyAt('03:15')->timezone($timezone);

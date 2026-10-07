@@ -4,32 +4,36 @@ namespace App\Jobs;
 
 use App\Enums\PushCampaignStatus;
 use App\Models\PushCampaign;
+use App\Notifications\CampaignNotification;
 use Illuminate\Contracts\Queue\ShouldQueue;
 use Illuminate\Foundation\Queue\Queueable;
-use Illuminate\Support\Facades\Log;
 
 /**
- * Delivers a manual push campaign. Until Phase 6 adds Web Push, it records the audience size only.
+ * Delivers a manual campaign to its audience: in-app for everyone, Web Push for readers with a subscribed device.
+ * recipients_count counts readers; failures_count is incremented per failed push (CountCampaignPushFailures).
  */
 class SendPushCampaign implements ShouldQueue
 {
     use Queueable;
 
+    public int $tries = 1;
+
     public function __construct(public PushCampaign $campaign) {}
 
     public function handle(): void
     {
-        $recipients = $this->campaign->audienceQuery()->count();
+        $recipients = 0;
 
-        Log::info('Push campaign recorded; Web Push delivery arrives in Phase 6.', [
-            'campaign' => $this->campaign->id,
-            'recipients' => $recipients,
-        ]);
+        $this->campaign->audienceQuery()->chunkById(500, function ($users) use (&$recipients): void {
+            foreach ($users as $user) {
+                $user->notify(new CampaignNotification($this->campaign));
+                $recipients++;
+            }
+        });
 
         $this->campaign->forceFill([
             'status' => PushCampaignStatus::Sent,
             'recipients_count' => $recipients,
-            'failures_count' => 0,
             'sent_at' => now(),
         ])->save();
     }
