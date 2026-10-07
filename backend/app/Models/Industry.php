@@ -2,6 +2,7 @@
 
 namespace App\Models;
 
+use App\Enums\ContentLocale;
 use App\Enums\IndustryGroup;
 use Database\Factories\IndustryFactory;
 use Illuminate\Database\Eloquent\Attributes\Fillable;
@@ -24,6 +25,22 @@ class Industry extends Model implements HasMedia
 
     public const CACHE_KEY = 'industries.active';
 
+    /**
+     * Cache key for the rendered API payload in one language. Only plain arrays are cached:
+     * Laravel 13 refuses to unserialize objects from the cache (serializable_classes = false).
+     */
+    public static function cacheKey(string $locale): string
+    {
+        return self::CACHE_KEY.'.'.$locale;
+    }
+
+    public static function forgetCache(): void
+    {
+        foreach (ContentLocale::values() as $locale) {
+            Cache::forget(self::cacheKey($locale));
+        }
+    }
+
     public const IMAGE_COLLECTION = 'image';
 
     /** @var list<string> */
@@ -31,8 +48,8 @@ class Industry extends Model implements HasMedia
 
     protected static function booted(): void
     {
-        static::saved(fn () => Cache::forget(self::CACHE_KEY));
-        static::deleted(fn () => Cache::forget(self::CACHE_KEY));
+        static::saved(fn () => self::forgetCache());
+        static::deleted(fn () => self::forgetCache());
     }
 
     /**

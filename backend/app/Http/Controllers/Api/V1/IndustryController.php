@@ -5,18 +5,19 @@ namespace App\Http\Controllers\Api\V1;
 use App\Http\Controllers\Controller;
 use App\Http\Resources\IndustryResource;
 use App\Models\Industry;
-use Illuminate\Http\Resources\Json\AnonymousResourceCollection;
+use Illuminate\Http\JsonResponse;
+use Illuminate\Http\Request;
 use Illuminate\Support\Facades\Cache;
 
 class IndustryController extends Controller
 {
-    public function index(): AnonymousResourceCollection
+    public function index(Request $request): JsonResponse
     {
-        $industries = Cache::rememberForever(
-            Industry::CACHE_KEY,
-            fn () => Industry::query()->active()->ordered()->with('media')->get(),
+        $payload = Cache::rememberForever(
+            Industry::cacheKey(app()->getLocale()),
+            fn () => IndustryResource::collection(Industry::query()->active()->ordered()->with('media')->get())->resolve($request),
         );
 
-        return IndustryResource::collection($industries);
+        return response()->json(['data' => $payload]);
     }
 }

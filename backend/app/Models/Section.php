@@ -2,6 +2,7 @@
 
 namespace App\Models;
 
+use App\Enums\ContentLocale;
 use Database\Factories\SectionFactory;
 use Illuminate\Database\Eloquent\Attributes\Fillable;
 use Illuminate\Database\Eloquent\Builder;
@@ -19,13 +20,29 @@ class Section extends Model
 
     public const CACHE_KEY = 'sections.all';
 
+    /**
+     * Cache key for the rendered API payload in one language. Only plain arrays are cached:
+     * Laravel 13 refuses to unserialize objects from the cache (serializable_classes = false).
+     */
+    public static function cacheKey(string $locale): string
+    {
+        return self::CACHE_KEY.'.'.$locale;
+    }
+
+    public static function forgetCache(): void
+    {
+        foreach (ContentLocale::values() as $locale) {
+            Cache::forget(self::cacheKey($locale));
+        }
+    }
+
     /** @var list<string> */
     public array $translatable = ['name'];
 
     protected static function booted(): void
     {
-        static::saved(fn () => Cache::forget(self::CACHE_KEY));
-        static::deleted(fn () => Cache::forget(self::CACHE_KEY));
+        static::saved(fn () => self::forgetCache());
+        static::deleted(fn () => self::forgetCache());
     }
 
     /**

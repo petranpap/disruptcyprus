@@ -43,6 +43,24 @@ it('sends cache headers and honours ETags on public taxonomy', function () {
     $this->withHeader('If-None-Match', $first->headers->get('ETag'))->getJson('/api/v1/industries')->assertStatus(304);
 });
 
+it('serves taxonomy from a serializing cache store, per language', function () {
+    // Regression: Laravel 13 refuses to unserialize cached objects; only arrays may be cached.
+    config(['cache.default' => 'file']);
+    cache()->store('file')->flush();
+
+    $first = $this->withHeader('Accept-Language', 'el')->getJson('/api/v1/industries')->assertOk();
+    $cached = $this->withHeader('Accept-Language', 'el')->getJson('/api/v1/industries')->assertOk();
+    $english = $this->withHeader('Accept-Language', 'en')->getJson('/api/v1/sections')->assertOk();
+    $this->withHeader('Accept-Language', 'en')->getJson('/api/v1/sections')->assertOk()->assertJsonPath('data.0.name', 'News');
+
+    expect($cached->json())->toBe($first->json())->and($english->json('data.0.name'))->toBe('News');
+
+    Industry::query()->where('slug', 'fintech')->firstOrFail()->update(['name' => ['el' => 'Χρηματοτεχνολογία', 'en' => 'FinTech']]);
+    $this->withHeader('Accept-Language', 'el')->getJson('/api/v1/industries')->assertJsonPath('data.0.name', 'Χρηματοτεχνολογία');
+
+    cache()->store('file')->flush();
+});
+
 it('seeds industries idempotently', function () {
     $this->seed(IndustrySeeder::class);
 
