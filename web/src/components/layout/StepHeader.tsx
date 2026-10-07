@@ -16,7 +16,7 @@ export function StepHeader({ current, total, onBack, onSkip }: StepHeaderProps) 
 
   return (
     <header className="sticky top-0 z-40 glass px-space-md py-space-sm pt-safe shadow-sm">
-      <div className="flex items-center justify-between">
+      <div className="mx-auto flex w-full max-w-narrow items-center justify-between lg:px-8">
         <div className="flex items-center gap-space-sm">
           {onBack ? (
             <IconButton icon="arrow_back" label={t('common.back')} size={20} onClick={onBack} className="-ml-2" />

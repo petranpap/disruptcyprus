@@ -7,7 +7,7 @@ import { HeroCard } from '@/components/content/HeroCard'
 import { SectionHeader } from '@/components/content/SectionHeader'
 import { StandardCard } from '@/components/content/StandardCard'
 import { TrendingCard } from '@/components/content/TrendingCard'
-import { AppColumn } from '@/components/layout/AppColumn'
+import { Screen } from '@/components/layout/Screen'
 import { Badge } from '@/components/ui/Badge'
 import { Button } from '@/components/ui/Button'
 import { Checkbox } from '@/components/ui/Checkbox'
@@ -66,8 +66,8 @@ export function ComponentsPage() {
   })
 
   return (
-    <AppColumn>
-      <main className="space-y-space-xl px-margin py-space-lg">
+    <Screen>
+      <main className="mx-auto w-full max-w-content space-y-space-xl px-margin py-space-lg lg:px-8">
         <div className="flex items-center justify-between">
           <Logo size="sm" />
           <h1 className="font-headline text-headline-md">{t('dev.title')}</h1>
@@ -89,7 +89,7 @@ export function ComponentsPage() {
         </Block>
 
         <Block title="Colours">
-          <div className="grid grid-cols-4 gap-2">
+          <div className="grid grid-cols-4 gap-2 lg:grid-cols-8">
             {Object.keys(tokens.colors).map((name) => (
               <div key={name} className="space-y-1">
                 <div
@@ -185,7 +185,7 @@ export function ComponentsPage() {
 
         <Block title="Cards">
           <HeroCard article={hero} />
-          <div className="grid gap-gutter sm:grid-cols-2">
+          <div className="grid gap-gutter sm:grid-cols-2 lg:grid-cols-3">
             <StandardCard article={plain} />
             <StandardCard article={greek} />
           </div>
@@ -215,6 +215,6 @@ export function ComponentsPage() {
           <EmptyState icon="cloud_off" title={t('errors.network')} tone="error" />
         </Block>
       </main>
-    </AppColumn>
+    </Screen>
   )
 }

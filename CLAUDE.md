@@ -98,7 +98,10 @@ Environment quirks on this machine:
 - Icons: Material Symbols as SVG components (`@material-symbols/svg-400`); no icon font.
 - Fonts self-hosted (`@fontsource-variable/*`). Headline stack: `"Playfair Display", "Noto Serif Display", serif` (Playfair has no Greek).
 - Greek uppercase labels go through the `greekUpper()` helper (strips tonos).
-- Mobile-first. ≥768px: centered 480px app column. 44px minimum tap targets, safe-area insets.
+- Responsive website with an app feel on phones: < `lg` (1024px) = app layout (tab row + bottom nav); ≥ `lg` = website
+  (top-bar navigation, `Container` up to 1200px, footer, no bottom nav). One header component rearranges via CSS — never
+  render separate mobile/desktop copies of navigation. Use `Screen` + `Container` (`content` | `narrow` | `reading`).
+  44px minimum tap targets, safe-area insets.
 
 ## Decisions log
 
@@ -137,6 +140,7 @@ Environment quirks on this machine:
 | 2026-10-07 | Relative time: English narrow ("2h ago", as in the designs), Greek long ("πριν από 2 ώρες") | Greek short form abbreviates to "ώ." |
 | 2026-10-07 | Logo mark drawn as SVG (bold "#") shared by app icon and header; wordmark stays Playfair until the SVG logo arrives | Thin font glyph was illegible at 28px |
 | 2026-10-07 | Route-level code splitting for welcome/auth/onboarding; precache only Latin + Greek font subsets | Main bundle 605→252 KB, precache 1.27 MB→0.88 MB |
+| 2026-10-07 | Desktop is a real website (top-bar nav, 1200px container, footer, split auth screens); app layout below 1024px | Product owner: "a website with PWA, not an app on desktop" (replaces the 480px column) |
 | 2026-10-05 | Everything runs in containers (podman + podman-compose locally; compose file stays Docker-compatible) | Product owner |
 
 ## Phase status

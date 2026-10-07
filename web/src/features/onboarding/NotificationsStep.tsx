@@ -61,7 +61,7 @@ function NotificationsForm({ initial }: { initial: NotificationPreferences | nul
   return (
     <>
       <StepHeader current={3} total={3} onBack={() => navigate('/onboarding/industries')} />
-      <main id="main" className="px-space-md pt-space-lg pb-36">
+      <main id="main" className="mx-auto w-full max-w-narrow px-space-md pt-space-lg pb-36 lg:px-8 lg:pt-space-xl">
         <OnboardingIntro
           icon="notifications"
           kicker={t('onboarding.notifications.kicker')}
@@ -135,6 +135,7 @@ function NotificationsForm({ initial }: { initial: NotificationPreferences | nul
       </main>
       <BottomDock>
         <Button
+          className="sm:ml-auto sm:w-auto sm:min-w-60"
           onClick={() => void finish()}
           disabled={!draft}
           loading={updatePreferences.isPending || updateProfile.isPending}

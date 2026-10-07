@@ -1,5 +1,5 @@
 import { useTranslation } from 'react-i18next'
-import { AppColumn } from '@/components/layout/AppColumn'
+import { Screen } from '@/components/layout/Screen'
 import { Button } from '@/components/ui/Button'
 import { EmptyState } from '@/components/ui/EmptyState'
 
@@ -8,7 +8,7 @@ export function RouteError() {
   const { t } = useTranslation()
 
   return (
-    <AppColumn className="flex items-center">
+    <Screen className="flex items-center">
       <main id="main" className="w-full">
         <EmptyState
           icon="error"
@@ -17,6 +17,6 @@ export function RouteError() {
           action={<Button onClick={() => window.location.reload()}>{t('common.retry')}</Button>}
         />
       </main>
-    </AppColumn>
+    </Screen>
   )
 }

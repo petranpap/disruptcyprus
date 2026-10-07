@@ -13,7 +13,7 @@ interface Item {
   isActive: (pathname: string) => boolean
 }
 
-/** Frosted bottom navigation: Home, Explore, Saved, Profile (active item filled). */
+/** Phone/tablet bottom navigation: Home, Explore, Saved, Profile (active item filled). Hidden on desktop. */
 export function BottomNav() {
   const { t } = useTranslation()
   const { pathname } = useLocation()
@@ -52,7 +52,7 @@ export function BottomNav() {
   return (
     <nav
       aria-label={t('nav.main')}
-      className="fixed inset-x-0 bottom-0 z-50 mx-auto max-w-app-column glass pb-safe shadow-[0_-4px_20px_-2px_rgba(15,23,42,0.05)] hairline-t"
+      className="fixed inset-x-0 bottom-0 z-50 glass pb-safe shadow-[0_-4px_20px_-2px_rgba(15,23,42,0.05)] hairline-t lg:hidden"
     >
       <ul className="flex items-center justify-around px-space-md pt-1">
         {items.map((item) => {

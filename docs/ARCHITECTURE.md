@@ -61,7 +61,9 @@ same across languages and routing stays simple; the page language follows the us
   - "Daily"/"Monthly" show the latest published News digest of that cadence (with a "previous editions" link).
   - "This week"/"This month" show the published Weekly/Monthly Events digest for the current period. If none is
     published yet, they fall back to a plain date-range query, so the tab is never empty.
-- Bottom nav: **Home | Explore | Saved | Profile** (matches the home export; DESIGN.md's 3-tab text is outdated).
+- Bottom nav (phones/tablets < 1024px): **Home | Explore | Saved | Profile** (matches the home export; DESIGN.md's 3-tab text is outdated).
+- Desktop (≥ 1024px) is a full website: the section tabs become the top-bar navigation, Explore is reached through the search field,
+  Saved/Notifications/Profile through header icons and the account link, and a footer holds the site map and legal links.
 - Header: logo, search (→ `/explore?focus=search`), bell with unread badge (→ `/notifications`).
 
 ## 3. Screens found in `UI/`

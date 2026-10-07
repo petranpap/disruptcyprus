@@ -68,7 +68,7 @@ export function AccountStep() {
   return (
     <>
       <StepHeader current={1} total={3} />
-      <main id="main" className="px-space-md pt-space-lg pb-36">
+      <main id="main" className="mx-auto w-full max-w-narrow px-space-md pt-space-lg pb-36 lg:px-8 lg:pt-space-xl">
         <OnboardingIntro
           icon="auto_awesome"
           kicker={t('onboarding.account.kicker')}
@@ -136,6 +136,7 @@ export function AccountStep() {
       </main>
       <BottomDock>
         <Button
+          className="sm:ml-auto sm:w-auto sm:min-w-60"
           onClick={() => void submit()}
           loading={updateProfile.isPending}
           trailingIcon={<Icon name="arrow_forward" size={18} />}

@@ -30,7 +30,11 @@
     "notificationsUnread": "Notifications, {{count}} unread",
     "search": "Search",
     "sections": "Sections",
-    "main": "Main"
+    "main": "Main",
+    "account": "Account",
+    "searchPlaceholder": "Search stories, events, industries",
+    "signIn": "Sign in",
+    "signUp": "Create account"
   },
   "tabs": {
     "forYou": "For you",
@@ -52,7 +56,8 @@
     "signIn": "Sign in",
     "google": "Continue with Google",
     "guest": "Continue as guest",
-    "legal": "By signing up, you agree to our <terms>Terms</terms> & <privacy>Privacy Policy</privacy>"
+    "legal": "By signing up, you agree to our <terms>Terms</terms> & <privacy>Privacy Policy</privacy>",
+    "trendingTitle": "Trending now"
   },
   "auth": {
     "signInTitle": "Welcome back",
@@ -180,5 +185,25 @@
   },
   "dev": {
     "title": "Component gallery"
+  },
+  "footer": {
+    "tagline": "Startup and innovation news for Cyprus and the Eastern Mediterranean, curated by our editors.",
+    "sections": "Sections",
+    "company": "Disrupt Cyprus",
+    "about": "About",
+    "contact": "Contact",
+    "privacy": "Privacy Policy",
+    "terms": "Terms of Use",
+    "rights": "© {{year}} Disrupt Cyprus. All rights reserved.",
+    "madeIn": "Made in Cyprus",
+    "sitemap": "Site map"
+  },
+  "brand": {
+    "personalizedTitle": "Personalized by industry",
+    "personalizedBody": "Follow the industries you care about across 33 sectors.",
+    "dailyTitle": "A daily briefing",
+    "dailyBody": "The morning roundup our editors put together for you.",
+    "eventsTitle": "The events calendar",
+    "eventsBody": "Meetups, pitch nights and conferences across the island."
   }
 }

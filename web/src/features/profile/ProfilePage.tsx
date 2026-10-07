@@ -14,7 +14,7 @@ export function ProfilePage() {
   const signOut = useSignOut()
 
   return (
-    <div className="flex flex-col gap-space-lg">
+    <div className="mx-auto flex w-full max-w-2xl flex-col gap-space-lg">
       <h1 className="font-headline text-headline-hero-mobile text-on-surface">{t('nav.profile')}</h1>
 
       {user ? (

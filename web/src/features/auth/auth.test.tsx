@@ -1,4 +1,4 @@
-import { screen, waitFor } from '@testing-library/react'
+import { screen, waitFor, within } from '@testing-library/react'
 import { renderApp } from '@/test/render'
 import { db } from '@/test/server'
 import { userFixture } from '@/test/fixtures'
@@ -17,7 +17,9 @@ describe('route gates', () => {
 
     expect(await screen.findByRole('link', { name: 'Home' })).toBeInTheDocument()
     expect(router.state.location.pathname).toBe('/')
-    expect(screen.getByRole('link', { name: 'Trending' })).toBeInTheDocument()
+    expect(
+      within(screen.getByRole('navigation', { name: 'Sections' })).getByRole('link', { name: 'Trending' }),
+    ).toBeInTheDocument()
   })
 
   it('sends readers who have not finished onboarding back to it', async () => {
@@ -85,7 +87,9 @@ describe('sign in', () => {
     await user.click(screen.getByRole('button', { name: 'Sign in' }))
 
     await waitFor(() => expect(router.state.location.pathname).toBe('/'))
-    expect(await screen.findByRole('link', { name: 'For you' })).toBeInTheDocument()
+    expect(
+      within(await screen.findByRole('navigation', { name: 'Sections' })).getByRole('link', { name: 'For you' }),
+    ).toBeInTheDocument()
   })
 
   it('explains a failed Google sign-in', async () => {

@@ -25,7 +25,7 @@ export function IndustriesStep() {
     return (
       <>
         <StepHeader current={2} total={3} />
-        <div className="grid grid-cols-2 gap-3.5 px-space-md pt-space-xl">
+        <div className="mx-auto grid w-full max-w-narrow grid-cols-2 gap-3.5 px-space-md pt-space-xl sm:grid-cols-3 lg:grid-cols-4 lg:px-8">
           {Array.from({ length: 6 }, (_, index) => (
             <Skeleton key={index} className="h-32 rounded-card" />
           ))}
@@ -95,7 +95,7 @@ function IndustriesForm({ initial }: { initial: MyIndustries }) {
         onBack={() => navigate('/onboarding/account')}
         onSkip={() => setSkipOpen(true)}
       />
-      <main id="main" className="px-space-md pt-space-lg pb-36">
+      <main id="main" className="mx-auto w-full max-w-narrow px-space-md pt-space-lg pb-36 lg:px-8 lg:pt-space-xl">
         <OnboardingIntro
           icon="tune"
           kicker={t('onboarding.industries.kicker')}
@@ -122,7 +122,7 @@ function IndustriesForm({ initial }: { initial: MyIndustries }) {
         {formError && <FormAlert>{formError}</FormAlert>}
 
         {industries.isPending ? (
-          <div className="grid grid-cols-2 gap-3.5">
+          <div className="grid grid-cols-2 gap-3.5 sm:grid-cols-3 lg:grid-cols-4">
             {Array.from({ length: 6 }, (_, index) => (
               <Skeleton key={index} className="h-32 rounded-card" />
             ))}
@@ -147,7 +147,7 @@ function IndustriesForm({ initial }: { initial: MyIndustries }) {
                 <h2 id={`group-${group}`} className="mb-3 text-label-md tracking-wider text-on-surface-variant">
                   {upper(t(`onboarding.industries.groups.${group}`))}
                 </h2>
-                <div className="grid grid-cols-2 gap-3.5">
+                <div className="grid grid-cols-2 gap-3.5 sm:grid-cols-3 lg:grid-cols-4">
                   {items.map((industry) => (
                     <TopicTile
                       key={industry.id}
@@ -179,7 +179,7 @@ function IndustriesForm({ initial }: { initial: MyIndustries }) {
         </div>
         <Button
           block={false}
-          className="flex-1"
+          className="flex-1 sm:max-w-80"
           disabled={remaining > 0}
           loading={update.isPending}
           onClick={() => void submit()}

@@ -137,8 +137,15 @@ the paragraph starts with a non-letter.
 | `space-xl` | 32px | Between feed sections |
 
 - 8px vertical rhythm.
-- App column: full width < 768px. On wider screens, a centered column of **max 480px** on a
-  `surface-container-low` backdrop, with a hairline border on both sides. Header, tabs and bottom nav are constrained to the column.
+- **Responsive website, app feel on phones** (decided 2026-10-07, replaces the 480px app column):
+  - `< 1024px` (phones, tablets): app layout — glass header with a scrolling section-tab row, content full width
+    with 16px gutters, fixed bottom navigation.
+  - `≥ 1024px` (`lg`): website layout — top bar with logo, inline section navigation, search field (≥1280px, icon below),
+    language, saved, notifications and account/sign-in buttons; content centred in `max-w-content` (1200px, 32px gutters);
+    site footer (sections, company links, language); no bottom navigation.
+  - Content widths: `content` 1200px (feeds; Phase 5 adds a 320px right sidebar on `lg`), `narrow` 768px (onboarding, forms,
+    settings), `reading` 720px (article reader). Auth screens on desktop: split view (brand panel + centred form).
+  - Sheets become centred modals on `lg`.
 - Safe areas: `viewport-fit=cover`; header gets `padding-top: env(safe-area-inset-top)`, bottom nav and
   floating docks get `padding-bottom: max(8px, env(safe-area-inset-bottom))`.
 - Tap targets ≥ 44×44px (the export's 32px back button and 18px bookmark icons get padded hit areas, with unchanged visuals).
