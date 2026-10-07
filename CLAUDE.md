@@ -47,7 +47,10 @@ to silence the provider banner; use `exec -T` in non-interactive scripts).
 | Run the scheduler once | `podman compose exec app php artisan schedule:run` (the `scheduler` container runs `schedule:work`) |
 | Admin panel | http://localhost:8080/admin (demo: admin@ / editor@disruptcyprus.test, password `password`) |
 | Failed jobs | `podman compose exec app php artisan queue:failed` / `queue:retry all` |
-| Web (Phase 4) | `npm --prefix web run dev` · `npm --prefix web test` · `npm --prefix web run lint` |
+| Web dev server | `podman compose up -d node` → http://localhost:5173 (Vite proxies /api, /sanctum, /storage to nginx) |
+| Web one-off commands | `podman compose run --rm -T node npm run <script>` (Node 20, same as production) |
+| Web checks | scripts: `typecheck`, `lint`, `test` (Vitest), `format`, `build` (tokens + tsc + vite), `tokens`, `icons` |
+| Component gallery | http://localhost:5173/dev/components (dev builds only) · `?theme=dark|light` forces a theme on any page |
 
 Ports (host network, 127.0.0.1): nginx 8080, php-fpm 9000, MariaDB 3307 (a host MySQL owns 3306), Mailpit 1025/8025.
 
@@ -83,6 +86,13 @@ Environment quirks on this machine:
 - Test helpers: `reader()`, `newArticle()`, `newEvent()`, `section()` (`event()` is a Laravel helper — don't shadow it).
 
 **Web**
+- React 19 + React Router 7 (data router, `createBrowserRouter`), TanStack Query 5, Zustand 5, react-hook-form + zod 4, i18next, Tailwind 4 (CSS-first).
+- Design tokens: edit `web/src/styles/tokens.json`, then `npm run tokens` regenerates `src/styles/theme.css` (never edit it by hand). Tailwind's
+  default palette is removed: only token colours exist (`bg-surface-container-lowest`, `text-on-surface-variant`, …).
+- API calls only through `src/api/client.ts` (CSRF cookie, `Accept-Language`, error envelope → `ApiError`) and zod-validated hooks in `src/api/*`.
+- Never copy server data into state from an effect: load in a parent, initialise the form's state from props (see onboarding steps).
+- Constants/helpers shared across components live in non-component modules (fast refresh).
+- Tests: Vitest + RTL with MSW (`src/test/server.ts` in-memory backend, `renderApp(path)` mounts the real routes). Tests run in English.
 - Feature folders under `web/src/features/*`. Server state = TanStack Query; client state = small Zustand stores.
 - Forms: react-hook-form + zod. API responses are validated with zod schemas in `web/src/api`.
 - Icons: Material Symbols as SVG components (`@material-symbols/svg-400`); no icon font.
@@ -122,6 +132,11 @@ Environment quirks on this machine:
 | 2026-10-06 | Creating a digest in the admin runs the generator; any admin save marks a draft edited; "Regenerate draft" overwrites after confirmation | One code path, no duplicates |
 | 2026-10-06 | "Publish and notify" and push campaigns fire `DigestPublished` / `SendPushCampaign`; delivery is a logged stub until Phase 6. Campaigns: 3 sends/hour per staff member | Brief |
 | 2026-10-06 | `admin:user` command for staff accounts (Filament's make:filament-user creates readers) | Panel access is role-based |
+| 2026-10-07 | Node 20 in a `node` compose service (same major as production); Vite dev on 5173 | Local mirrors production |
+| 2026-10-07 | Cache only arrays/scalars (rendered resource payloads per locale), never Eloquent objects | Laravel 13 `serializable_classes = false` breaks unserialize; caught by screenshot QA |
+| 2026-10-07 | Relative time: English narrow ("2h ago", as in the designs), Greek long ("πριν από 2 ώρες") | Greek short form abbreviates to "ώ." |
+| 2026-10-07 | Logo mark drawn as SVG (bold "#") shared by app icon and header; wordmark stays Playfair until the SVG logo arrives | Thin font glyph was illegible at 28px |
+| 2026-10-07 | Route-level code splitting for welcome/auth/onboarding; precache only Latin + Greek font subsets | Main bundle 605→252 KB, precache 1.27 MB→0.88 MB |
 | 2026-10-05 | Everything runs in containers (podman + podman-compose locally; compose file stays Docker-compatible) | Product owner |
 
 ## Phase status
@@ -130,7 +145,7 @@ Environment quirks on this machine:
 - [x] Phase 1 — Backend foundation (schema, seeders, auth, account, taxonomy, preferences)
 - [x] Phase 2 — Content API (feeds, sections, articles, events, digests, search, bookmarks, OpenAPI)
 - [x] Phase 3 — Admin panel (Filament 5), digest generation + scheduler, push campaigns UI (delivery stubbed)
-- [ ] Phase 4 — Web foundation
+- [x] Phase 4 — Web foundation (shell, tokens, i18n, API client, auth, onboarding, component gallery, PWA base)
 - [ ] Phase 5 — Web features
 - [ ] Phase 6 — Notifications
 - [ ] Phase 7 — Landing, share pages, GDPR, CI, Lighthouse, deployment, visual QA
