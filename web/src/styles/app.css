@@ -1,0 +1,136 @@
+@import 'tailwindcss';
+@import './theme.css';
+
+/* `dark:` follows the resolved theme attribute (system preference or manual override). */
+@custom-variant dark (&:where([data-theme='dark'], [data-theme='dark'] *));
+
+@layer base {
+  html {
+    -webkit-text-size-adjust: 100%;
+    -webkit-tap-highlight-color: transparent;
+  }
+
+  body {
+    @apply bg-background font-ui text-on-surface antialiased;
+    min-height: 100dvh;
+  }
+
+  /* App column backdrop on wide screens (the app itself is a centered 480px column). */
+  @media (min-width: 768px) {
+    body {
+      @apply bg-surface-container-low;
+    }
+  }
+
+  :focus-visible {
+    outline: 2px solid var(--dc-brand-cyan);
+    outline-offset: 2px;
+  }
+
+  ::selection {
+    @apply bg-primary-fixed text-on-surface;
+  }
+
+  @media (prefers-reduced-motion: reduce) {
+    *,
+    *::before,
+    *::after {
+      animation-duration: 0.01ms !important;
+      animation-iteration-count: 1 !important;
+      transition-duration: 0.01ms !important;
+      scroll-behavior: auto !important;
+    }
+  }
+}
+
+@utility scrim-hero {
+  background-image: var(--dc-scrim-hero);
+}
+
+@utility scrim-tile {
+  background-image: var(--dc-scrim-tile);
+}
+
+/* iOS-style frosted glass for sticky headers and the bottom navigation. */
+@utility glass {
+  background-color: var(--dc-glass);
+  -webkit-backdrop-filter: blur(20px);
+  backdrop-filter: blur(20px);
+}
+
+/* 0.5px editorial hairline (falls back to 1px where sub-pixel borders are unsupported). */
+@utility hairline {
+  border: 0.5px solid var(--dc-hairline);
+}
+
+@utility hairline-b {
+  border-bottom: 0.5px solid var(--dc-hairline);
+}
+
+@utility hairline-t {
+  border-top: 0.5px solid var(--dc-hairline);
+}
+
+@utility no-scrollbar {
+  scrollbar-width: none;
+  &::-webkit-scrollbar {
+    display: none;
+  }
+}
+
+@utility pt-safe {
+  padding-top: env(safe-area-inset-top);
+}
+
+@utility pb-safe {
+  padding-bottom: max(0.5rem, env(safe-area-inset-bottom));
+}
+
+@utility press {
+  transition: transform 150ms ease-out;
+  &:active {
+    transform: scale(0.98);
+  }
+}
+
+/* Article drop cap (reader). */
+@utility drop-cap {
+  &::first-letter {
+    float: left;
+    font-family: var(--font-headline);
+    font-size: 3.75rem;
+    line-height: 0.8;
+    padding: 0.25rem 0.65rem 0.15rem 0;
+    color: var(--dc-primary);
+    font-weight: 700;
+  }
+}
+
+@keyframes shimmer {
+  from {
+    background-position: -200% 0;
+  }
+  to {
+    background-position: 200% 0;
+  }
+}
+
+@utility skeleton {
+  background: linear-gradient(
+    90deg,
+    var(--dc-surface-container) 25%,
+    var(--dc-surface-container-high) 50%,
+    var(--dc-surface-container) 75%
+  );
+  background-size: 200% 100%;
+  animation: shimmer 1.2s linear infinite;
+}
+
+@keyframes sheet-in {
+  from {
+    transform: translateY(100%);
+  }
+  to {
+    transform: translateY(0);
+  }
+}
