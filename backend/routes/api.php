@@ -21,6 +21,8 @@ use App\Http\Controllers\Api\V1\Me\IndustriesController;
 use App\Http\Controllers\Api\V1\Me\NotificationPreferencesController;
 use App\Http\Controllers\Api\V1\Me\PasswordController;
 use App\Http\Controllers\Api\V1\Me\ProfileController;
+use App\Http\Controllers\Api\V1\Notifications\NotificationController;
+use App\Http\Controllers\Api\V1\Notifications\PushSubscriptionController;
 use App\Http\Controllers\Api\V1\SectionController;
 use App\Http\Middleware\ResolveOptionalUser;
 use Illuminate\Support\Facades\Route;
@@ -54,6 +56,8 @@ Route::prefix('v1')->middleware(['throttle:api', ResolveOptionalUser::class])->g
         Route::get('search', SearchController::class)->middleware('throttle:search')->name('search');
     });
 
+    Route::get('push/public-key', [PushSubscriptionController::class, 'publicKey'])->name('push.public-key');
+
     Route::post('articles/{id}/view', [ArticleController::class, 'view'])
         ->whereNumber('id')->middleware('throttle:views')->name('articles.view');
 
@@ -63,6 +67,14 @@ Route::prefix('v1')->middleware(['throttle:api', ResolveOptionalUser::class])->g
         Route::get('bookmarks', [BookmarkController::class, 'index'])->name('bookmarks.index');
         Route::post('bookmarks', [BookmarkController::class, 'store'])->name('bookmarks.store');
         Route::delete('bookmarks', [BookmarkController::class, 'destroy'])->name('bookmarks.destroy');
+
+        Route::get('notifications', [NotificationController::class, 'index'])->name('notifications.index');
+        Route::get('notifications/unread-count', [NotificationController::class, 'unreadCount'])->name('notifications.unread-count');
+        Route::post('notifications/read-all', [NotificationController::class, 'markAllRead'])->name('notifications.read-all');
+        Route::post('notifications/{id}/read', [NotificationController::class, 'markRead'])->whereUuid('id')->name('notifications.read');
+
+        Route::post('push/subscriptions', [PushSubscriptionController::class, 'store'])->name('push.subscriptions.store');
+        Route::delete('push/subscriptions', [PushSubscriptionController::class, 'destroy'])->name('push.subscriptions.destroy');
     });
 
     // Authentication

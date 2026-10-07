@@ -16,6 +16,8 @@ class AccountDeletionService
     {
         DB::transaction(function () use ($user): void {
             $user->tokens()->delete();
+            $user->pushSubscriptions()->delete();
+            DB::table('notification_dispatches')->where('user_id', $user->id)->delete();
             $user->socialAccounts()->delete();
             $user->bookmarks()->delete();
             $user->industries()->detach();

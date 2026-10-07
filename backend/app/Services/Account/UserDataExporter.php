@@ -61,6 +61,12 @@ class UserDataExporter
             'followed_industries' => $user->industries
                 ->map(fn (Industry $industry) => ['slug' => $industry->slug, 'notify' => (bool) $industry->getRelationValue('pivot')->notify])
                 ->values(),
+            'push_devices' => $user->pushSubscriptions()->get()
+                ->map(fn ($subscription) => [
+                    'user_agent' => $subscription->getAttribute('user_agent'),
+                    'subscribed_at' => $subscription->created_at?->toIso8601String(),
+                ])
+                ->values(),
             'notification_preferences' => $user->notificationPreference?->only([
                 'digest_news_daily', 'digest_news_monthly', 'digest_events_weekly', 'digest_events_monthly', 'event_reminders', 'delivery_time',
             ]),

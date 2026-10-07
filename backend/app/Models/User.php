@@ -18,7 +18,9 @@ use Illuminate\Database\Eloquent\Relations\HasOne;
 use Illuminate\Database\Eloquent\SoftDeletes;
 use Illuminate\Foundation\Auth\User as Authenticatable;
 use Illuminate\Notifications\Notifiable;
+use Illuminate\Support\Facades\DB;
 use Laravel\Sanctum\HasApiTokens;
+use NotificationChannels\WebPush\HasPushSubscriptions;
 use Spatie\Image\Enums\Fit;
 use Spatie\MediaLibrary\HasMedia;
 use Spatie\MediaLibrary\InteractsWithMedia;
@@ -29,7 +31,7 @@ use Spatie\MediaLibrary\MediaCollections\Models\Media;
 class User extends Authenticatable implements FilamentUser, HasLocalePreference, HasMedia, MustVerifyEmail
 {
     /** @use HasFactory<UserFactory> */
-    use HasApiTokens, HasFactory, InteractsWithMedia, Notifiable, SoftDeletes, StoresUtcTimestamps;
+    use HasApiTokens, HasFactory, HasPushSubscriptions, InteractsWithMedia, Notifiable, SoftDeletes, StoresUtcTimestamps;
 
     public const AVATAR_COLLECTION = 'avatar';
 
@@ -115,6 +117,18 @@ class User extends Authenticatable implements FilamentUser, HasLocalePreference,
     public function canAccessPanel(Panel $panel): bool
     {
         return $this->role->canAccessAdmin();
+    }
+
+    /**
+     * Records that an automatic notification was sent; false when it already had been (idempotency).
+     */
+    public function claimDispatch(string $key): bool
+    {
+        return DB::table('notification_dispatches')->insertOrIgnore([
+            'user_id' => $this->id,
+            'key' => $key,
+            'created_at' => now(),
+        ]) === 1;
     }
 
     public function hasPassword(): bool
