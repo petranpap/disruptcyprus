@@ -125,4 +125,5 @@ export const api = {
 }
 
 /** Full-page navigation endpoints (OAuth). */
-export const socialRedirectUrl = (provider: 'google') => `${API_PREFIX}/auth/social/${provider}/redirect`
+export const socialRedirectUrl = (provider: 'google', next?: string) =>
+  `${API_PREFIX}/auth/social/${provider}/redirect${next ? `?next=${encodeURIComponent(next)}` : ''}`

@@ -1,4 +1,4 @@
-import { screen, waitFor, within } from '@testing-library/react'
+import { act, screen, waitFor, within } from '@testing-library/react'
 import { renderApp } from '@/test/render'
 import { db } from '@/test/server'
 import { userFixture } from '@/test/fixtures'
@@ -96,6 +96,23 @@ describe('sign in', () => {
     renderApp('/sign-in?error=social_failed')
 
     expect(await screen.findByRole('alert')).toHaveTextContent('Google sign-in did not complete')
+  })
+
+  it('treats a cancelled Google sign-in gently', async () => {
+    renderApp('/sign-in?error=social_cancelled')
+
+    expect(await screen.findByRole('alert')).toHaveTextContent('Google sign-in was cancelled')
+  })
+
+  it('sends readers back to the story they wanted to save after Google sign-in', async () => {
+    window.localStorage.setItem('dc.welcomed', '1')
+    const { router } = renderApp('/')
+    await act(() => router.navigate('/sign-in', { state: { from: '/articles/seed-round' } }))
+
+    expect(await screen.findByRole('link', { name: 'Continue with Google' })).toHaveAttribute(
+      'href',
+      '/api/v1/auth/social/google/redirect?next=%2Farticles%2Fseed-round',
+    )
   })
 })
 

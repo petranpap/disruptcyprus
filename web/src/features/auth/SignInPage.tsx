@@ -12,15 +12,24 @@ import { applyServerErrors } from '@/lib/forms'
 import { AuthHeading, FormAlert } from './AuthHeading'
 import { GoogleButton } from './GoogleButton'
 
+/** Error codes the OAuth callback sends back to /sign-in. */
+const SOCIAL_ERRORS = {
+  social_failed: 'auth.socialFailed',
+  social_cancelled: 'auth.socialCancelled',
+  social_unavailable: 'auth.socialUnavailable',
+  social_unverified: 'auth.socialUnverified',
+} as const
+
 export function SignInPage() {
   const { t } = useTranslation()
   const navigate = useNavigate()
   const location = useLocation()
   const [params] = useSearchParams()
   const signIn = useSignIn()
-  const [formError, setFormError] = useState<string | null>(
-    params.get('error') === 'social_failed' ? t('auth.socialFailed') : null,
-  )
+  const [formError, setFormError] = useState<string | null>(() => {
+    const code = params.get('error')
+    return code && code in SOCIAL_ERRORS ? t(SOCIAL_ERRORS[code as keyof typeof SOCIAL_ERRORS]) : null
+  })
 
   const schema = useMemo(
     () =>

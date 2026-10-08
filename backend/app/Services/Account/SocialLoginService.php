@@ -2,9 +2,11 @@
 
 namespace App\Services\Account;
 
+use App\Exceptions\UnverifiedSocialEmail;
 use App\Models\SocialAccount;
 use App\Models\User;
 use Illuminate\Support\Facades\DB;
+use Laravel\Socialite\AbstractUser;
 use Laravel\Socialite\Contracts\User as ProviderUser;
 
 /**
@@ -28,6 +30,10 @@ class SocialLoginService
         return DB::transaction(function () use ($provider, $providerUser, $email, $locale): User {
             $user = User::query()->where('email', $email)->first();
 
+            if ($user !== null && ! $this->emailVerified($providerUser)) {
+                throw new UnverifiedSocialEmail;
+            }
+
             if ($user === null) {
                 // Consent is collected in onboarding; needs_consent stays true until then.
                 $user = User::query()->create([
@@ -49,5 +55,16 @@ class SocialLoginService
 
             return $user;
         });
+    }
+
+    /**
+     * Google sends `email_verified` (OpenID Connect); providers that omit it are treated as verified.
+     */
+    private function emailVerified(ProviderUser $providerUser): bool
+    {
+        $raw = $providerUser instanceof AbstractUser ? $providerUser->getRaw() : [];
+        $verified = $raw['email_verified'] ?? $raw['verified_email'] ?? true;
+
+        return filter_var($verified, FILTER_VALIDATE_BOOLEAN);
     }
 }

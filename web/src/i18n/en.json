@@ -89,7 +89,10 @@
     "socialFailed": "Google sign-in did not complete. Please try again.",
     "emailVerified": "Your email is verified. Thank you!",
     "backToSignIn": "Back to sign in",
-    "signOut": "Sign out"
+    "signOut": "Sign out",
+    "socialCancelled": "Google sign-in was cancelled. You can try again or use your email.",
+    "socialUnavailable": "Google sign-in is not available right now. Please use your email and password.",
+    "socialUnverified": "This Google account has not verified that email address, so we could not link it to your account. Sign in with your password instead."
   },
   "validation": {
     "required": "This field is required.",

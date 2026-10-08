@@ -4,14 +4,17 @@ use App\Models\User;
 use Laravel\Socialite\Facades\Socialite;
 use Laravel\Socialite\Two\User as SocialiteUser;
 
-function fakeGoogleUser(string $id = 'google-123', string $email = 'anna@gmail.com'): void
+function fakeGoogleUser(string $id = 'google-123', string $email = 'anna@gmail.com', bool $verified = true): void
 {
-    $providerUser = (new SocialiteUser)->map(['id' => $id, 'name' => 'Anna K', 'email' => $email]);
+    $providerUser = (new SocialiteUser)
+        ->setRaw(['email_verified' => $verified])
+        ->map(['id' => $id, 'name' => 'Anna K', 'email' => $email]);
 
     Socialite::shouldReceive('driver->user')->andReturn($providerUser);
 }
 
 it('redirects to Google', function () {
+    config(['services.google.client_id' => 'client-id']);
     Socialite::shouldReceive('driver->redirect')->andReturn(redirect('https://accounts.google.com/o/oauth2/auth'));
 
     $this->get('/api/v1/auth/social/google/redirect')->assertRedirect('https://accounts.google.com/o/oauth2/auth');
@@ -63,3 +66,42 @@ it('redirects back to sign-in when the provider fails', function () {
         ->assertRedirect(config('app.frontend_url').'/sign-in?error=social_failed');
     $this->assertGuest('web');
 });
+
+it('explains that Google sign-in is unavailable when it is not configured', function () {
+    config(['services.google.client_id' => null]);
+
+    $this->get('/api/v1/auth/social/google/redirect')
+        ->assertRedirect(config('app.frontend_url').'/sign-in?error=social_unavailable');
+});
+
+it('treats a cancelled consent screen as a cancellation, not a failure', function () {
+    $this->get('/api/v1/auth/social/google/callback?error=access_denied')
+        ->assertRedirect(config('app.frontend_url').'/sign-in?error=social_cancelled');
+    $this->assertGuest('web');
+});
+
+it('never links an unverified Google email to an existing account', function () {
+    $existing = reader(['email' => 'anna@gmail.com']);
+    fakeGoogleUser(verified: false);
+
+    $this->get('/api/v1/auth/social/google/callback')
+        ->assertRedirect(config('app.frontend_url').'/sign-in?error=social_unverified');
+
+    expect($existing->socialAccounts()->count())->toBe(0);
+    $this->assertGuest('web');
+});
+
+it('returns onboarded readers to the page they started from, in-app paths only', function (string $next, string $expected) {
+    config(['services.google.client_id' => 'client-id']);
+    Socialite::shouldReceive('driver->redirect')->andReturn(redirect('https://accounts.google.com/o/oauth2/auth'));
+    reader(['email' => 'anna@gmail.com']);
+    fakeGoogleUser();
+
+    $this->get('/api/v1/auth/social/google/redirect?next='.urlencode($next));
+    $this->get('/api/v1/auth/social/google/callback')->assertRedirect(config('app.frontend_url').$expected);
+})->with([
+    'article' => ['/articles/seed-round?x=1', '/articles/seed-round?x=1'],
+    'other site' => ['//evil.example', '/'],
+    'absolute url' => ['https://evil.example', '/'],
+    'backslash trick' => ['/\\evil.example', '/'],
+]);

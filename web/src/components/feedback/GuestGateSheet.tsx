@@ -1,4 +1,4 @@
-import { useNavigate } from 'react-router'
+import { useLocation, useNavigate } from 'react-router'
 import { useTranslation } from 'react-i18next'
 import { Button } from '@/components/ui/Button'
 import { Sheet } from '@/components/ui/Sheet'
@@ -8,12 +8,14 @@ import { useUiStore } from '@/stores/ui'
 export function GuestGateSheet() {
   const { t } = useTranslation()
   const navigate = useNavigate()
+  const location = useLocation()
   const reason = useUiStore((state) => state.guestGate)
   const close = useUiStore((state) => state.closeGuestGate)
 
   const go = (path: string) => {
     close()
-    navigate(path)
+    // Come back to the story the guest was trying to save.
+    navigate(path, { state: { from: location.pathname + location.search } })
   }
 
   return (
