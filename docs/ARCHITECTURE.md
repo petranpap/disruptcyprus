@@ -240,11 +240,13 @@ web/src/
 4. **Digest timing**: Daily News draft generated at **06:00** for the window `[yesterday 06:00, today 06:00)`; Weekly Events Sunday **18:00** for Mon–Sun of the coming week;
    Monthly drafts on the 1st at **06:00**. Generation runs at the same times for everyone; editor publishing is manual.
 5. **Digest notification timing**: when an editor publishes, each user is notified at their `delivery_time` (in their timezone) that day.
-   If that time has already passed, they are notified immediately. Monthly digests use the same rule.
+   If that time has already passed, they are notified immediately between 07:00 and 22:00 local time, otherwise at their
+   delivery time the next morning. Monthly digests use the same rule. A digest is never sent twice to the same reader.
 6. "This week" = Monday–Sunday in Asia/Nicosia. "This month" = calendar month.
 7. A digest's items are articles only (News) or events only (Events). An article/event can appear in several digests.
-8. Event reminders go to users who saved the event, if `event_reminders` is on, ~24h before (an hourly job picks events
-   starting in [23h, 24h)). Events saved less than 24h before the start get no reminder.
+8. Event reminders go to users who saved the event, if `event_reminders` is on: an hourly job (`reminders:events`) picks
+   events starting between 1h and 24h from now, once per reader and event. So an event saved on the day still gets a
+   reminder, but never as the doors open.
 9. Featured-article push: sent when an article is first published with `is_featured`, to followers of its industries with `notify = true`.
    At most one push per user per article, and at most 3 such pushes per user per day.
 10. View counts are anonymous (hashed IP + UA + day), so no consent is needed. Only strictly necessary cookies are used (session, XSRF), so there is no cookie banner. Analytics are out of scope.

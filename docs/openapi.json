@@ -1313,7 +1313,7 @@
                 ],
                 "responses": {
                     "200": {
-                        "description": "Array of `IndustryResource`",
+                        "description": "",
                         "content": {
                             "application/json": {
                                 "schema": {
@@ -1321,9 +1321,7 @@
                                     "properties": {
                                         "data": {
                                             "type": "array",
-                                            "items": {
-                                                "$ref": "#/components/schemas/IndustryResource"
-                                            }
+                                            "items": {}
                                         }
                                     },
                                     "required": [
@@ -1449,6 +1447,197 @@
                     },
                     "422": {
                         "$ref": "#/components/responses/ValidationException"
+                    }
+                }
+            }
+        },
+        "/v1/notifications": {
+            "get": {
+                "operationId": "notifications.index",
+                "tags": [
+                    "Notification"
+                ],
+                "parameters": [
+                    {
+                        "name": "cursor",
+                        "in": "query",
+                        "schema": {
+                            "type": [
+                                "string",
+                                "null"
+                            ],
+                            "maxLength": 512
+                        }
+                    }
+                ],
+                "responses": {
+                    "200": {
+                        "description": "",
+                        "content": {
+                            "application/json": {
+                                "schema": {
+                                    "type": "object",
+                                    "properties": {
+                                        "data": {
+                                            "type": "array",
+                                            "items": {
+                                                "type": "object",
+                                                "properties": {
+                                                    "id": {
+                                                        "type": "string"
+                                                    },
+                                                    "type": {},
+                                                    "title": {},
+                                                    "body": {},
+                                                    "url": {},
+                                                    "read_at": {
+                                                        "type": [
+                                                            "string",
+                                                            "null"
+                                                        ]
+                                                    },
+                                                    "created_at": {
+                                                        "type": [
+                                                            "string",
+                                                            "null"
+                                                        ]
+                                                    }
+                                                },
+                                                "required": [
+                                                    "id",
+                                                    "type",
+                                                    "title",
+                                                    "body",
+                                                    "url",
+                                                    "read_at",
+                                                    "created_at"
+                                                ]
+                                            }
+                                        },
+                                        "meta": {
+                                            "type": "object",
+                                            "properties": {
+                                                "per_page": {
+                                                    "type": "integer",
+                                                    "const": 20
+                                                },
+                                                "next_cursor": {
+                                                    "type": [
+                                                        "string",
+                                                        "null"
+                                                    ]
+                                                },
+                                                "prev_cursor": {
+                                                    "type": "null"
+                                                },
+                                                "unread_count": {
+                                                    "type": "integer",
+                                                    "minimum": 0
+                                                }
+                                            },
+                                            "required": [
+                                                "per_page",
+                                                "next_cursor",
+                                                "prev_cursor",
+                                                "unread_count"
+                                            ]
+                                        }
+                                    },
+                                    "required": [
+                                        "data",
+                                        "meta"
+                                    ]
+                                }
+                            }
+                        }
+                    },
+                    "401": {
+                        "$ref": "#/components/responses/AuthenticationException"
+                    },
+                    "422": {
+                        "$ref": "#/components/responses/ValidationException"
+                    }
+                }
+            }
+        },
+        "/v1/notifications/unread-count": {
+            "get": {
+                "operationId": "notifications.unread-count",
+                "tags": [
+                    "Notification"
+                ],
+                "responses": {
+                    "200": {
+                        "description": "",
+                        "content": {
+                            "application/json": {
+                                "schema": {
+                                    "type": "object",
+                                    "properties": {
+                                        "data": {
+                                            "type": "object",
+                                            "properties": {
+                                                "count": {
+                                                    "type": "integer",
+                                                    "minimum": 0
+                                                }
+                                            },
+                                            "required": [
+                                                "count"
+                                            ]
+                                        }
+                                    },
+                                    "required": [
+                                        "data"
+                                    ]
+                                }
+                            }
+                        }
+                    },
+                    "401": {
+                        "$ref": "#/components/responses/AuthenticationException"
+                    }
+                }
+            }
+        },
+        "/v1/notifications/read-all": {
+            "post": {
+                "operationId": "notifications.read-all",
+                "tags": [
+                    "Notification"
+                ],
+                "responses": {
+                    "204": {
+                        "description": "No content"
+                    },
+                    "401": {
+                        "$ref": "#/components/responses/AuthenticationException"
+                    }
+                }
+            }
+        },
+        "/v1/notifications/{id}/read": {
+            "post": {
+                "operationId": "notifications.read",
+                "tags": [
+                    "Notification"
+                ],
+                "parameters": [
+                    {
+                        "name": "id",
+                        "in": "path",
+                        "required": true,
+                        "schema": {
+                            "type": "string"
+                        }
+                    }
+                ],
+                "responses": {
+                    "204": {
+                        "description": "No content"
+                    },
+                    "401": {
+                        "$ref": "#/components/responses/AuthenticationException"
                     }
                 }
             }
@@ -1741,6 +1930,107 @@
                 }
             }
         },
+        "/v1/push/public-key": {
+            "get": {
+                "operationId": "push.public-key",
+                "summary": "VAPID public key the browser needs to subscribe. Public: it is not a secret",
+                "tags": [
+                    "PushSubscription"
+                ],
+                "responses": {
+                    "200": {
+                        "description": "",
+                        "content": {
+                            "application/json": {
+                                "schema": {
+                                    "type": "object",
+                                    "properties": {
+                                        "data": {
+                                            "type": "object",
+                                            "properties": {
+                                                "public_key": {
+                                                    "type": "string"
+                                                }
+                                            },
+                                            "required": [
+                                                "public_key"
+                                            ]
+                                        }
+                                    },
+                                    "required": [
+                                        "data"
+                                    ]
+                                }
+                            }
+                        }
+                    }
+                }
+            }
+        },
+        "/v1/push/subscriptions": {
+            "post": {
+                "operationId": "push.subscriptions.store",
+                "tags": [
+                    "PushSubscription"
+                ],
+                "requestBody": {
+                    "required": true,
+                    "content": {
+                        "application/json": {
+                            "schema": {
+                                "$ref": "#/components/schemas/StorePushSubscriptionRequest"
+                            }
+                        }
+                    }
+                },
+                "responses": {
+                    "200": {
+                        "description": "",
+                        "content": {
+                            "application/json": {
+                                "schema": {
+                                    "type": "string"
+                                }
+                            }
+                        }
+                    },
+                    "401": {
+                        "$ref": "#/components/responses/AuthenticationException"
+                    },
+                    "422": {
+                        "$ref": "#/components/responses/ValidationException"
+                    }
+                }
+            },
+            "delete": {
+                "operationId": "push.subscriptions.destroy",
+                "tags": [
+                    "PushSubscription"
+                ],
+                "parameters": [
+                    {
+                        "name": "endpoint",
+                        "in": "query",
+                        "required": true,
+                        "schema": {
+                            "type": "string",
+                            "maxLength": 500
+                        }
+                    }
+                ],
+                "responses": {
+                    "204": {
+                        "description": "No content"
+                    },
+                    "401": {
+                        "$ref": "#/components/responses/AuthenticationException"
+                    },
+                    "422": {
+                        "$ref": "#/components/responses/ValidationException"
+                    }
+                }
+            }
+        },
         "/v1/auth/register": {
             "post": {
                 "operationId": "auth.register",
@@ -1858,7 +2148,7 @@
                 ],
                 "responses": {
                     "200": {
-                        "description": "Array of `SectionResource`",
+                        "description": "",
                         "content": {
                             "application/json": {
                                 "schema": {
@@ -1866,9 +2156,7 @@
                                     "properties": {
                                         "data": {
                                             "type": "array",
-                                            "items": {
-                                                "$ref": "#/components/schemas/SectionResource"
-                                            }
+                                            "items": {}
                                         }
                                     },
                                     "required": [
@@ -3790,34 +4078,44 @@
                 ],
                 "title": "ResetPasswordRequest"
             },
-            "SectionResource": {
+            "StorePushSubscriptionRequest": {
                 "type": "object",
                 "properties": {
-                    "id": {
-                        "type": "integer"
+                    "endpoint": {
+                        "type": "string",
+                        "format": "uri",
+                        "maxLength": 500
                     },
-                    "slug": {
-                        "type": "string"
+                    "keys": {
+                        "type": "object",
+                        "properties": {
+                            "p256dh": {
+                                "type": "string",
+                                "maxLength": 255
+                            },
+                            "auth": {
+                                "type": "string",
+                                "maxLength": 255
+                            }
+                        },
+                        "required": [
+                            "p256dh",
+                            "auth"
+                        ]
                     },
-                    "name": {
-                        "type": "array",
-                        "items": {}
-                    },
-                    "has_articles": {
-                        "type": "boolean"
-                    },
-                    "sort_order": {
-                        "type": "integer"
+                    "content_encoding": {
+                        "type": "string",
+                        "enum": [
+                            "aesgcm",
+                            "aes128gcm"
+                        ]
                     }
                 },
                 "required": [
-                    "id",
-                    "slug",
-                    "name",
-                    "has_articles",
-                    "sort_order"
+                    "endpoint",
+                    "keys"
                 ],
-                "title": "SectionResource"
+                "title": "StorePushSubscriptionRequest"
             },
             "UpdateIndustriesRequest": {
                 "type": "object",

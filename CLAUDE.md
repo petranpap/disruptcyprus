@@ -44,6 +44,7 @@ to silence the provider banner; use `exec -T` in non-interactive scripts).
 | OpenAPI export | `podman compose exec app php artisan scramble:export --path=storage/app/private/openapi.json && cp backend/storage/app/private/openapi.json docs/` |
 | Generate a digest draft | `podman compose exec app php artisan digests:generate news daily [--date=YYYY-MM-DD] [--refresh]` |
 | Create/promote staff | `podman compose exec app php artisan admin:user you@example.com [--role=editor]` |
+| VAPID keys (once per environment) | `podman compose exec app php artisan webpush:vapid` (writes `.env`; never commit) |
 | Run the scheduler once | `podman compose exec app php artisan schedule:run` (the `scheduler` container runs `schedule:work`) |
 | Admin panel | http://localhost:8080/admin (demo: admin@ / editor@disruptcyprus.test, password `password`) |
 | Failed jobs | `podman compose exec app php artisan queue:failed` / `queue:retry all` |
@@ -147,6 +148,14 @@ Environment quirks on this machine:
 | 2026-10-07 | Bookmarks are optimistic across every cached query (`patchCards`) with rollback; guests get a sign-up sheet | Instant feedback everywhere a card appears |
 | 2026-10-07 | First-time guests are sent to Welcome only from `/`; deep links (shared articles/events) open directly | Shared links must land on the content |
 | 2026-10-07 | Reader "Listen" uses Web Speech behind `SpeechProvider`; hidden when the device has no voice for the story language | Brief; swappable for a TTS service later |
+| 2026-10-07 | Notifications: one `AppNotification` payload `{type,title,body,url}` → database (inbox) always + Web Push when the reader has a device (`laravel-notification-channels/webpush`). Rendered in the reader's UI language | One code path; inbox works without push |
+| 2026-10-07 | Digest notifications at each reader's `delivery_time` in their timezone; if already passed: now between 07:00–22:00 local, else next morning. Delayed jobs re-check that the content is still published (`shouldSend`) | Brief + no midnight pushes |
+| 2026-10-07 | Idempotency via `notification_dispatches` (unique user + key): one digest/featured alert/reminder per reader; featured alerts ≤ 3 per reader per 24 h | Retries and republishing never double-notify |
+| 2026-10-07 | Event reminders: hourly, events starting in (now+1h, now+24h] | Covers events saved on the day; never at the door |
+| 2026-10-07 | Filament panel uses database transactions; featured-article listener is after-commit + 60 s delay | Listener must see the industries pivot saved after the record |
+| 2026-10-07 | Push endpoints restricted to known push services (FCM, Mozilla, Apple, Windows) | The server POSTs to the endpoint: no SSRF |
+| 2026-10-07 | Sign-out unsubscribes push on that device (no prompt); sign-in re-attaches an existing subscription to the new account | Shared devices never get another reader's notifications |
+| 2026-10-07 | Install/push prompts: one per visit, never in the first 60 s; push offer after the first save, install banner after 3 reads or first save, snoozed 14 days; iOS gets Home Screen instructions | Brief; non-intrusive |
 | 2026-10-05 | Everything runs in containers (podman + podman-compose locally; compose file stays Docker-compatible) | Product owner |
 
 ## Phase status
@@ -157,5 +166,5 @@ Environment quirks on this machine:
 - [x] Phase 3 — Admin panel (Filament 5), digest generation + scheduler, push campaigns UI (delivery stubbed)
 - [x] Phase 4 — Web foundation (shell, tokens, i18n, API client, auth, onboarding, component gallery, PWA base)
 - [x] Phase 5 — Web features (feeds, sections, reader, events + calendar, digests, explore/search, saved + offline, settings, guest mode)
-- [ ] Phase 6 — Notifications
+- [x] Phase 6 — Notifications (inbox, Web Push, digest timing, featured alerts, event reminders, campaigns, install prompt)
 - [ ] Phase 7 — Landing, share pages, GDPR, CI, Lighthouse, deployment, visual QA

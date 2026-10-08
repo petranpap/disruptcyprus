@@ -88,6 +88,26 @@ On failure it redirects to `FRONTEND_URL/sign-in?error=social_failed`.
 | POST | `/bookmarks` | ✓ | `{ type, id }` | 201 (new) or 200 (already saved). 404 if not published |
 | DELETE | `/bookmarks` | ✓ | `{ type, id }` | 204 (idempotent) |
 
+## Endpoints (Phase 6 — notifications)
+
+| Method | Path | Auth | Query / body | Response |
+|---|---|---|---|---|
+| GET | `/notifications` | ✓ | `cursor?` | `InboxNotification[]`, newest first; `meta.unread_count` |
+| GET | `/notifications/unread-count` | ✓ | — | `data: { count }` (the bell badge polls this every 60 s and on push) |
+| POST | `/notifications/{id}/read` | ✓ | — | 204. 404 for another reader's notification |
+| POST | `/notifications/read-all` | ✓ | — | 204 |
+| GET | `/push/public-key` | — | — | `data: { public_key }` (VAPID, not a secret) |
+| POST | `/push/subscriptions` | ✓ | `{ endpoint, keys: { p256dh, auth }, content_encoding?: aes128gcm\|aesgcm }` | 201 (new device) or 200. The endpoint must be HTTPS on a known push service (FCM, Mozilla, Apple, Windows), since the server POSTs to it. A browser re-subscribed by another account moves to that account |
+| DELETE | `/push/subscriptions` | ✓ | `{ endpoint }` | 204 (idempotent). Called on sign-out, so shared devices stop receiving the previous reader's pushes |
+
+```jsonc
+// InboxNotification: the same payload feeds the inbox and Web Push, already in the reader's UI language
+{ "id": "uuid", "type": "digest_published|featured_article|event_reminder|campaign|data_export",
+  "title": "Ημερήσιες Ειδήσεις: νέο τεύχος", "body": "Κορυφαίο θέμα: …", "url": "/digests/daily-news-2026-10-07",
+  "read_at": null, "created_at": "…" }
+// Web Push payload: { title, body, icon, badge, tag, lang, data: { url, type, campaign_id? } }, TTL 24 h (reminders 23 h)
+```
+
 ### Content resources
 
 ```jsonc
