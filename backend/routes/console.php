@@ -15,3 +15,4 @@ Schedule::command('digests:generate events monthly')->monthlyOn(1, '06:05')->tim
 Schedule::command('content:publish-scheduled')->everyMinute()->withoutOverlapping();
 Schedule::command('reminders:events')->hourly()->withoutOverlapping();
 Schedule::command('maintenance:prune')->dailyAt('03:15')->timezone($timezone);
+Schedule::command('users:purge-deleted')->dailyAt('03:30')->timezone($timezone);
