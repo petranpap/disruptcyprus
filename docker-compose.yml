@@ -85,6 +85,8 @@ services:
       npm_config_cache: /tmp/.npm
     volumes:
       - ./web:/app:z
+      # The token generator also writes the Blade site's tokens.css + fonts.
+      - ./backend/public/site:/backend/public/site:z
     command: sh -c "test -d node_modules || npm ci; npm run dev"
 
 volumes:
