@@ -20,7 +20,8 @@ class EventReminderNotification extends AppNotification
     public function payload(User $notifiable): array
     {
         $locale = $this->event->resolveLocale($notifiable->locale, $notifiable->content_locales) ?? $notifiable->locale;
-        $time = $this->event->starts_at->copy()->setTimezone($this->event->timezone)->locale($notifiable->locale)->isoFormat('dddd LT');
+        $time = $this->event->starts_at->copy()->setTimezone($this->event->timezone)->locale($notifiable->locale)
+            ->isoFormat($notifiable->locale === 'el' ? 'dddd HH:mm' : 'dddd h:mm A');
         $place = $this->event->is_online ? __('notifications.event_reminder.online') : (string) $this->event->city;
 
         return [
