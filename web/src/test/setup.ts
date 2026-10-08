@@ -2,10 +2,13 @@ import '@testing-library/jest-dom/vitest'
 import { cleanup, configure } from '@testing-library/react'
 import { afterAll, afterEach, beforeAll, vi } from 'vitest'
 import i18n from '@/i18n'
+import { useEngagementStore } from '@/stores/engagement'
 import { resetDb, server } from './server'
 
+const initialEngagement = useEngagementStore.getState()
+
 // Lazy route chunks load on first use; give async queries room.
-configure({ asyncUtilTimeout: 5000 })
+configure({ asyncUtilTimeout: 10000 })
 
 // jsdom gaps.
 Object.defineProperty(window, 'matchMedia', {
@@ -48,6 +51,7 @@ afterEach(async () => {
   server.resetHandlers()
   resetDb()
   window.localStorage.clear()
+  useEngagementStore.setState(initialEngagement, true)
   document.cookie.split(';').forEach((cookie) => {
     document.cookie = `${cookie.split('=')[0]?.trim()}=; expires=Thu, 01 Jan 1970 00:00:00 GMT; path=/`
   })

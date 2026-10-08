@@ -31,4 +31,5 @@ export const STORAGE_KEYS = {
   theme: 'dc.theme',
   welcomed: 'dc.welcomed',
   readerFontSize: 'dc.reader-font-size',
+  engagement: 'dc.engagement',
 } as const

@@ -88,5 +88,7 @@ export default defineConfig({
     css: false,
     restoreMocks: true,
     testTimeout: 15000,
+    // Full-route tests are CPU-heavy (lazy chunks + jsdom); too many workers starve each other on small machines.
+    maxWorkers: 4,
   },
 })
