@@ -15,7 +15,7 @@ use Illuminate\View\Middleware\ShareErrorsFromSession;
 | Public site on the main domain: landing, share pages behind every shared link, static pages, SEO files.
 */
 // Stateless: no session or CSRF cookie, so pages are cacheable and visitors aren't tracked.
-Route::middleware('cache.headers:public;max_age=300;etag')->withoutMiddleware([
+Route::middleware(['cache.headers:public;max_age=300;etag', 'security:site'])->withoutMiddleware([
     StartSession::class,
     ShareErrorsFromSession::class,
     PreventRequestForgery::class,

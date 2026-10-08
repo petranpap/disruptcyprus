@@ -190,12 +190,16 @@ sudo a2enmod proxy_fcgi rewrite headers ssl
     <LocationMatch "^/assets/">
         Header set Cache-Control "public, max-age=31536000, immutable"
     </LocationMatch>
-    <LocationMatch "^/(index\.html|sw\.js|manifest\.webmanifest)$">
+    <LocationMatch "^/(index\.html|sw\.js|manifest\.webmanifest|theme-init\.js)$">
         Header set Cache-Control "no-cache"
     </LocationMatch>
 
     Header always set X-Content-Type-Options "nosniff"
     Header always set Referrer-Policy "strict-origin-when-cross-origin"
+    Header always set X-Frame-Options "DENY"
+    Header always set Permissions-Policy "camera=(), microphone=(), geolocation=(), payment=()"
+    # The PWA has no inline scripts (theme-init.js is a file). Inline style attributes carry industry colours.
+    Header always set Content-Security-Policy "default-src 'self'; script-src 'self'; style-src 'self' 'unsafe-inline'; img-src 'self' data: blob:; font-src 'self'; connect-src 'self'; worker-src 'self'; manifest-src 'self'; object-src 'none'; base-uri 'self'; form-action 'self'; frame-ancestors 'none'"
 
     ErrorLog ${APACHE_LOG_DIR}/app.disruptcyprus-error.log
     CustomLog ${APACHE_LOG_DIR}/app.disruptcyprus-access.log combined
@@ -215,6 +219,15 @@ sudo apt install certbot python3-certbot-apache
 sudo certbot --apache -d disruptcyprus.com -d www.disruptcyprus.com -d app.disruptcyprus.com
 ```
 Certbot creates the `:443` vhosts and the HTTP→HTTPS redirect, and renews automatically.
+
+Then add HSTS to **both** generated `*-le-ssl.conf` vhosts (only once HTTPS works for every host, since browsers remember it):
+
+```apache
+Header always set Strict-Transport-Security "max-age=31536000; includeSubDomains"
+```
+
+Laravel adds `X-Content-Type-Options`, `Referrer-Policy`, `Permissions-Policy` and `X-Frame-Options` to its own responses,
+and a strict Content-Security-Policy to the public Blade pages. The PWA's static files get theirs from the vhost above.
 
 ### 1.7 Ports and firewall
 Public traffic uses only **443** (HTTPS). **80** stays open solely for the HTTP→HTTPS redirect and certbot renewals.

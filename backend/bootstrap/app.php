@@ -1,6 +1,7 @@
 <?php
 
 use App\Http\Middleware\ContentCacheHeaders;
+use App\Http\Middleware\SecurityHeaders;
 use App\Http\Middleware\SetLocaleFromHeader;
 use App\Support\ApiExceptionRenderer;
 use Illuminate\Foundation\Application;
@@ -19,7 +20,8 @@ return Application::configure(basePath: dirname(__DIR__))
         // Sanctum SPA cookie auth for requests coming from the PWA origin.
         $middleware->statefulApi();
         $middleware->api(prepend: [SetLocaleFromHeader::class]);
-        $middleware->alias(['content.cache' => ContentCacheHeaders::class]);
+        $middleware->append(SecurityHeaders::class);
+        $middleware->alias(['content.cache' => ContentCacheHeaders::class, 'security' => SecurityHeaders::class]);
     })
     ->withExceptions(function (Exceptions $exceptions): void {
         $exceptions->shouldRenderJsonWhen(

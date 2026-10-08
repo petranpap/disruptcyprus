@@ -1,5 +1,7 @@
 <?php
 
+use App\Http\Middleware\SecurityHeaders;
+
 it('serves the landing page in Greek at / and in English at /en', function () {
     $article = newArticle(['title' => ['en' => 'Latest English story', 'el' => 'Τελευταίο θέμα']]);
     newEvent(['title' => ['en' => 'Upcoming meetup', 'el' => 'Επερχόμενο meetup'], 'starts_at' => now()->addDays(2), 'ends_at' => now()->addDays(2)->addHours(2)]);
@@ -46,4 +48,19 @@ it('points crawlers at the sitemap and away from the admin', function () {
         ->assertOk()
         ->assertSee('Disallow: /admin')
         ->assertSee('Sitemap: '.url('/sitemap.xml'));
+});
+
+it('sends security headers, with a strict CSP on public pages', function () {
+    $this->get('/')
+        ->assertHeader('X-Content-Type-Options', 'nosniff')
+        ->assertHeader('Referrer-Policy', 'strict-origin-when-cross-origin')
+        ->assertHeader('Content-Security-Policy', SecurityHeaders::SITE_CSP);
+
+    $this->getJson('/api/v1/sections')
+        ->assertHeader('X-Content-Type-Options', 'nosniff')
+        ->assertHeaderMissing('Content-Security-Policy');
+});
+
+it('uses root-relative media URLs so the app host serves images same-origin', function () {
+    expect(Storage::disk('public')->url('1/photo.webp'))->toBe('/storage/1/photo.webp');
 });
