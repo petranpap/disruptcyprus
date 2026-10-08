@@ -40,7 +40,12 @@
     <link rel="icon" href="{{ asset('favicon.ico') }}" sizes="32x32">
     <link rel="icon" href="{{ asset('site/favicon.svg') }}" type="image/svg+xml">
     <link rel="apple-touch-icon" href="{{ asset('site/apple-touch-icon-180x180.png') }}">
-    <link rel="preload" href="{{ asset('site/fonts/inter-latin-wght-normal.woff2') }}" as="font" type="font/woff2" crossorigin>
+    {{-- The fonts above the fold in this language: preloading them avoids the headline reflowing when they swap in. --}}
+    @foreach ($locale === 'el'
+        ? ['noto-serif-display-greek', 'source-serif-4-greek', 'inter-greek', 'inter-latin']
+        : ['playfair-display-latin', 'source-serif-4-latin', 'inter-latin'] as $font)
+        <link rel="preload" href="{{ asset("site/fonts/{$font}-wght-normal.woff2") }}" as="font" type="font/woff2" crossorigin>
+    @endforeach
     <link rel="stylesheet" href="{{ asset('site/tokens.css') }}?v={{ filemtime(public_path('site/tokens.css')) }}">
     <link rel="stylesheet" href="{{ asset('site/site.css') }}?v={{ filemtime(public_path('site/site.css')) }}">
     @if ($jsonLd = $meta->jsonLdScript())

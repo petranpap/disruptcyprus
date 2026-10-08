@@ -1,0 +1,7 @@
+# app.disruptcyprus.com: the reader app. Shareable, indexable versions of every story live on the main domain.
+User-agent: *
+Disallow: /api/
+Disallow: /settings
+Disallow: /onboarding
+
+Sitemap: https://disruptcyprus.com/sitemap.xml

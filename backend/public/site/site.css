@@ -131,9 +131,14 @@ a { color: var(--dc-primary); }
 .card-image { aspect-ratio: 16 / 10; object-fit: cover; width: 100%; background: var(--dc-surface-container); }
 .card-body { display: flex; flex-direction: column; gap: 0.375rem; padding: 1rem; }
 .card-title { display: block; font: var(--dc-text-headline-sm); color: var(--dc-on-surface); }
+/* Industry colours are decoration only (a dot), never text colour: many fail contrast as small text. Same as the app. */
 .kicker {
-  font: var(--dc-text-label-sm); letter-spacing: 0.06em; text-transform: uppercase;
-  color: var(--industry, var(--dc-brand-crimson));
+  display: inline-flex; align-items: center; gap: 0.375rem;
+  font: var(--dc-text-label-sm); font-weight: 600; letter-spacing: 0.06em; text-transform: uppercase;
+  color: var(--dc-primary);
+}
+.kicker[style]::before, .chip[style]::before {
+  content: ""; width: 0.5rem; height: 0.5rem; border-radius: var(--dc-radius-pill); background: var(--industry);
 }
 .meta { display: block; font: var(--dc-text-label-sm); color: var(--dc-outline); }
 
@@ -151,7 +156,7 @@ a { color: var(--dc-primary); }
   width: 3.5rem; height: 3.5rem; border-radius: var(--dc-radius-control);
   background: var(--dc-surface-container-low); border: 1px solid var(--dc-card-stroke);
 }
-.date-chip-month { font: var(--dc-text-label-sm); color: var(--dc-brand-crimson); text-transform: uppercase; }
+.date-chip-month { font: var(--dc-text-label-sm); font-weight: 600; color: var(--dc-secondary); text-transform: uppercase; }
 .date-chip-day { font: var(--dc-text-headline-md); color: var(--dc-on-surface); }
 
 .briefing {
@@ -173,12 +178,11 @@ a { color: var(--dc-primary); }
 .article-header { margin-bottom: 1.5rem; }
 .kickers { display: flex; flex-wrap: wrap; gap: 0.5rem; margin: 0 0 1rem; }
 .chip {
-  display: inline-flex; align-items: center; padding: 0.25rem 0.625rem; border-radius: var(--dc-radius-pill);
-  font: var(--dc-text-label-sm); letter-spacing: 0.04em; text-transform: uppercase;
-  color: var(--industry, var(--dc-primary));
-  background: color-mix(in srgb, var(--industry, var(--dc-primary)) 12%, transparent);
+  display: inline-flex; align-items: center; gap: 0.375rem; padding: 0.25rem 0.625rem; border-radius: var(--dc-radius-pill);
+  font: var(--dc-text-label-sm); font-weight: 600; letter-spacing: 0.04em; text-transform: uppercase;
+  color: var(--dc-on-surface); background: var(--dc-surface-container);
 }
-.chip-original { color: var(--dc-brand-crimson); background: color-mix(in srgb, var(--dc-brand-crimson) 10%, transparent); }
+.chip-original { color: var(--dc-secondary); background: var(--dc-secondary-fixed); }
 .article-title {
   margin: 0; font: var(--dc-text-headline-hero-mobile); letter-spacing: -0.015em; color: var(--dc-on-surface);
 }
