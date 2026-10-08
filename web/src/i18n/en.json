@@ -19,7 +19,8 @@
     "share": "Share",
     "online": "Online",
     "minRead_one": "{{count}} min read",
-    "minRead_other": "{{count}} min read"
+    "minRead_other": "{{count}} min read",
+    "notNow": "Not now"
   },
   "nav": {
     "home": "Home",
@@ -149,9 +150,6 @@
       "eventReminders": "Event reminders",
       "eventRemindersHint": "24 hours before events you save",
       "deliveryTime": "Delivery time",
-      "installTitle": "Install the app for notifications",
-      "installIos": "On iPhone and iPad, notifications work once Disrupt Cyprus is on your Home Screen: tap <share/> Share, then “Add to Home Screen”.",
-      "installOther": "Add Disrupt Cyprus to your home screen for a faster, full-screen experience.",
       "finish": "Finish"
     }
   },
@@ -167,10 +165,6 @@
     "en": "English",
     "short_el": "ΕΛ",
     "short_en": "EN"
-  },
-  "placeholder": {
-    "title": "Coming in the next release",
-    "body": "This screen is part of the reading experience we are building right now."
   },
   "errors": {
     "generic": "Something went wrong. Please try again.",
@@ -346,8 +340,7 @@
       "alertsHint": "Get a notification when a featured story is published in these industries."
     },
     "notifications": {
-      "title": "Notifications",
-      "pushNote": "Push notifications on this device can be enabled once the notification centre launches."
+      "title": "Notifications"
     },
     "language": {
       "title": "Language"
@@ -385,5 +378,39 @@
       "deleteFinal": "Permanently delete",
       "deleted": "Your account has been deleted."
     }
+  },
+  "notifications": {
+    "title": "Notifications",
+    "emptyTitle": "You're all caught up",
+    "emptyBody": "Digests, alerts for featured stories in your industries and reminders for saved events appear here.",
+    "manage": "Notification settings",
+    "markAllRead": "Mark all as read",
+    "today": "Today",
+    "earlier": "Earlier",
+    "guestTitle": "Never miss what matters",
+    "guestBody": "Create a free account to get your digests, alerts from the industries you follow and reminders for events you save."
+  },
+  "push": {
+    "title": "Push notifications",
+    "deviceLabel": "On this device",
+    "onHint": "Digests, alerts and reminders arrive even when the app is closed.",
+    "offHint": "You will still find everything in your notifications inbox.",
+    "unsupported": "This browser doesn't support push notifications. Everything still arrives in your notifications inbox.",
+    "denied": "Notifications are blocked for Disrupt Cyprus in your browser settings. Allow them there, then come back to turn them on.",
+    "installIos": "On iPhone and iPad, notifications work once Disrupt Cyprus is on your Home Screen: tap <share/> Share, then “Add to Home Screen”, and open the app from there.",
+    "turnOn": "Turn on",
+    "inboxBanner": "Get digests and reminders on this device, even when the app is closed.",
+    "enabledToast": "Notifications are on for this device",
+    "disabledToast": "Notifications are off for this device",
+    "deniedToast": "Notifications were not allowed",
+    "errorToast": "Couldn't turn on notifications. Please try again.",
+    "promptTitle": "Get a reminder before saved events?",
+    "promptBody": "Turn on notifications for event reminders, your digests and alerts from your industries."
+  },
+  "install": {
+    "title": "Install Disrupt Cyprus",
+    "body": "Open it from your home screen: faster, full screen, and saved stories work offline.",
+    "action": "Install",
+    "howTo": "Show me how"
   }
 }

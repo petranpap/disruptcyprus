@@ -86,3 +86,75 @@ self.addEventListener('message', (event) => {
   // The "new version available" prompt asks the waiting worker to take over.
   if (type === 'SKIP_WAITING') void self.skipWaiting()
 })
+
+// ---- Web Push -------------------------------------------------------------------------------------------
+
+interface PushPayload {
+  title: string
+  body?: string
+  icon?: string
+  badge?: string
+  tag?: string
+  lang?: string
+  data?: { url?: string }
+}
+
+/** Tells open tabs to refresh the inbox and the bell badge. */
+async function notifyClients(): Promise<void> {
+  const clients = await self.clients.matchAll({ type: 'window', includeUncontrolled: true })
+  clients.forEach((client) => client.postMessage({ type: 'NOTIFICATIONS_CHANGED' }))
+}
+
+self.addEventListener('push', (event) => {
+  let payload: PushPayload
+  try {
+    payload = event.data?.json() as PushPayload
+  } catch {
+    payload = { title: 'Disrupt Cyprus', body: event.data?.text() }
+  }
+
+  event.waitUntil(
+    Promise.all([
+      self.registration.showNotification(payload.title || 'Disrupt Cyprus', {
+        body: payload.body,
+        icon: payload.icon ?? '/pwa-192x192.png',
+        badge: payload.badge ?? '/pwa-64x64.png',
+        tag: payload.tag,
+        lang: payload.lang,
+        data: payload.data ?? {},
+      }),
+      notifyClients(),
+    ]),
+  )
+})
+
+self.addEventListener('notificationclick', (event) => {
+  event.notification.close()
+  const raw = (event.notification.data as { url?: string } | null)?.url ?? '/'
+  // Only same-origin destinations: a payload can never send the reader elsewhere.
+  const target = new URL(raw, self.location.origin)
+  const url = target.origin === self.location.origin ? target.href : self.location.origin + '/'
+
+  event.waitUntil(
+    (async () => {
+      const clients = await self.clients.matchAll({ type: 'window', includeUncontrolled: true })
+      const existing = clients.find((client) => new URL(client.url).origin === self.location.origin)
+      if (existing) {
+        await existing.focus()
+        await existing.navigate(url).catch(() => existing.postMessage({ type: 'NAVIGATE', url }))
+        return
+      }
+      await self.clients.openWindow(url)
+    })(),
+  )
+})
+
+// The browser rotated the subscription: subscribe again with the same key. Service workers cannot send the
+// CSRF token, so the app saves the new subscription on its next start (resyncPush in RootLayout).
+self.addEventListener('pushsubscriptionchange', (event) => {
+  const change = event as ExtendableEvent & { oldSubscription?: PushSubscription | null }
+  const applicationServerKey = change.oldSubscription?.options.applicationServerKey
+  if (!applicationServerKey) return
+
+  change.waitUntil(self.registration.pushManager.subscribe({ userVisibleOnly: true, applicationServerKey }))
+})

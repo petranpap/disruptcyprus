@@ -3,6 +3,7 @@ import { z } from 'zod'
 import { buildUrl, api } from './client'
 import { patchCards, type CardType } from './cardCache'
 import { SAVED_CACHE } from './offline'
+import { useEngagementStore } from '@/stores/engagement'
 import {
   articleCardSchema,
   articleSchema,
@@ -26,7 +27,7 @@ import {
 type Page<T> = { data: T[]; meta: { next_cursor: string | null } & Record<string, unknown> }
 
 /** Shared infinite-query plumbing for cursor-paginated lists. */
-function useCursorList<T>(
+export function useCursorList<T>(
   key: readonly unknown[],
   fetchPage: (cursor: string | null) => Promise<Page<T>>,
   enabled = true,
@@ -95,6 +96,7 @@ export function useRelatedArticles(slug: string, locale: string) {
 
 /** Fire-and-forget read counter (deduplicated server-side). */
 export function recordArticleView(id: number): void {
+  useEngagementStore.getState().recordRead()
   void api.post(`/articles/${id}/view`).catch(() => undefined)
 }
 
@@ -236,6 +238,7 @@ export function useToggleBookmark() {
     onError: (_error, target) =>
       patchCards(queryClient, target.type, target.id, { is_bookmarked: target.is_bookmarked }),
     onSuccess: (_data, target) => {
+      if (!target.is_bookmarked) useEngagementStore.getState().recordSave()
       void syncOfflineCopy(
         target,
         !target.is_bookmarked,

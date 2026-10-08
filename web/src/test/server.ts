@@ -1,6 +1,6 @@
 import { http, HttpResponse } from 'msw'
 import { setupServer } from 'msw/node'
-import type { MyIndustries, NotificationPreferences, User } from '@/api/schemas'
+import type { InboxNotification, MyIndustries, NotificationPreferences, User } from '@/api/schemas'
 import {
   articleDetailFixture,
   articleFixture,
@@ -20,12 +20,14 @@ export const db: {
   preferences: NotificationPreferences
   requests: { method: string; path: string; body: unknown; headers: Headers; search: string }[]
   bookmarks: Set<string>
+  notifications: InboxNotification[]
 } = {
   user: null,
   myIndustries: { industry_ids: [], notify_ids: [] },
   preferences: { ...preferencesFixture },
   requests: [],
   bookmarks: new Set(),
+  notifications: [],
 }
 
 export function resetDb(): void {
@@ -34,6 +36,7 @@ export function resetDb(): void {
   db.preferences = { ...preferencesFixture }
   db.requests = []
   db.bookmarks = new Set()
+  db.notifications = []
 }
 
 const unauthenticated = () =>
@@ -253,6 +256,33 @@ export const handlers = [
     db.bookmarks.delete(`${body.type}:${body.id}`)
     return new HttpResponse(null, { status: 204 })
   }),
+
+  http.get('*/api/v1/notifications/unread-count', () =>
+    db.user
+      ? HttpResponse.json({ data: { count: db.notifications.filter((item) => !item.read_at).length } })
+      : unauthenticated(),
+  ),
+  http.get('*/api/v1/notifications', () =>
+    db.user
+      ? HttpResponse.json({
+          data: db.notifications,
+          meta: { next_cursor: null, unread_count: db.notifications.filter((item) => !item.read_at).length },
+        })
+      : unauthenticated(),
+  ),
+  http.post('*/api/v1/notifications/read-all', async ({ request }) => {
+    await record(request)
+    db.notifications = db.notifications.map((item) => ({ ...item, read_at: item.read_at ?? new Date().toISOString() }))
+    return new HttpResponse(null, { status: 204 })
+  }),
+  http.post('*/api/v1/notifications/:id/read', async ({ request, params }) => {
+    await record(request)
+    db.notifications = db.notifications.map((item) =>
+      item.id === params.id ? { ...item, read_at: new Date().toISOString() } : item,
+    )
+    return new HttpResponse(null, { status: 204 })
+  }),
+  http.get('*/api/v1/push/public-key', () => HttpResponse.json({ data: { public_key: 'BTestKey' } })),
 
   http.put('*/api/v1/me/password', async ({ request }) => {
     const body = (await record(request)) as { current_password?: string }

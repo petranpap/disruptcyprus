@@ -7,6 +7,7 @@ import { Skeleton } from '@/components/ui/Skeleton'
 import { Switch } from '@/components/ui/Switch'
 import { DELIVERY_TIMES, PREFERENCE_TOGGLES } from '@/features/onboarding/constants'
 import { useUiStore } from '@/stores/ui'
+import { PushCard } from '@/features/notifications/PushCard'
 import { SettingsCard, SettingsPage } from './SettingsLayout'
 
 function PreferencesForm({ initial }: { initial: NotificationPreferences }) {
@@ -44,7 +45,6 @@ function PreferencesForm({ initial }: { initial: NotificationPreferences }) {
           </label>
         </div>
       </SettingsCard>
-      <p className="text-body-sm text-outline">{t('settings.notifications.pushNote')}</p>
       <Button
         loading={update.isPending}
         onClick={() =>
@@ -66,6 +66,7 @@ export function NotificationSettings() {
 
   return (
     <SettingsPage title={t('settings.notifications.title')} description={t('onboarding.notifications.subtitle')}>
+      <PushCard variant="settings" />
       {preferences.data ? <PreferencesForm initial={preferences.data} /> : <Skeleton className="h-72 rounded-card" />}
     </SettingsPage>
   )

@@ -36,6 +36,12 @@ import Tune from '@material-symbols/svg-400/outlined/tune.svg?react'
 import VerifiedFill from '@material-symbols/svg-400/outlined/verified-fill.svg?react'
 import Visibility from '@material-symbols/svg-400/outlined/visibility.svg?react'
 import VisibilityOff from '@material-symbols/svg-400/outlined/visibility_off.svg?react'
+import Campaign from '@material-symbols/svg-400/outlined/campaign.svg?react'
+import DoneAll from '@material-symbols/svg-400/outlined/done_all.svg?react'
+import Download from '@material-symbols/svg-400/outlined/download.svg?react'
+import Newspaper from '@material-symbols/svg-400/outlined/newspaper.svg?react'
+import NotificationsActive from '@material-symbols/svg-400/outlined/notifications_active.svg?react'
+import NotificationsOff from '@material-symbols/svg-400/outlined/notifications_off.svg?react'
 import { cn } from '@/lib/cn'
 
 /**
@@ -80,6 +86,12 @@ const ICONS = {
   'verified-fill': VerifiedFill,
   visibility: Visibility,
   visibility_off: VisibilityOff,
+  campaign: Campaign,
+  done_all: DoneAll,
+  download: Download,
+  newspaper: Newspaper,
+  notifications_active: NotificationsActive,
+  notifications_off: NotificationsOff,
 } satisfies Record<string, ComponentType<SVGProps<SVGSVGElement>>>
 
 export type IconName = keyof typeof ICONS

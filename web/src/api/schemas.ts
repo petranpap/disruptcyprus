@@ -208,3 +208,24 @@ export const bookmarkedCardSchema = z.discriminatedUnion('type', [
   eventCardSchema.extend({ bookmarked_at: z.string() }),
 ])
 export type BookmarkedCard = z.infer<typeof bookmarkedCardSchema>
+
+export const notificationTypeSchema = z.enum([
+  'digest_published',
+  'featured_article',
+  'event_reminder',
+  'campaign',
+  'data_export',
+  'general',
+])
+export type NotificationType = z.infer<typeof notificationTypeSchema>
+
+export const inboxNotificationSchema = z.object({
+  id: z.string(),
+  type: notificationTypeSchema.catch('general'),
+  title: z.string(),
+  body: z.string(),
+  url: z.string().nullable(),
+  read_at: z.string().nullable(),
+  created_at: z.string(),
+})
+export type InboxNotification = z.infer<typeof inboxNotificationSchema>

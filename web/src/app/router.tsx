@@ -4,7 +4,6 @@ import { HomePage } from '@/features/feed/HomePage'
 import { SectionPage } from '@/features/feed/SectionPage'
 import { ProfilePage } from '@/features/profile/ProfilePage'
 import { NotFoundPage } from '@/features/shell/NotFoundPage'
-import { PlaceholderPage } from '@/features/shell/PlaceholderPage'
 import { RouteError } from '@/features/shell/RouteError'
 import { GuestOnly, RequireAuth, Splash } from './guards'
 import { AppShell, AuthLayout, OnboardingLayout } from './layouts'
@@ -38,6 +37,7 @@ const ExplorePage = lazyNamed(() => import('@/features/explore/ExplorePage'), 'E
 const IndustryPage = lazyNamed(() => import('@/features/explore/IndustryPage'), 'IndustryPage')
 const SavedPage = lazyNamed(() => import('@/features/saved/SavedPage'), 'SavedPage')
 const IndustriesSettings = lazyNamed(() => import('@/features/settings/IndustriesSettings'), 'IndustriesSettings')
+const NotificationsPage = lazyNamed(() => import('@/features/notifications/NotificationsPage'), 'NotificationsPage')
 const NotificationSettings = lazyNamed(() => import('@/features/settings/NotificationSettings'), 'NotificationSettings')
 const LanguageSettings = lazyNamed(() => import('@/features/settings/LanguageSettings'), 'LanguageSettings')
 const AppearanceSettings = lazyNamed(() => import('@/features/settings/AppearanceSettings'), 'AppearanceSettings')
@@ -111,7 +111,7 @@ export const routes: RouteObject[] = [
           { path: '/explore/:industry', element: page(<IndustryPage />) },
           { path: '/saved', element: page(<SavedPage />) },
           { path: '/digests/:slug', element: page(<DigestPage />) },
-          { path: '/notifications', element: <PlaceholderPage titleKey="nav.notifications" icon="notifications" /> },
+          { path: '/notifications', element: page(<NotificationsPage />) },
           { path: '/profile', element: <ProfilePage /> },
           { path: '/settings/language', element: page(<LanguageSettings />) },
           { path: '/settings/appearance', element: page(<AppearanceSettings />) },

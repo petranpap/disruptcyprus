@@ -1,4 +1,5 @@
 import { useMutation, useQuery, useQueryClient } from '@tanstack/react-query'
+import { disablePush } from '@/lib/push'
 import { api } from './client'
 import { ApiError } from './errors'
 import { dataSchema, userSchema, type Locale, type User } from './schemas'
@@ -82,7 +83,11 @@ export function useSignOut() {
   const queryClient = useQueryClient()
 
   return useMutation({
-    mutationFn: () => api.post<undefined>('/auth/logout'),
+    mutationFn: async () => {
+      // Shared devices must not keep receiving this reader's notifications.
+      await disablePush().catch(() => undefined)
+      await api.post<undefined>('/auth/logout')
+    },
     onSettled: () => {
       queryClient.clear()
       queryClient.setQueryData(meQueryKey, null)

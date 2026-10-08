@@ -1,6 +1,7 @@
 import { useState, type FormEvent } from 'react'
 import { Link, NavLink, useNavigate } from 'react-router'
 import { useTranslation } from 'react-i18next'
+import { useUnreadCount } from '@/api/notifications'
 import type { User } from '@/api/schemas'
 import { buttonClasses } from '@/components/ui/buttonClasses'
 import { Icon } from '@/components/ui/Icon'
@@ -17,7 +18,6 @@ export interface SectionTab {
 interface SiteHeaderProps {
   tabs: SectionTab[]
   user: User | null | undefined
-  unreadCount?: number
 }
 
 /** Shared icon-link look; each link adds its own display utility so responsive visibility never conflicts. */
@@ -30,11 +30,12 @@ const iconLink =
  *  - desktop (lg+): a website top bar — logo, inline section navigation, search field, language,
  *    saved, notifications and the account (or sign-in buttons for guests).
  */
-export function SiteHeader({ tabs, user, unreadCount = 0 }: SiteHeaderProps) {
+export function SiteHeader({ tabs, user }: SiteHeaderProps) {
   const { t } = useTranslation()
   const navigate = useNavigate()
   const { locale, setLocale } = useLocale()
   const [query, setQuery] = useState('')
+  const unreadCount = useUnreadCount(Boolean(user)).data ?? 0
 
   const search = (event: FormEvent) => {
     event.preventDefault()

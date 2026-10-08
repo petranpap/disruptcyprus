@@ -1,5 +1,5 @@
 import { useState } from 'react'
-import { Trans, useTranslation } from 'react-i18next'
+import { useTranslation } from 'react-i18next'
 import { useNavigate } from 'react-router'
 import { useUpdateProfile } from '@/api/auth'
 import { useNotificationPreferences, useUpdateNotificationPreferences } from '@/api/preferences'
@@ -11,7 +11,7 @@ import { Icon } from '@/components/ui/Icon'
 import { Skeleton } from '@/components/ui/Skeleton'
 import { Switch } from '@/components/ui/Switch'
 import { FormAlert } from '@/features/auth/AuthHeading'
-import { isIos, isStandalone } from '@/hooks/useStandalone'
+import { PushCard } from '@/features/notifications/PushCard'
 import { applyServerErrors } from '@/lib/forms'
 import { DELIVERY_TIMES, PREFERENCE_TOGGLES, withSuggestions } from './constants'
 import { OnboardingIntro } from './OnboardingIntro'
@@ -34,7 +34,6 @@ function NotificationsForm({ initial }: { initial: NotificationPreferences | nul
   const updateProfile = useUpdateProfile()
   const [draft, setDraft] = useState<NotificationPreferences | null>(initial)
   const [formError, setFormError] = useState<string | null>(null)
-  const showInstallHint = !isStandalone()
 
   const finish = async () => {
     if (!draft) return
@@ -102,26 +101,7 @@ function NotificationsForm({ initial }: { initial: NotificationPreferences | nul
           )}
         </section>
 
-        {showInstallHint && (
-          <section className="mt-space-lg rounded-card bg-primary-fixed p-space-md text-on-primary-fixed-variant">
-            <h2 className="flex items-center gap-2 font-headline text-headline-sm">
-              <Icon name="ios_share" size={20} />
-              {t('onboarding.notifications.installTitle')}
-            </h2>
-            <p className="mt-space-sm text-body-sm">
-              {isIos() ? (
-                <Trans
-                  i18nKey="onboarding.notifications.installIos"
-                  components={{
-                    share: <Icon name="ios_share" size={16} className="-mt-0.5 inline" label={t('common.share')} />,
-                  }}
-                />
-              ) : (
-                t('onboarding.notifications.installOther')
-              )}
-            </p>
-          </section>
-        )}
+        <PushCard className="mt-space-lg" />
       </main>
       <BottomDock>
         <Button
