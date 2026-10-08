@@ -32,7 +32,9 @@ podman compose restart queue scheduler
 | http://localhost:8025 | Mailpit (all outgoing mail) |
 | http://localhost:5173 | PWA dev server: `podman compose up -d node` (first start runs `npm ci`) |
 | http://localhost:5173/dev/components | Component gallery (development only) |
-| http://localhost:8080/admin | Filament admin (from Phase 3) |
+| http://localhost:8080/admin | Filament admin |
+| http://localhost:8080/ | Public site: landing, share pages (`/a/{slug}`), sitemap |
+| http://127.0.0.1:4173 | Production build of the PWA: `npm run build` then `npm run preview` (see docs/DEPLOYMENT.md §6) |
 
 Demo accounts (password `password`): `admin@disruptcyprus.test`, `editor@disruptcyprus.test`, `reader@disruptcyprus.test`.
 
@@ -42,6 +44,8 @@ Demo accounts (password `password`): `admin@disruptcyprus.test`, `editor@disrupt
 - After `composer require` or changes to service providers, run `podman compose restart queue scheduler`.
 
 ## Tests & quality
+
+CI (`.github/workflows/ci.yml`) runs all of the following on every push and pull request once the repository is on GitHub.
 
 Web (inside the Node 20 container):
 ```bash

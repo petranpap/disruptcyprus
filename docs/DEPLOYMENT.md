@@ -304,5 +304,33 @@ sudo -u disrupt mkdir -p /var/www/disruptcyprus/backups
 ```
 Store DB credentials for that cron in `/var/www/disruptcyprus/.my.cnf` (`chmod 600`). Copy backups off the server (e.g. a Hetzner Storage Box).
 
-## 4. Still to come
-- Lighthouse checks, CSP header and the final security checklist (Phase 7).
+## 4. Launch checklist
+
+1. DNS: `disruptcyprus.com`, `www` and `app` A records point at the server; certbot issued all three certificates.
+2. `backend/.env`: `APP_ENV=production`, `APP_DEBUG=false`, real `MAIL_*`, `GOOGLE_*` (redirect URI on `app.`), VAPID keys
+   generated once. `deploy.sh` warns about debug mode and missing VAPID keys.
+3. Google Cloud console: authorised redirect URI `https://app.disruptcyprus.com/api/v1/auth/social/google/callback`.
+   Without `GOOGLE_CLIENT_ID` the Google button shows a friendly "not available" message.
+4. First admin created with `php artisan admin:user`; the industries and sections seeders ran.
+5. Check, from a phone: sign up, onboarding, enable push, save an event, get the test campaign from the admin.
+6. Share an article link in WhatsApp/LinkedIn: the preview card comes from `disruptcyprus.com/a/{slug}`.
+7. Submit `https://disruptcyprus.com/sitemap.xml` in Google Search Console.
+8. HSTS added to both TLS vhosts once everything works over HTTPS (§1.6).
+9. Legal: the privacy policy and terms (`backend/resources/views/site/pages/`) are drafts that describe what the app
+   actually does. Have them reviewed, add the legal entity name, and update `PageController::LEGAL_UPDATED` when they change.
+
+## 5. Scheduled jobs (all Asia/Nicosia)
+
+| When | Command | What |
+|---|---|---|
+| every minute | `content:publish-scheduled` | Publishes scheduled articles/events |
+| hourly | `reminders:events` | Reminders for saved events starting within 24 h |
+| daily 06:00, Sun 18:00, 1st 06:00/06:05 | `digests:generate …` | Digest drafts for editors |
+| daily 03:15 | `maintenance:prune` | Old view statistics and expired data exports |
+| daily 03:30 | `users:purge-deleted` | Permanently deletes accounts deleted more than 30 days ago |
+
+## 6. Checking a build locally like production
+
+`podman compose run --rm -T node npm run build`, then `podman compose run --rm -T node npm run preview` serves the build on
+http://127.0.0.1:4173 with the production CSP header and the API proxied to Laravel: use it for Lighthouse, CSP and
+service-worker checks.

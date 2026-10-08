@@ -51,6 +51,8 @@ to silence the provider banner; use `exec -T` in non-interactive scripts).
 | Web dev server | `podman compose up -d node` → http://localhost:5173 (Vite proxies /api, /sanctum, /storage to nginx) |
 | Web one-off commands | `podman compose run --rm -T node npm run <script>` (Node 20, same as production) |
 | Web checks | scripts: `typecheck`, `lint`, `test` (Vitest), `format`, `build` (tokens + tsc + vite), `tokens`, `icons` |
+| Production build locally | `podman compose run --rm -T node npm run build && podman compose run --rm -T node npm run preview` → http://127.0.0.1:4173 (production CSP + API proxy) |
+| Public site (landing/share pages) | http://localhost:8080/ · `/en` · `/a/{slug}` `/e/{slug}` `/d/{slug}` · `/sitemap.xml` |
 | Component gallery | http://localhost:5173/dev/components (dev builds only) · `?theme=dark|light` forces a theme on any page |
 
 Ports (host network, 127.0.0.1): nginx 8080, php-fpm 9000, MariaDB 3307 (a host MySQL owns 3306), Mailpit 1025/8025.
@@ -85,10 +87,13 @@ Environment quirks on this machine:
 - Status/published_at are normalized in the models (`NormalizesPublication`); never set `scheduled` by hand elsewhere.
 - Tests touching FULLTEXT search go in `tests/Search` (truncation, not transactions: InnoDB FTS only sees committed rows).
 - Test helpers: `reader()`, `newArticle()`, `newEvent()`, `section()` (`event()` is a Laravel helper — don't shadow it).
+- Public site (`routes/web.php`, `app/Http/Controllers/Site`, `resources/views/site`, `lang/*/site.php`): stateless (no session/CSRF
+  middleware, cacheable), strict CSP, plain CSS in `public/site/site.css` using only `--dc-*` variables. `?lang=en`, Greek default.
+- Media URLs are root-relative (`/storage/...`); use `SiteLocale::absolute()` where an absolute URL is required (OG, JSON-LD).
 
 **Web**
 - React 19 + React Router 7 (data router, `createBrowserRouter`), TanStack Query 5, Zustand 5, react-hook-form + zod 4, i18next, Tailwind 4 (CSS-first).
-- Design tokens: edit `web/src/styles/tokens.json`, then `npm run tokens` regenerates `src/styles/theme.css` (never edit it by hand). Tailwind's
+- Design tokens: edit `web/src/styles/tokens.json`, then `npm run tokens` regenerates `src/styles/theme.css` **and** `backend/public/site/{tokens.css,fonts,icons}` (never edit them by hand; commit the output — CI and deploy.sh check it). Tailwind's
   default palette is removed: only token colours exist (`bg-surface-container-lowest`, `text-on-surface-variant`, …).
 - API calls only through `src/api/client.ts` (CSRF cookie, `Accept-Language`, error envelope → `ApiError`) and zod-validated hooks in `src/api/*`.
 - After Prettier runs, multi-line code no longer matches single-line search strings: verify scripted edits actually applied (grep), as several silently missed in Phase 5.
@@ -156,6 +161,13 @@ Environment quirks on this machine:
 | 2026-10-07 | Push endpoints restricted to known push services (FCM, Mozilla, Apple, Windows) | The server POSTs to the endpoint: no SSRF |
 | 2026-10-07 | Sign-out unsubscribes push on that device (no prompt); sign-in re-attaches an existing subscription to the new account | Shared devices never get another reader's notifications |
 | 2026-10-07 | Install/push prompts: one per visit, never in the first 60 s; push offer after the first save, install banner after 3 reads or first save, snoozed 14 days; iOS gets Home Screen instructions | Brief; non-intrusive |
+| 2026-10-08 | Public site is plain Blade + handwritten CSS on generated token variables (no Vite/Tailwind build in backend) | Boring, no second build pipeline; one token source |
+| 2026-10-08 | Media URLs root-relative (`MEDIA_URL=/storage`); both hosts serve `/storage` | Same-origin images for the PWA service worker (offline); share pages absolutize for OG |
+| 2026-10-08 | CSP: strict on public pages (Laravel) and the PWA (Apache); no inline scripts (`theme-init.js`); zod `jitless` in its own chunk | Zero CSP violations verified on the production build |
+| 2026-10-08 | Google sign-in: never links an unverified provider email to an existing account; cancel/unconfigured get their own messages; `next` path limited to in-app paths | Account-takeover and open-redirect safe |
+| 2026-10-08 | Deleted accounts purged 30 days after deletion (`users:purge-deleted`, daily 03:30) | GDPR; FKs cascade or null so staff-written content stays |
+| 2026-10-08 | Legal pages are drafts describing actual data practices; need legal review + entity name before launch | Product owner / lawyer |
+| 2026-10-08 | Guest `GET /me` keeps returning 401 (one console error in Lighthouse) | Correct API semantics beat a Best-Practices point |
 | 2026-10-05 | Everything runs in containers (podman + podman-compose locally; compose file stays Docker-compatible) | Product owner |
 
 ## Phase status
@@ -167,4 +179,4 @@ Environment quirks on this machine:
 - [x] Phase 4 — Web foundation (shell, tokens, i18n, API client, auth, onboarding, component gallery, PWA base)
 - [x] Phase 5 — Web features (feeds, sections, reader, events + calendar, digests, explore/search, saved + offline, settings, guest mode)
 - [x] Phase 6 — Notifications (inbox, Web Push, digest timing, featured alerts, event reminders, campaigns, install prompt)
-- [ ] Phase 7 — Landing, share pages, GDPR, CI, Lighthouse, deployment, visual QA
+- [x] Phase 7 — Landing, share pages, GDPR purge, Google sign-in polish, security headers/CSP, CI, Lighthouse, deployment docs, visual QA
