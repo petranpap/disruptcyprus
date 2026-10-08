@@ -80,7 +80,9 @@ if (existsSync(resolve(root, '../backend/public'))) {
     siteVars.push(`  --dc-font-${name}: ${families.map(quote).join(', ')};`)
   }
   for (const [name, style] of Object.entries(tokens.typeScale)) {
-    siteVars.push(`  --dc-text-${name}: ${style.weight} ${style.size}/${style.lineHeight} var(--dc-font-${name.startsWith('headline') ? 'headline' : name.startsWith('body') ? 'body' : 'ui'});`)
+    siteVars.push(
+      `  --dc-text-${name}: ${style.weight} ${style.size}/${style.lineHeight} var(--dc-font-${name.startsWith('headline') ? 'headline' : name.startsWith('body') ? 'body' : 'ui'});`,
+    )
     if (style.tracking) siteVars.push(`  --dc-tracking-${name}: ${style.tracking};`)
   }
   for (const [name, value] of Object.entries(tokens.spacing)) siteVars.push(`  --dc-${name}: ${value};`)
@@ -95,7 +97,10 @@ if (existsSync(resolve(root, '../backend/public'))) {
     for (const block of css.match(/@font-face \{[^}]+\}/g) ?? []) {
       const file = block.match(/files\/([^)]+-(latin|greek)-wght-normal\.woff2)/)?.[1]
       if (!file || (pkg === 'noto-serif-display' && file.includes('latin'))) continue
-      copyFileSync(resolve(root, `node_modules/@fontsource-variable/${pkg}/files/${file}`), resolve(siteDir, 'fonts', file))
+      copyFileSync(
+        resolve(root, `node_modules/@fontsource-variable/${pkg}/files/${file}`),
+        resolve(siteDir, 'fonts', file),
+      )
       fontFaces.push(block.replace(/url\(\.\/files\//, 'url(fonts/'))
     }
   }
