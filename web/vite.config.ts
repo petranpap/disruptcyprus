@@ -8,6 +8,16 @@ import svgr from 'vite-plugin-svgr'
 
 // Laravel (nginx) in local dev. In production the API is served same-origin by Apache.
 const BACKEND = process.env.VITE_BACKEND_URL ?? 'http://127.0.0.1:8080'
+const PROXY = {
+  '/api': { target: BACKEND, changeOrigin: false },
+  '/sanctum': { target: BACKEND, changeOrigin: false },
+  '/storage': { target: BACKEND, changeOrigin: false },
+}
+
+// Same policy as the production Apache vhost (docs/DEPLOYMENT.md), so `npm run preview` catches CSP violations.
+const CSP =
+  "default-src 'self'; script-src 'self'; style-src 'self' 'unsafe-inline'; img-src 'self' data: blob:; font-src 'self'; " +
+  "connect-src 'self'; worker-src 'self'; manifest-src 'self'; object-src 'none'; base-uri 'self'; form-action 'self'; frame-ancestors 'none'"
 
 export default defineConfig({
   plugins: [
@@ -75,11 +85,27 @@ export default defineConfig({
   server: {
     port: 5173,
     strictPort: true,
-    proxy: {
-      '/api': { target: BACKEND, changeOrigin: false },
-      '/sanctum': { target: BACKEND, changeOrigin: false },
-      '/storage': { target: BACKEND, changeOrigin: false },
+    proxy: PROXY,
+  },
+  build: {
+    rolldownOptions: {
+      output: {
+        codeSplitting: {
+          groups: [
+            // zod and its config in one chunk, config first: schemas are created at import time, and creating one
+            // probes for eval unless `jitless` is already set (the probe is a CSP violation). See src/lib/zodConfig.ts.
+            { name: 'zod', test: /node_modules[\\/]zod[\\/]|src[\\/]lib[\\/]zodConfig\.ts/ },
+          ],
+        },
+      },
     },
+  },
+  // Production build locally (Lighthouse, CSP and service-worker checks): `npm run build && npm run preview`.
+  preview: {
+    port: 4173,
+    strictPort: true,
+    proxy: PROXY,
+    headers: { 'Content-Security-Policy': CSP },
   },
   test: {
     globals: true,

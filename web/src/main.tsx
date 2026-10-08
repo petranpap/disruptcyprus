@@ -1,3 +1,4 @@
+import './lib/zodConfig'
 import '@fontsource-variable/inter/wght.css'
 import '@fontsource-variable/source-serif-4/wght.css'
 import '@fontsource-variable/playfair-display/wght.css'
