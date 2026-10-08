@@ -32,8 +32,11 @@ Only origins listed in `SANCTUM_STATEFUL_DOMAINS` get session auth.
 
 ### Google
 Open `GET /api/v1/auth/social/google/redirect` in the browser (a top-level navigation, not fetch). After Google, the callback
-signs the user in and redirects to `FRONTEND_URL/onboarding` (new user, or consent/onboarding missing) or to `FRONTEND_URL/`.
-On failure it redirects to `FRONTEND_URL/sign-in?error=social_failed`.
+signs the user in and redirects to `FRONTEND_URL/onboarding` (new user, or consent/onboarding missing), otherwise to the
+optional `?next=/in-app/path` given to the redirect (in-app paths only; anything else falls back to `/`).
+Failures redirect to `FRONTEND_URL/sign-in?error=…`: `social_failed` (provider error), `social_cancelled` (consent screen
+cancelled), `social_unavailable` (Google not configured), `social_unverified` (Google did not verify an email that already
+belongs to an account here, so it is never linked).
 
 ## Endpoints (Phase 1)
 
