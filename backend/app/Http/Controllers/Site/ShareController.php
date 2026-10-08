@@ -36,7 +36,7 @@ class ShareController extends Controller
         $title = (string) $article->getTranslation('title', $locale, false);
         $excerpt = (string) $article->getTranslation('excerpt', $locale, false);
         $hero = $article->getFirstMedia(Article::HERO_COLLECTION);
-        $image = $hero?->getAvailableUrl(['hero']);
+        $image = SiteLocale::absolute($hero?->getAvailableUrl(['hero']));
 
         $meta = new PageMeta(
             title: $title,
@@ -86,7 +86,7 @@ class ShareController extends Controller
 
         $title = (string) $event->getTranslation('title', $locale, false);
         $description = (string) $event->getTranslation('description', $locale, false);
-        $image = $event->getFirstMedia(Event::HERO_COLLECTION)?->getAvailableUrl(['hero']);
+        $image = SiteLocale::absolute($event->getFirstMedia(Event::HERO_COLLECTION)?->getAvailableUrl(['hero']));
         $location = $event->is_online
             ? ['@type' => 'VirtualLocation', 'url' => $event->online_url ?: SiteLocale::appUrl('/events/'.$event->slug)]
             : ['@type' => 'Place', 'name' => $event->location_name ?: $event->city, 'address' => trim(implode(', ', array_filter([$event->address, $event->city, 'Cyprus'])))];

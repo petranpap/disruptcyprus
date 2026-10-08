@@ -41,7 +41,9 @@ return [
         'public' => [
             'driver' => 'local',
             'root' => storage_path('app/public'),
-            'url' => rtrim(env('APP_URL', 'http://localhost'), '/').'/storage',
+            // Root-relative on purpose: both hosts serve /storage, so the PWA (app.) gets same-origin images its
+            // service worker can cache offline. Pages that need absolute URLs (OG tags) prefix them themselves.
+            'url' => env('MEDIA_URL', '/storage'),
             'visibility' => 'public',
             'throw' => false,
             'report' => false,

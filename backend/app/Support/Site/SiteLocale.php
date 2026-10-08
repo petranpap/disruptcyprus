@@ -36,6 +36,14 @@ final class SiteLocale
         return $locale === self::DEFAULT ? $url : $url.'?lang='.$locale;
     }
 
+    /**
+     * Media URLs are root-relative (see config/filesystems.php); social previews and structured data need absolute ones.
+     */
+    public static function absolute(?string $url): ?string
+    {
+        return $url !== null && str_starts_with($url, '/') && ! str_starts_with($url, '//') ? url($url) : $url;
+    }
+
     public static function appUrl(string $path = '/'): string
     {
         return rtrim((string) config('app.frontend_url'), '/').$path;
