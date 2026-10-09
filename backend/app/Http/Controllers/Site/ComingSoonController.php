@@ -3,78 +3,57 @@
 namespace App\Http\Controllers\Site;
 
 use App\Http\Controllers\Controller;
+use App\Http\Requests\Site\JoinWaitlistRequest;
 use App\Models\Industry;
-use App\Support\Preview\PreviewAccess;
+use App\Models\WaitlistSignup;
 use App\Support\Site\SiteLocale;
 use Illuminate\Http\RedirectResponse;
 use Illuminate\Http\Request;
 use Illuminate\Http\Response;
 
 /**
- * Pre-launch page: what Disrupt Cyprus is, plus the team sign-in that unlocks the site and the app.
+ * Pre-launch page: what Disrupt Cyprus is, and a waitlist form for the launch email.
  */
 class ComingSoonController extends Controller
 {
-    public function show(Request $request, ?string $error = null, int $status = 200): Response
+    /**
+     * @param  array<string, list<string>>  $errors
+     */
+    public function show(Request $request, array $errors = [], int $status = 200): Response
     {
         $locale = SiteLocale::fromRequest($request);
         app()->setLocale($locale);
 
         return response()->view('site.coming-soon', [
             'locale' => $locale,
-            'error' => $error,
-            'username' => $request->string('username')->toString(),
-            'next' => $this->next($request),
-            'loginUrl' => route('preview.login', $locale === SiteLocale::DEFAULT ? [] : ['lang' => $locale]),
-            'switchUrl' => $request->fullUrlWithQuery(['lang' => SiteLocale::other($locale)]),
+            'fieldErrors' => $errors,
+            'old' => ['name' => (string) $request->input('name', ''), 'email' => (string) $request->input('email', ''), 'consent' => $request->boolean('consent')],
+            'joined' => $request->boolean('joined'),
+            'joinUrl' => route('waitlist.join', $locale === SiteLocale::DEFAULT ? [] : ['lang' => $locale]),
+            'switchUrl' => url('/').'?'.http_build_query(array_filter(['lang' => SiteLocale::other($locale) === SiteLocale::DEFAULT ? null : SiteLocale::other($locale)])),
             'industries' => Industry::query()->active()->orderBy('sort_order')->get()
                 ->map(fn (Industry $industry) => ['name' => $industry->getTranslation('name', $locale), 'color' => $industry->color])
                 ->all(),
         ], $status);
     }
 
-    public function login(Request $request): Response|RedirectResponse
-    {
-        $username = $request->string('username')->toString();
-        $password = $request->string('password')->toString();
-
-        if (! PreviewAccess::attempt($username, $password)) {
-            app()->setLocale(SiteLocale::fromRequest($request));
-
-            return $this->show($request, __('coming_soon.login.failed'), 422);
-        }
-
-        return redirect()->to($this->destination($request))->withCookie(PreviewAccess::cookie());
-    }
-
-    public function logout(): RedirectResponse
-    {
-        return redirect()->to('/')->withCookie(PreviewAccess::forget());
-    }
-
     /**
-     * Where to go after signing in: the app (default) or a page on this site the visitor originally asked for.
+     * Joining twice, or with an address that is already on the list, looks exactly like joining once:
+     * the page never reveals whether an email is on the waitlist.
      */
-    private function destination(Request $request): string
+    public function join(JoinWaitlistRequest $request): RedirectResponse
     {
-        $next = $this->next($request);
+        $locale = SiteLocale::fromRequest($request);
 
-        return $next === 'app' ? SiteLocale::appUrl('/') : url($next);
-    }
-
-    private function next(Request $request): string
-    {
-        $next = $request->input('next', $request->getRequestUri());
-
-        if (! is_string($next) || ! preg_match('#^/(?![/\\\\])#', $next) || str_starts_with($next, '/preview')) {
-            return 'app';
+        if (blank($request->validated('website'))) {
+            WaitlistSignup::query()->firstOrCreate(
+                ['email' => $request->validated('email')],
+                ['name' => $request->validated('name'), 'locale' => $locale, 'consented_at' => now()],
+            );
         }
 
-        // The landing page itself (any language) isn't worth returning to: the app is the point.
-        if (in_array(parse_url($next, PHP_URL_PATH), ['/', '/en'], true)) {
-            return 'app';
-        }
+        $query = array_filter(['lang' => $locale === SiteLocale::DEFAULT ? null : $locale, 'joined' => 1]);
 
-        return $next;
+        return redirect()->to(url('/').'?'.http_build_query($query).'#waitlist');
     }
 }

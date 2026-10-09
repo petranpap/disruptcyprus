@@ -7,6 +7,7 @@
     <li><strong>Activity you choose to save:</strong> saved stories and events, and the notifications we have sent you.</li>
     <li><strong>Push notifications:</strong> if you turn them on, the address your browser gives us for delivering notifications to that device, and the browser name.</li>
     <li><strong>Reading statistics:</strong> we count how often stories are read using a daily, one-way hash of the IP address and browser. We cannot link these counts to you.</li>
+    <li><strong>Launch waitlist:</strong> if you join it on our coming-soon page, your name, email and language, to send you one email when we launch. We keep them until then and delete them on request.</li>
     <li><strong>Server logs:</strong> IP address, time and requested page, kept for security and troubleshooting.</li>
 </ul>
 <p>We do not use advertising or analytics trackers, and we do not sell or share your data for marketing.</p>
@@ -14,6 +15,7 @@
 <h2>Why, and on what legal basis</h2>
 <ul>
     <li>To provide the service you signed up for: your account, personalized feed, briefings and saved items (performance of a contract, GDPR Art. 6(1)(b)).</li>
+    <li>To send the launch email to people on the waitlist (consent, Art. 6(1)(a)).</li>
     <li>To send push notifications, only after you allow them in your browser (consent, Art. 6(1)(a)). You can turn them off at any time in Settings or in your browser.</li>
     <li>To keep the service secure and working (legitimate interests, Art. 6(1)(f)).</li>
 </ul>

@@ -35,9 +35,8 @@ Route::middleware(['preview:site', 'cache.headers:public;max_age=300;etag', 'sec
 Route::middleware('security:site')->withoutMiddleware($stateless)->group(function (): void {
     Route::get('robots.txt', [SitemapController::class, 'robots'])->name('site.robots');
 
-    // Team sign-in on the coming-soon page. No CSRF token (stateless page); rate-limited against guessing.
-    Route::post('preview/login', [ComingSoonController::class, 'login'])->middleware('throttle:5,1')->name('preview.login');
-    Route::get('preview/logout', [ComingSoonController::class, 'logout'])->name('preview.logout');
+    // Waitlist form on the coming-soon page. Stateless page, so no CSRF token: rate-limited, honeypot, idempotent.
+    Route::post('waitlist', [ComingSoonController::class, 'join'])->middleware('throttle:5,1')->name('waitlist.join');
 });
 
 Route::get('admin-language/{locale}', AdminLanguageController::class)

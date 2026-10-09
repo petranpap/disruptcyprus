@@ -19,7 +19,7 @@
     <link rel="stylesheet" href="{{ asset('site/tokens.css') }}?v={{ filemtime(public_path('site/tokens.css')) }}">
     <link rel="stylesheet" href="{{ asset('site/coming-soon.css') }}?v={{ filemtime(public_path('site/coming-soon.css')) }}">
 </head>
-<body class="cs{{ $error ? ' cs-still' : '' }}">
+<body class="cs{{ $fieldErrors !== [] || $joined ? ' cs-still' : '' }}">
     <div class="cs-sky" aria-hidden="true">
         <span class="cs-orb cs-orb-1"></span>
         <span class="cs-orb cs-orb-2"></span>
@@ -62,28 +62,51 @@
             </ul>
         </section>
 
-        <section id="login" class="cs-card cs-rise" style="--d: 0.5s" aria-labelledby="login-title">
-            <span class="cs-card-icon">@include('site.partials.icon', ['name' => 'lock'])</span>
-            <h2 id="login-title" class="cs-card-title">{{ __('coming_soon.login.title') }}</h2>
-            <p class="cs-card-body">{{ __('coming_soon.login.body') }}</p>
+        <section id="waitlist" class="cs-card cs-rise" style="--d: 0.5s" aria-labelledby="waitlist-title">
+            @if ($joined)
+                <div class="cs-success" role="status">
+                    <span class="cs-success-icon" aria-hidden="true">
+                        <svg viewBox="0 0 24 24"><path class="cs-check" d="M5 12.5l4.5 4.5L19 7.5"/></svg>
+                    </span>
+                    <h2 id="waitlist-title" class="cs-card-title">{{ __('coming_soon.waitlist.success_title') }}</h2>
+                    <p class="cs-card-body">{{ __('coming_soon.waitlist.success_body') }}</p>
+                </div>
+            @else
+                <span class="cs-card-icon">@include('site.partials.icon', ['name' => 'mail'])</span>
+                <h2 id="waitlist-title" class="cs-card-title">{{ __('coming_soon.waitlist.title') }}</h2>
+                <p class="cs-card-body">{{ __('coming_soon.waitlist.body') }}</p>
 
-            @if ($error)
-                <p class="cs-error" role="alert">{{ $error }}</p>
+                @if ($fieldErrors !== [])
+                    <p class="cs-error" role="alert">{{ __('coming_soon.waitlist.error_summary') }}</p>
+                @endif
+
+                {{-- #waitlist brings the card (and any error) back into view after submitting. --}}
+                <form method="post" action="{{ $joinUrl }}#waitlist" class="cs-form" novalidate>
+                    <label class="cs-field @if (isset($fieldErrors['name'])) cs-invalid @endif">
+                        <span>{{ __('coming_soon.waitlist.name') }}</span>
+                        <input type="text" name="name" value="{{ $old['name'] }}" autocomplete="name" maxlength="120" required
+                            @if (isset($fieldErrors['name'])) aria-invalid="true" aria-describedby="name-error" autofocus @endif>
+                        @isset($fieldErrors['name'])<small id="name-error" class="cs-field-error">{{ $fieldErrors['name'][0] }}</small>@endisset
+                    </label>
+                    <label class="cs-field @if (isset($fieldErrors['email'])) cs-invalid @endif">
+                        <span>{{ __('coming_soon.waitlist.email') }}</span>
+                        <input type="email" name="email" value="{{ $old['email'] }}" autocomplete="email" inputmode="email" maxlength="191" required
+                            @if (isset($fieldErrors['email'])) aria-invalid="true" aria-describedby="email-error" @endif
+                            @if (isset($fieldErrors['email']) && ! isset($fieldErrors['name'])) autofocus @endif>
+                        @isset($fieldErrors['email'])<small id="email-error" class="cs-field-error">{{ $fieldErrors['email'][0] }}</small>@endisset
+                    </label>
+                    {{-- Honeypot: invisible to people, irresistible to bots. --}}
+                    <label class="cs-hp" aria-hidden="true">Website <input type="text" name="website" tabindex="-1" autocomplete="off"></label>
+                    <label class="cs-consent @if (isset($fieldErrors['consent'])) cs-invalid @endif">
+                        <input type="checkbox" name="consent" value="1" required @checked($old['consent'])
+                            @if (isset($fieldErrors['consent'])) aria-invalid="true" aria-describedby="consent-error" @endif>
+                        <span>{!! __('coming_soon.waitlist.consent', ['privacy' => e(\App\Support\Site\SiteLocale::url('/privacy', $locale))]) !!}</span>
+                    </label>
+                    @isset($fieldErrors['consent'])<small id="consent-error" class="cs-field-error">{{ $fieldErrors['consent'][0] }}</small>@endisset
+                    <button type="submit" class="cs-button">{{ __('coming_soon.waitlist.submit') }} <span aria-hidden="true">→</span></button>
+                    <p class="cs-note">{{ __('coming_soon.waitlist.privacy_note') }}</p>
+                </form>
             @endif
-
-            {{-- #login brings the card (and any error) back into view after a failed attempt. --}}
-            <form method="post" action="{{ $loginUrl }}#login" class="cs-form">
-                <input type="hidden" name="next" value="{{ $next }}">
-                <label class="cs-field">
-                    <span>{{ __('coming_soon.login.username') }}</span>
-                    <input type="text" name="username" value="{{ $username }}" autocomplete="username" autocapitalize="none" spellcheck="false" required>
-                </label>
-                <label class="cs-field">
-                    <span>{{ __('coming_soon.login.password') }}</span>
-                    <input type="password" name="password" autocomplete="current-password" required @if ($error) autofocus @endif>
-                </label>
-                <button type="submit" class="cs-button">{{ __('coming_soon.login.submit') }} <span aria-hidden="true">→</span></button>
-            </form>
         </section>
     </main>
 
@@ -105,6 +128,7 @@
 
     <footer class="cs-footer">
         <span>{{ __('coming_soon.contact') }}</span>
+        <a href="{{ url('/admin') }}" class="cs-staff">{{ __('coming_soon.staff') }}</a>
         <span>{{ __('coming_soon.rights', ['year' => now()->year]) }}</span>
     </footer>
 </body>

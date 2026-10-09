@@ -16,7 +16,7 @@ class PageController extends Controller
     public const PAGES = ['about', 'contact', 'privacy', 'terms'];
 
     /** Date shown on the legal pages; bump when their text changes. */
-    public const LEGAL_UPDATED = '2026-10-08';
+    public const LEGAL_UPDATED = '2026-10-09';
 
     public function __invoke(Request $request, string $page): View
     {

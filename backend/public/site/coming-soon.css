@@ -145,13 +145,13 @@
 @keyframes cs-shake { 20%, 60% { transform: translateX(-6px); } 40%, 80% { transform: translateX(6px); } }
 .cs-form { display: grid; gap: 1rem; }
 .cs-field { display: grid; gap: 0.375rem; font: var(--dc-text-label-md); color: var(--cs-muted); }
-.cs-field input {
+.cs-field input[type="text"], .cs-field input[type="email"] {
   min-height: 3rem; padding: 0 1rem; border-radius: var(--dc-radius-control);
   border: 1px solid var(--cs-line); background: var(--cs-panel); color: var(--cs-text);
   font: var(--dc-text-body-md); font-family: var(--dc-font-ui);
   transition: border-color 150ms ease, box-shadow 150ms ease;
 }
-.cs-field input:focus {
+.cs-field input:focus-visible {
   outline: none; border-color: var(--dc-brand-cyan);
   box-shadow: 0 0 0 3px color-mix(in srgb, var(--dc-brand-cyan) 30%, transparent);
 }
@@ -190,12 +190,43 @@
 }
 @media (min-width: 1024px) { .cs-footer { padding-inline: 2rem; } }
 
-/* After a failed sign-in: no replayed entrance animations, the card scrolls into view. */
+/* Waitlist form */
+.cs-field-error { font: var(--dc-text-label-sm); color: color-mix(in srgb, var(--dc-brand-crimson) 55%, var(--dc-white)); }
+.cs-invalid input[type="text"], .cs-invalid input[type="email"] { border-color: color-mix(in srgb, var(--dc-brand-crimson) 70%, transparent); }
+.cs-consent {
+  display: flex; gap: 0.75rem; align-items: flex-start; cursor: pointer;
+  font: var(--dc-text-body-sm); font-family: var(--dc-font-ui); color: var(--cs-muted);
+}
+.cs-consent input {
+  flex-shrink: 0; width: 1.25rem; height: 1.25rem; margin: 0.125rem 0 0; accent-color: var(--dc-brand-cyan); cursor: pointer;
+}
+.cs-consent a { color: var(--dc-brand-cyan); }
+.cs-invalid.cs-consent input { outline: 2px solid color-mix(in srgb, var(--dc-brand-crimson) 70%, transparent); outline-offset: 2px; }
+.cs-note { margin: 0; text-align: center; font: var(--dc-text-label-sm); color: var(--cs-faint); }
+/* Honeypot: off-screen rather than display:none, which some bots skip. */
+.cs-hp { position: absolute; left: -10000px; width: 1px; height: 1px; overflow: hidden; }
+
+.cs-success { text-align: center; padding-block: 1rem; }
+.cs-success .cs-card-body { margin-bottom: 0; }
+.cs-success-icon {
+  display: inline-flex; align-items: center; justify-content: center; width: 4rem; height: 4rem; margin-bottom: 1.25rem;
+  border-radius: 50%; background: color-mix(in srgb, var(--dc-brand-cyan) 20%, transparent);
+  animation: cs-pop 600ms cubic-bezier(0.34, 1.56, 0.64, 1) both;
+}
+.cs-success-icon svg { width: 2rem; height: 2rem; fill: none; stroke: var(--dc-brand-cyan); stroke-width: 2.5; stroke-linecap: round; stroke-linejoin: round; }
+.cs-check { stroke-dasharray: 24; stroke-dashoffset: 24; animation: cs-draw 500ms 350ms ease forwards; }
+@keyframes cs-draw { to { stroke-dashoffset: 0; } }
+
+.cs-staff { color: var(--cs-faint); text-decoration: none; }
+.cs-staff:hover { color: var(--cs-text); text-decoration: underline; }
+
+/* After submitting: no replayed entrance animations, the card scrolls into view. */
 .cs-still .cs-rise, .cs-still .cs-mark, .cs-still .cs-bar, .cs-still .cs-word { animation: none; }
 .cs-still .cs-title { animation: cs-shine 6s 1.5s ease-in-out infinite; }
-#login { scroll-margin-top: 1.5rem; }
+#waitlist { scroll-margin-top: 1.5rem; }
 
 @media (prefers-reduced-motion: reduce) {
   *, *::before, *::after { animation: none !important; transition: none !important; }
   .cs-title { color: var(--dc-white); background: none; }
+  .cs-check { stroke-dashoffset: 0; }
 }

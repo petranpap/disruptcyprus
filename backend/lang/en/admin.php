@@ -6,6 +6,18 @@ return [
         'engagement' => 'Engagement',
         'taxonomy' => 'Taxonomy',
         'administration' => 'Administration',
+        'view_site' => 'View public site',
+        'open_app' => 'Open the app',
+    ],
+    'waitlist' => [
+        'label' => 'Waitlist signup',
+        'plural' => 'Waitlist',
+        'name' => 'Name',
+        'email' => 'Email',
+        'locale' => 'Language',
+        'joined' => 'Joined',
+        'export' => 'Export CSV',
+        'count' => 'People waiting',
     ],
     'locales' => ['en' => 'English', 'el' => 'Greek'],
     'common' => [
