@@ -6,6 +6,7 @@ use App\Http\Controllers\Controller;
 use App\Models\Article;
 use App\Models\Digest;
 use App\Models\Event;
+use App\Support\Preview\PreviewAccess;
 use App\Support\Site\SiteLocale;
 use Illuminate\Http\Response;
 use Illuminate\Support\Facades\Cache;
@@ -24,7 +25,9 @@ class SitemapController extends Controller
 
     public function robots(): Response
     {
-        $lines = ['User-agent: *', 'Disallow: /admin', 'Disallow: /api/', '', 'Sitemap: '.url('/sitemap.xml')];
+        $lines = PreviewAccess::enabled()
+            ? ['User-agent: *', 'Disallow: /']
+            : ['User-agent: *', 'Disallow: /admin', 'Disallow: /api/', '', 'Sitemap: '.url('/sitemap.xml')];
 
         return response(implode("\n", $lines)."\n", 200, ['Content-Type' => 'text/plain; charset=UTF-8']);
     }

@@ -1,0 +1,201 @@
+/* Pre-launch page. Always the dark "ink" brand canvas; only token variables from tokens.css. CSS-only motion. */
+
+*, *::before, *::after { box-sizing: border-box; }
+
+.cs {
+  --cs-text: var(--dc-white);
+  --cs-muted: color-mix(in srgb, var(--dc-white) 72%, transparent);
+  --cs-faint: color-mix(in srgb, var(--dc-white) 50%, transparent);
+  --cs-line: color-mix(in srgb, var(--dc-white) 12%, transparent);
+  --cs-panel: color-mix(in srgb, var(--dc-white) 6%, transparent);
+  color-scheme: dark;
+  margin: 0; min-height: 100dvh; display: flex; flex-direction: column;
+  background: var(--dc-ink); color: var(--cs-text);
+  font: var(--dc-text-body-md); font-family: var(--dc-font-ui);
+  -webkit-font-smoothing: antialiased; overflow-x: hidden;
+}
+
+/* Background: drifting brand-colour orbs over a faint grid */
+.cs-sky { position: fixed; inset: 0; z-index: 0; pointer-events: none; overflow: hidden; }
+.cs-orb { position: absolute; border-radius: 50%; filter: blur(80px); opacity: 0.55; will-change: transform; }
+.cs-orb-1 { width: 42rem; height: 42rem; left: -14rem; top: -16rem; background: var(--dc-brand-cyan); animation: cs-drift-1 22s ease-in-out infinite alternate; }
+.cs-orb-2 { width: 34rem; height: 34rem; right: -12rem; bottom: -14rem; background: var(--dc-brand-crimson); opacity: 0.4; animation: cs-drift-2 26s ease-in-out infinite alternate; }
+.cs-orb-3 { width: 22rem; height: 22rem; left: 45%; top: 35%; background: var(--dc-primary-action); opacity: 0.3; animation: cs-drift-3 30s ease-in-out infinite alternate; }
+.cs-grid {
+  position: absolute; inset: 0;
+  background-image:
+    linear-gradient(var(--cs-line) 1px, transparent 1px),
+    linear-gradient(90deg, var(--cs-line) 1px, transparent 1px);
+  background-size: 56px 56px;
+  mask-image: radial-gradient(ellipse at 50% 30%, black 10%, transparent 70%);
+  opacity: 0.35;
+}
+@keyframes cs-drift-1 { to { transform: translate(8rem, 6rem) scale(1.1); } }
+@keyframes cs-drift-2 { to { transform: translate(-6rem, -8rem) scale(1.15); } }
+@keyframes cs-drift-3 { to { transform: translate(-10rem, 4rem) scale(0.9); } }
+
+/* Header */
+.cs-top {
+  position: relative; z-index: 1; display: flex; align-items: center; justify-content: space-between; gap: 1rem;
+  width: 100%; max-width: var(--dc-container-content); margin: 0 auto;
+  padding: calc(1.25rem + env(safe-area-inset-top)) var(--dc-space-md) 0;
+}
+.cs-logo { display: inline-flex; align-items: center; gap: 0.625rem; }
+.cs-mark { width: 2.5rem; height: 2.5rem; flex-shrink: 0; animation: cs-pop 700ms cubic-bezier(0.34, 1.56, 0.64, 1) both; }
+.cs-mark-bg { fill: var(--dc-brand-cyan); }
+.cs-bar { transform-box: fill-box; animation: cs-bar 500ms cubic-bezier(0.22, 1, 0.36, 1) both; }
+.cs-bar-1, .cs-bar-2 { transform-origin: 50% 100%; }
+.cs-bar-3, .cs-bar-4 { transform-origin: 0% 50%; }
+.cs-bar-1 { animation-delay: 250ms; } .cs-bar-2 { animation-delay: 350ms; }
+.cs-bar-3 { animation-delay: 450ms; } .cs-bar-4 { animation-delay: 550ms; }
+.cs-bar-1, .cs-bar-2 { animation-name: cs-bar-v; }
+.cs-word { font: 700 1.5rem/1 var(--dc-font-headline); letter-spacing: -0.01em; animation: cs-fade 600ms 300ms ease both; }
+.cs-crimson { color: color-mix(in srgb, var(--dc-brand-crimson) 80%, var(--dc-white)); }
+.cs-cyan { color: var(--dc-brand-cyan); }
+.cs-lang {
+  display: inline-flex; align-items: center; min-height: var(--dc-tap); padding: 0 1rem; border-radius: var(--dc-radius-pill);
+  border: 1px solid var(--cs-line); color: var(--cs-muted); font: var(--dc-text-label-lg); text-decoration: none;
+  transition: color 150ms ease, border-color 150ms ease;
+}
+.cs-lang:hover { color: var(--cs-text); border-color: var(--cs-faint); }
+@keyframes cs-pop { from { transform: scale(0.4) rotate(-12deg); opacity: 0; } }
+@keyframes cs-bar-v { from { transform: scaleY(0); } }
+@keyframes cs-bar { from { transform: scaleX(0); } }
+@keyframes cs-fade { from { opacity: 0; } }
+
+/* Layout */
+.cs-main {
+  position: relative; z-index: 1; flex: 1; display: grid; gap: 2.5rem; align-items: center;
+  width: 100%; max-width: var(--dc-container-content); margin: 0 auto; padding: 3rem var(--dc-space-md);
+}
+@media (min-width: 1024px) {
+  .cs-main { grid-template-columns: minmax(0, 1.35fr) minmax(22rem, 0.9fr); gap: 4rem; padding-block: 4rem; }
+  .cs-top, .cs-main { padding-inline: 2rem; }
+}
+
+.cs-rise { animation: cs-rise 800ms cubic-bezier(0.22, 1, 0.36, 1) var(--d, 0s) both; }
+@keyframes cs-rise { from { opacity: 0; transform: translateY(24px); filter: blur(6px); } }
+
+.cs-badge {
+  display: inline-flex; align-items: center; gap: 0.625rem; margin: 0 0 1.5rem; padding: 0.5rem 1rem;
+  border: 1px solid var(--cs-line); border-radius: var(--dc-radius-pill); background: var(--cs-panel);
+  font: var(--dc-text-label-md); letter-spacing: 0.1em; text-transform: uppercase; color: var(--cs-text);
+  -webkit-backdrop-filter: blur(12px); backdrop-filter: blur(12px);
+}
+.cs-pulse { position: relative; width: 0.5rem; height: 0.5rem; border-radius: 50%; background: var(--dc-brand-crimson); }
+.cs-pulse::after {
+  content: ""; position: absolute; inset: 0; border-radius: 50%; background: var(--dc-brand-crimson);
+  animation: cs-ping 1.8s cubic-bezier(0, 0, 0.2, 1) infinite;
+}
+@keyframes cs-ping { 75%, 100% { transform: scale(3); opacity: 0; } }
+
+.cs-title {
+  margin: 0; max-width: 22ch;
+  font: 700 clamp(2.125rem, 4.4vw, 3.5rem)/1.1 var(--dc-font-headline); letter-spacing: -0.025em;
+  background: linear-gradient(110deg, var(--dc-white) 40%, var(--dc-brand-cyan) 50%, var(--dc-white) 60%) 0 0 / 250% 100%;
+  -webkit-background-clip: text; background-clip: text; color: transparent;
+  animation: cs-rise 800ms cubic-bezier(0.22, 1, 0.36, 1) var(--d, 0s) both, cs-shine 6s 1.5s ease-in-out infinite;
+}
+@keyframes cs-shine { 0%, 60% { background-position: 100% 0; } 100% { background-position: -50% 0; } }
+.cs-subtitle { margin: 1.5rem 0 0; max-width: 58ch; font: var(--dc-text-body-lg); color: var(--cs-muted); }
+
+.cs-features { list-style: none; margin: 2.5rem 0 0; padding: 0; display: grid; gap: 1rem; }
+@media (min-width: 640px) { .cs-features { grid-template-columns: 1fr 1fr; } }
+.cs-feature {
+  display: flex; gap: 0.875rem; padding: 1rem; border: 1px solid var(--cs-line); border-radius: var(--dc-radius-card);
+  background: var(--cs-panel); transition: border-color 200ms ease, transform 200ms ease;
+}
+.cs-feature:hover { border-color: color-mix(in srgb, var(--dc-brand-cyan) 50%, transparent); transform: translateY(-2px); }
+.cs-feature-icon {
+  display: inline-flex; align-items: center; justify-content: center; flex-shrink: 0; width: 2.5rem; height: 2.5rem;
+  border-radius: var(--dc-radius-control); background: color-mix(in srgb, var(--dc-brand-cyan) 18%, transparent); color: var(--dc-brand-cyan);
+}
+.icon { width: 1.375rem; height: 1.375rem; fill: currentColor; }
+.cs-feature-title { display: block; font: var(--dc-text-label-lg); color: var(--cs-text); }
+.cs-feature-body { display: block; margin-top: 0.25rem; font: var(--dc-text-body-sm); font-family: var(--dc-font-ui); color: var(--cs-muted); }
+
+/* Login card */
+.cs-card {
+  position: relative; padding: 2rem; border-radius: 24px; overflow: hidden;
+  background: color-mix(in srgb, var(--dc-ink) 70%, transparent);
+  border: 1px solid var(--cs-line); box-shadow: 0 30px 80px -20px rgba(0, 0, 0, 0.6);
+  -webkit-backdrop-filter: blur(20px); backdrop-filter: blur(20px);
+}
+.cs-card::before {
+  /* Slowly rotating brand-colour edge light */
+  content: ""; position: absolute; inset: -50%; z-index: -1;
+  background: conic-gradient(from 0deg, transparent 0 70%, var(--dc-brand-cyan) 80%, var(--dc-brand-crimson) 90%, transparent 100%);
+  animation: cs-spin 8s linear infinite; opacity: 0.35;
+}
+.cs-card::after { content: ""; position: absolute; inset: 1px; z-index: -1; border-radius: 23px; background: var(--dc-ink); opacity: 0.92; }
+@keyframes cs-spin { to { transform: rotate(1turn); } }
+.cs-card-icon {
+  display: inline-flex; align-items: center; justify-content: center; width: 2.75rem; height: 2.75rem; margin-bottom: 1rem;
+  border-radius: 50%; background: var(--cs-panel); color: var(--cs-text);
+}
+.cs-card-title { margin: 0; font: var(--dc-text-headline-lg); color: var(--cs-text); }
+.cs-card-body { margin: 0.5rem 0 1.5rem; font: var(--dc-text-body-sm); font-family: var(--dc-font-ui); color: var(--cs-muted); }
+.cs-error {
+  margin: 0 0 1rem; padding: 0.75rem 1rem; border-radius: var(--dc-radius-control);
+  background: color-mix(in srgb, var(--dc-brand-crimson) 18%, transparent);
+  border: 1px solid color-mix(in srgb, var(--dc-brand-crimson) 50%, transparent);
+  font: var(--dc-text-body-sm); font-family: var(--dc-font-ui); color: var(--cs-text);
+  animation: cs-shake 400ms ease both;
+}
+@keyframes cs-shake { 20%, 60% { transform: translateX(-6px); } 40%, 80% { transform: translateX(6px); } }
+.cs-form { display: grid; gap: 1rem; }
+.cs-field { display: grid; gap: 0.375rem; font: var(--dc-text-label-md); color: var(--cs-muted); }
+.cs-field input {
+  min-height: 3rem; padding: 0 1rem; border-radius: var(--dc-radius-control);
+  border: 1px solid var(--cs-line); background: var(--cs-panel); color: var(--cs-text);
+  font: var(--dc-text-body-md); font-family: var(--dc-font-ui);
+  transition: border-color 150ms ease, box-shadow 150ms ease;
+}
+.cs-field input:focus {
+  outline: none; border-color: var(--dc-brand-cyan);
+  box-shadow: 0 0 0 3px color-mix(in srgb, var(--dc-brand-cyan) 30%, transparent);
+}
+.cs-button {
+  display: inline-flex; align-items: center; justify-content: center; gap: 0.5rem; min-height: 3rem; margin-top: 0.5rem;
+  border: 0; border-radius: var(--dc-radius-control); cursor: pointer;
+  background: var(--dc-primary-action); color: var(--dc-on-primary); font: var(--dc-text-label-lg); font-weight: 700;
+  transition: background-color 150ms ease, transform 150ms ease;
+}
+.cs-button:hover { background: var(--dc-primary-action-hover); }
+.cs-button:hover span { transform: translateX(3px); }
+.cs-button span { transition: transform 150ms ease; }
+.cs-button:active { transform: scale(0.98); }
+.cs-button:focus-visible, .cs-lang:focus-visible { outline: 2px solid var(--dc-brand-cyan); outline-offset: 3px; }
+
+/* Industry ticker */
+.cs-ticker { position: relative; z-index: 1; padding-block: 1.25rem; border-block: 1px solid var(--cs-line); overflow: hidden; }
+.cs-ticker-label {
+  margin: 0 0 0.75rem; text-align: center; font: var(--dc-text-label-sm); letter-spacing: 0.12em; text-transform: uppercase; color: var(--cs-faint);
+}
+.cs-ticker-track {
+  display: flex; width: max-content; animation: cs-marquee 60s linear infinite;
+  mask-image: linear-gradient(90deg, transparent, black 10%, black 90%, transparent);
+}
+.cs-ticker:hover .cs-ticker-track { animation-play-state: paused; }
+.cs-ticker-list { display: flex; gap: 2.5rem; margin: 0; padding: 0 1.25rem; list-style: none; }
+.cs-ticker-list li { display: inline-flex; align-items: center; gap: 0.5rem; white-space: nowrap; font: var(--dc-text-label-lg); color: var(--cs-muted); }
+.cs-dot { width: 0.5rem; height: 0.5rem; border-radius: 50%; background: var(--industry); box-shadow: 0 0 12px var(--industry); }
+@keyframes cs-marquee { to { transform: translateX(-50%); } }
+
+.cs-footer {
+  position: relative; z-index: 1; display: flex; flex-wrap: wrap; justify-content: space-between; gap: 0.5rem 1.5rem;
+  width: 100%; max-width: var(--dc-container-content); margin: 0 auto;
+  padding: 1.25rem var(--dc-space-md) calc(1.25rem + env(safe-area-inset-bottom));
+  font: var(--dc-text-label-sm); color: var(--cs-faint);
+}
+@media (min-width: 1024px) { .cs-footer { padding-inline: 2rem; } }
+
+/* After a failed sign-in: no replayed entrance animations, the card scrolls into view. */
+.cs-still .cs-rise, .cs-still .cs-mark, .cs-still .cs-bar, .cs-still .cs-word { animation: none; }
+.cs-still .cs-title { animation: cs-shine 6s 1.5s ease-in-out infinite; }
+#login { scroll-margin-top: 1.5rem; }
+
+@media (prefers-reduced-motion: reduce) {
+  *, *::before, *::after { animation: none !important; transition: none !important; }
+  .cs-title { color: var(--dc-white); background: none; }
+}

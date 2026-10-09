@@ -1,4 +1,5 @@
 import type { z } from 'zod'
+import { SITE_URL } from '@/lib/env'
 import { ApiError, NetworkError } from './errors'
 
 const API_PREFIX = '/api/v1'
@@ -101,6 +102,10 @@ async function send<T>(method: Method, path: string, options: RequestOptions<T>,
 
   if (!response.ok) {
     const envelope = (payload ?? {}) as { message?: string; code?: string; errors?: Record<string, string[]> }
+    // Pre-launch gate: without the team cookie the API is locked; the coming-soon page has the sign-in.
+    if (response.status === 403 && envelope.code === 'preview_locked') {
+      window.location.assign(`${SITE_URL}/`)
+    }
     throw new ApiError(
       response.status,
       envelope.code ?? 'http_error',

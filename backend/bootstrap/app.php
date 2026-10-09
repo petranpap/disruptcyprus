@@ -1,6 +1,7 @@
 <?php
 
 use App\Http\Middleware\ContentCacheHeaders;
+use App\Http\Middleware\PreviewGate;
 use App\Http\Middleware\SecurityHeaders;
 use App\Http\Middleware\SetLocaleFromHeader;
 use App\Support\ApiExceptionRenderer;
@@ -19,9 +20,11 @@ return Application::configure(basePath: dirname(__DIR__))
     ->withMiddleware(function (Middleware $middleware): void {
         // Sanctum SPA cookie auth for requests coming from the PWA origin.
         $middleware->statefulApi();
-        $middleware->api(prepend: [SetLocaleFromHeader::class]);
+        $middleware->api(prepend: [PreviewGate::class.':api', SetLocaleFromHeader::class]);
+        // Read by Apache on the app host (presence only) and verified here; must stay unencrypted.
+        $middleware->encryptCookies(except: ['dc_preview']);
         $middleware->append(SecurityHeaders::class);
-        $middleware->alias(['content.cache' => ContentCacheHeaders::class, 'security' => SecurityHeaders::class]);
+        $middleware->alias(['content.cache' => ContentCacheHeaders::class, 'security' => SecurityHeaders::class, 'preview' => PreviewGate::class]);
     })
     ->withExceptions(function (Exceptions $exceptions): void {
         $exceptions->shouldRenderJsonWhen(
