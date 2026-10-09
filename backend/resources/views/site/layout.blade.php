@@ -54,6 +54,13 @@
 </head>
 <body>
     <a class="skip" href="#main">{{ __('site.nav.skip') }}</a>
+    @if (\App\Support\Preview\PreviewAccess::enabled())
+        {{-- Only staff get past the pre-launch gate: remind them what everyone else sees (like WordPress maintenance mode). --}}
+        <div class="preview-bar" role="status">
+            <span><span class="preview-dot" aria-hidden="true"></span>{{ __('site.preview.notice') }}</span>
+            <a href="{{ url('/admin') }}">{{ __('site.preview.admin') }}</a>
+        </div>
+    @endif
     <header class="site-header">
         <div class="container header-row">
             <a href="{{ $locale === 'el' ? url('/') : url('/en') }}" class="header-logo">@include('site.partials.logo')</a>

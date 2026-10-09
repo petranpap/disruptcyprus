@@ -259,3 +259,15 @@ a { color: var(--dc-primary); }
 /* 404 */
 .not-found { min-height: 100dvh; display: flex; flex-direction: column; justify-content: center; gap: 1rem; }
 .not-found .hero-actions { justify-content: flex-start; }
+
+/* Pre-launch preview bar (staff only) */
+.preview-bar {
+  display: flex; flex-wrap: wrap; align-items: center; justify-content: center; gap: 0.25rem 1rem;
+  padding: 0.5rem var(--dc-space-md); background: var(--dc-ink); color: var(--dc-white);
+  font: var(--dc-text-label-md); text-align: center;
+}
+.preview-bar a { color: var(--dc-brand-cyan); font-weight: 600; }
+.preview-dot {
+  display: inline-block; width: 0.5rem; height: 0.5rem; margin-right: 0.5rem; border-radius: 50%;
+  background: var(--dc-brand-crimson); vertical-align: middle;
+}

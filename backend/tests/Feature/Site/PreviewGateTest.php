@@ -161,6 +161,17 @@ describe('staff access', function () {
         expect($check($valid))->toBeFalse();
     });
 
+    it('shows staff a preview bar on the real site, and nothing when the gate is off', function () {
+        $editor = User::factory()->editor()->create();
+
+        $this->withUnencryptedCookie('dc_preview', accessCookieFor($editor))
+            ->get('/en')
+            ->assertSee('Everyone else sees the coming-soon page.');
+
+        config(['preview.enabled' => false]);
+        $this->get('/en')->assertDontSee('Everyone else sees the coming-soon page.');
+    });
+
     it('stops working as soon as the account is no longer staff', function () {
         $editor = User::factory()->editor()->create();
         $cookie = accessCookieFor($editor);

@@ -73,4 +73,8 @@ return [
         'terms' => 'Terms of Use',
         'updated' => 'Last updated: :date',
     ],
+    'preview' => [
+        'notice' => 'Preview: you are signed in to the admin. Everyone else sees the coming-soon page.',
+        'admin' => 'Back to admin',
+    ],
 ];
