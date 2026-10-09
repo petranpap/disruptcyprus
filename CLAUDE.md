@@ -168,7 +168,8 @@ Environment quirks on this machine:
 | 2026-10-08 | Deleted accounts purged 30 days after deletion (`users:purge-deleted`, daily 03:30) | GDPR; FKs cascade or null so staff-written content stays |
 | 2026-10-08 | Legal pages are drafts describing actual data practices; need legal review + entity name before launch | Product owner / lawyer |
 | 2026-10-08 | Guest `GET /me` keeps returning 401 (one console error in Lighthouse) | Correct API semantics beat a Best-Practices point |
-| 2026-10-09 | Pre-launch gate (`PREVIEW_ENABLED`): animated coming-soon page on the main domain + 403 `preview_locked` API; shared team credentials in `.env` only; HMAC access cookie on `.disruptcyprus.com`, unencrypted so Apache can check presence | Product owner: coming-soon page with a team login; repo is public, so no hardcoded secrets |
+| 2026-10-09 | Pre-launch gate (`PREVIEW_ENABLED`): animated coming-soon page with a waitlist form (name, email, consent → `waitlist_signups`, admin-only resource with CSV export) + 403 `preview_locked` API. Staff access = personal HMAC cookie `{user}.{expiry}.{sig}` issued by the admin panel, checked against the current role; no shared password | Product owner: waitlist for new users; no username/password for security |
+| 2026-10-09 | Admin navigation groups registered by key (`'content' => NavigationGroup::make()…`) | Filament matches resource groups by array key; a list showed raw keys untranslated |
 | 2026-10-05 | Everything runs in containers (podman + podman-compose locally; compose file stays Docker-compatible) | Product owner |
 
 ## Phase status

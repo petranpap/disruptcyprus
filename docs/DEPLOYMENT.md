@@ -306,23 +306,24 @@ Store DB credentials for that cron in `/var/www/disruptcyprus/.my.cnf` (`chmod 6
 
 ## 3b. Pre-launch "coming soon" gate
 
-Until launch, the public sees an animated coming-soon page; the team signs in on it with one shared username and password
-and then uses the real site and app (the access cookie lasts 30 days and covers both hosts).
+Until launch, the public sees an animated coming-soon page that explains Disrupt Cyprus and collects a **waitlist**
+(name + email + consent). Admins see signups in **Admin → Engagement → Waitlist** (search, delete, CSV export for the
+launch email). There is **no shared password**: anyone who signs in to `/admin` (editors and admins) automatically gets
+a personal access cookie that opens the real site and the app for 14 days. It is tied to that account, can't be forged,
+and stops working when they sign out of the admin or stop being staff. The admin user menu has "View public site" and
+"Open the app".
 
-In `backend/.env` on the server (never in git):
+In `backend/.env` on the server, then `php artisan optimize`:
 
 ```dotenv
 PREVIEW_ENABLED=true
-PREVIEW_USERNAME=team
-PREVIEW_PASSWORD=<long random password>      # e.g. openssl rand -base64 18
 PREVIEW_COOKIE_DOMAIN=.disruptcyprus.com
 ```
 
-then `php artisan optimize`. What it does:
-- `disruptcyprus.com` (landing and share links): coming-soon page with the sign-in; `noindex`, `robots.txt` blocks everything.
-- `app.disruptcyprus.com/api`: `403 preview_locked`; the app sends people to the coming-soon page.
-- Admin (`/admin`) is not affected: editors keep their own login and can prepare content.
-- Changing `PREVIEW_PASSWORD` signs everyone out. Sign out: `https://disruptcyprus.com/preview/logout`.
+While it is on:
+- `disruptcyprus.com` and every share link show the coming-soon page; `noindex`, `robots.txt` blocks everything.
+- `app.disruptcyprus.com/api` answers `403 preview_locked` and the app sends visitors to the coming-soon page.
+- The waitlist form is rate-limited (5/minute per IP), has a bot honeypot, and never reveals whether an email is already listed.
 
 Optional, so nobody even downloads the app shell without the cookie: in the `app.disruptcyprus.com` vhost add
 
@@ -334,8 +335,10 @@ Optional, so nobody even downloads the app shell without the cookie: in the `app
     RewriteRule ^ https://disruptcyprus.com/ [R=302,L]
 ```
 
-**Launch day:** `PREVIEW_ENABLED=false` → `php artisan optimize`, remove the rewrite block (if added) and reload Apache.
-The real landing page, share pages and sitemap go live immediately.
+**Launch day:** export the waitlist CSV and send the launch email, then `PREVIEW_ENABLED=false` → `php artisan optimize`,
+remove the rewrite block (if added) and reload Apache. The real landing page, share pages and sitemap go live immediately.
+After the launch email, delete the waitlist (Admin → Waitlist → select all → delete): the privacy policy promises we
+keep it only until then.
 
 ## 4. Launch checklist
 
