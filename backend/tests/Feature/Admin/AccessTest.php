@@ -12,8 +12,9 @@ use App\Models\User;
 dataset('editorial pages', ['/admin', '/admin/articles', '/admin/events', '/admin/digests', '/admin/authors', '/admin/push-campaigns', '/admin/notification-log']);
 dataset('admin-only pages', ['/admin/users', '/admin/industries', '/admin/sections']);
 
-it('keeps readers out of the panel', function () {
-    $this->actingAs(reader())->get('/admin')->assertForbidden();
+it('keeps readers out of the panel by signing them out and showing the login', function () {
+    $this->actingAs(reader())->get('/admin')->assertRedirect('/admin/login');
+    $this->assertGuest();
 });
 
 it('redirects guests to the login page', function () {

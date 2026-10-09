@@ -2,11 +2,11 @@
 
 namespace App\Providers\Filament;
 
+use App\Http\Middleware\AuthenticateAdmin;
 use App\Http\Middleware\IssuePreviewAccess;
 use App\Http\Middleware\SetAdminLocale;
 use App\Support\DigestPeriod;
 use Filament\Actions\Action;
-use Filament\Http\Middleware\Authenticate;
 use Filament\Http\Middleware\AuthenticateSession;
 use Filament\Http\Middleware\DisableBladeIconComponents;
 use Filament\Http\Middleware\DispatchServingFilamentEvent;
@@ -94,7 +94,7 @@ class AdminPanelProvider extends PanelProvider
                 DispatchServingFilamentEvent::class,
             ])
             ->authMiddleware([
-                Authenticate::class,
+                AuthenticateAdmin::class,
                 SetAdminLocale::class,
                 // Pre-launch: staff get the cookie that opens the public site and the app (no shared password).
                 IssuePreviewAccess::class,
