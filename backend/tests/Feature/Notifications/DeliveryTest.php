@@ -176,13 +176,14 @@ describe('event reminders', function () {
     });
 
     it('formats the reminder with the event time in Cyprus and its city', function () {
+        // Travel first: the event must already be published at the (earlier) test time.
+        $this->travelTo(CarbonImmutable::parse('2026-10-07 20:00', 'Asia/Nicosia'));
         $event = newEvent([
             'title' => ['en' => 'Pitch Night', 'el' => 'Βραδιά Pitch'],
             'starts_at' => CarbonImmutable::parse('2026-10-08 18:00', 'Asia/Nicosia'),
             'ends_at' => CarbonImmutable::parse('2026-10-08 21:00', 'Asia/Nicosia'),
             'city' => 'Larnaca', 'is_online' => false,
         ]);
-        $this->travelTo(CarbonImmutable::parse('2026-10-07 20:00', 'Asia/Nicosia'));
         $user = reader(['locale' => 'en']);
 
         $user->notify(new EventReminderNotification($event));
