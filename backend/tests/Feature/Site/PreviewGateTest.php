@@ -1,105 +1,172 @@
 <?php
 
+use App\Filament\Resources\WaitlistSignups\Pages\ListWaitlistSignups;
+use App\Http\Middleware\IssuePreviewAccess;
+use App\Models\User;
+use App\Models\WaitlistSignup;
 use App\Support\Preview\PreviewAccess;
+use Filament\Facades\Filament;
+use Illuminate\Http\Request;
+use Livewire\Livewire;
 
 beforeEach(function () {
-    config(['preview.enabled' => true, 'preview.username' => 'team', 'preview.password' => 'launch-2026']);
+    config(['preview.enabled' => true]);
 });
 
-function previewCookie(): string
+function accessCookieFor(User $user): string
 {
-    return PreviewAccess::cookie()->getValue();
+    return PreviewAccess::cookieFor($user)->getValue();
 }
 
-it('shows the coming-soon page instead of the site, in Greek or English, without caching or indexing', function () {
-    $article = newArticle();
+describe('coming-soon page', function () {
+    it('replaces the site in Greek or English, without caching or indexing', function () {
+        $article = newArticle();
 
-    $this->get('/')
-        ->assertOk()
-        ->assertSee('Το Disrupt Cyprus έρχεται σύντομα')
-        ->assertSee('name="password"', false)
-        ->assertHeader('X-Robots-Tag', 'noindex, nofollow')
-        ->assertHeader('Cache-Control', 'no-store, private')
-        ->assertHeaderMissing('Set-Cookie');
+        $this->get('/')
+            ->assertOk()
+            ->assertSee('Το Disrupt Cyprus έρχεται σύντομα')
+            ->assertSee('name="email"', false)
+            ->assertDontSee('name="password"', false)
+            ->assertHeader('X-Robots-Tag', 'noindex, nofollow')
+            ->assertHeader('Cache-Control', 'no-store, private')
+            ->assertHeaderMissing('Set-Cookie');
 
-    $this->get('/?lang=en')->assertOk()->assertSee('Disrupt Cyprus is launching soon');
-    $this->get('/a/'.$article->slug)->assertOk()->assertSee('name="next" value="/a/'.$article->slug.'"', false);
+        $this->get('/?lang=en')->assertOk()->assertSee('Disrupt Cyprus is launching soon');
+        $this->get('/a/'.$article->slug)->assertOk()->assertSee('name="email"', false);
+    });
+
+    it('locks the API with a clear error code', function () {
+        $this->getJson('/api/v1/sections')->assertForbidden()->assertJsonPath('code', 'preview_locked');
+    });
+
+    it('keeps crawlers out', function () {
+        $this->get('/robots.txt')->assertOk()->assertSee('Disallow: /')->assertDontSee('Sitemap:');
+    });
+
+    it('changes nothing when the gate is off', function () {
+        config(['preview.enabled' => false]);
+
+        $this->get('/')->assertOk()->assertDontSee('name="email"', false);
+        $this->getJson('/api/v1/sections')->assertOk();
+    });
 });
 
-it('locks the API with a clear error code', function () {
-    $this->getJson('/api/v1/sections')->assertForbidden()->assertJsonPath('code', 'preview_locked');
+describe('waitlist', function () {
+    it('adds a signup with consent and shows the thank-you state', function () {
+        $this->post('/waitlist?lang=en', ['name' => ' Anna K ', 'email' => 'Anna@Example.com ', 'consent' => '1'])
+            ->assertRedirect(url('/').'?lang=en&joined=1#waitlist');
+
+        $signup = WaitlistSignup::query()->sole();
+        expect($signup->name)->toBe('Anna K')
+            ->and($signup->email)->toBe('anna@example.com')
+            ->and($signup->locale)->toBe('en')
+            ->and($signup->consented_at)->not->toBeNull();
+
+        $this->get('/?lang=en&joined=1')->assertOk()->assertSee('You are on the list')->assertDontSee('name="email"', false);
+    });
+
+    it('never reveals whether an email is already on the list', function () {
+        WaitlistSignup::query()->create(['name' => 'First', 'email' => 'anna@example.com', 'locale' => 'el', 'consented_at' => now()]);
+
+        $this->post('/waitlist', ['name' => 'Second', 'email' => 'anna@example.com', 'consent' => '1'])
+            ->assertRedirect(url('/').'?joined=1#waitlist');
+
+        expect(WaitlistSignup::query()->sole()->name)->toBe('First');
+    });
+
+    it('explains invalid input in the page language and keeps what was typed', function () {
+        $this->post('/waitlist?lang=en', ['name' => 'Anna', 'email' => 'not-an-email'])
+            ->assertStatus(422)
+            ->assertSee('Please check the highlighted fields.')
+            ->assertSee('value="Anna"', false)
+            ->assertSee('id="email-error"', false)
+            ->assertSee('id="consent-error"', false);
+
+        $this->post('/waitlist', ['name' => '', 'email' => '', 'consent' => '1'])
+            ->assertStatus(422)
+            ->assertSee('Έλεγξε τα πεδία');
+
+        expect(WaitlistSignup::query()->count())->toBe(0);
+    });
+
+    it('quietly ignores bots that fill the hidden field', function () {
+        $this->post('/waitlist', ['name' => 'Bot', 'email' => 'bot@example.com', 'consent' => '1', 'website' => 'http://spam.example'])
+            ->assertRedirect(url('/').'?joined=1#waitlist');
+
+        expect(WaitlistSignup::query()->count())->toBe(0);
+    });
+
+    it('is shown to admins only, with a CSV export', function () {
+        WaitlistSignup::query()->create(['name' => '=HYPERLINK("x")', 'email' => 'a@example.com', 'locale' => 'el', 'consented_at' => now()]);
+        Filament::setCurrentPanel('admin');
+
+        $this->actingAs(User::factory()->editor()->create())->get('/admin/waitlist')->assertForbidden();
+
+        $this->actingAs(User::factory()->admin()->create());
+        Livewire::test(ListWaitlistSignups::class)
+            ->assertCanSeeTableRecords(WaitlistSignup::all())
+            ->callAction('export')
+            ->assertFileDownloaded('disrupt-cyprus-waitlist-'.now()->format('Y-m-d').'.csv');
+    });
 });
 
-it('signs the team in with the shared credentials and sends them to the app', function () {
-    $response = $this->post('/preview/login', ['username' => 'team', 'password' => 'launch-2026', 'next' => 'app'])
-        ->assertRedirect(config('app.frontend_url').'/');
+describe('staff access', function () {
+    it('opens the site and the API for staff who signed in to the admin, without any shared password', function () {
+        $editor = User::factory()->editor()->create();
 
-    $cookie = collect($response->headers->getCookies())->firstWhere(fn ($cookie) => $cookie->getName() === 'dc_preview');
-    expect($cookie)->not->toBeNull()
-        ->and($cookie->isHttpOnly())->toBeTrue();
-});
+        $this->withUnencryptedCookie('dc_preview', accessCookieFor($editor))
+            ->get('/')
+            ->assertOk()
+            ->assertDontSee('name="email"', false);
 
-it('returns to the shared page the visitor asked for, and never to another site', function (string $next, string $expected) {
-    $this->post('/preview/login', ['username' => 'team', 'password' => 'launch-2026', 'next' => $next])
-        ->assertRedirect($expected === 'app' ? config('app.frontend_url').'/' : url($expected));
-})->with([
-    'share page' => ['/a/seed-round', '/a/seed-round'],
-    'other site' => ['//evil.example', 'app'],
-    'absolute url' => ['https://evil.example', 'app'],
-    'backslash trick' => ['/\\evil.example', 'app'],
-]);
+        $this->withCredentials()->withUnencryptedCookie('dc_preview', accessCookieFor($editor))
+            ->getJson('/api/v1/sections')->assertOk();
+    });
 
-it('rejects wrong credentials', function () {
-    $this->post('/preview/login', ['username' => 'team', 'password' => 'wrong'])
-        ->assertStatus(422)
-        ->assertSee('Τα στοιχεία δεν είναι σωστά');
+    it('issues the access cookie when staff open the admin panel', function () {
+        $editor = User::factory()->editor()->create();
+        Filament::setCurrentPanel('admin');
 
-    $this->post('/preview/login', ['username' => '', 'password' => ''])->assertStatus(422);
-});
+        $response = $this->actingAs($editor)->get('/admin');
 
-it('opens the site and the API with a valid access cookie only', function () {
-    $this->withUnencryptedCookie('dc_preview', previewCookie())
-        ->get('/')
-        ->assertOk()
-        ->assertDontSee('name="password"', false)
-        ->assertHeader('Cache-Control', 'no-store, private');
+        $cookie = collect($response->headers->getCookies())->firstWhere(fn ($cookie) => $cookie->getName() === 'dc_preview');
+        expect($cookie)->not->toBeNull()
+            ->and($cookie->isHttpOnly())->toBeTrue()
+            ->and(PreviewAccess::granted(Request::create('/', cookies: ['dc_preview' => $cookie->getValue()])))->toBeTrue();
+    });
 
-    $this->withCredentials()->withUnencryptedCookie('dc_preview', previewCookie())->getJson('/api/v1/sections')->assertOk();
+    it('never gives readers access', function () {
+        $reader = reader();
+        $request = Request::create('/admin');
+        $request->setUserResolver(fn () => $reader);
 
-    $this->withCredentials()->withUnencryptedCookie('dc_preview', 'forged')->getJson('/api/v1/sections')->assertForbidden();
-});
+        app(IssuePreviewAccess::class)->handle($request, fn () => response('ok'));
 
-it('signs everyone out when the password changes', function () {
-    $old = previewCookie();
-    config(['preview.password' => 'new-password']);
+        expect(cookie()->getQueuedCookies())->toBeEmpty()
+            ->and(PreviewAccess::granted(Request::create('/', cookies: ['dc_preview' => accessCookieFor($reader)])))->toBeFalse();
+    });
 
-    $this->withCredentials()->withUnencryptedCookie('dc_preview', $old)->getJson('/api/v1/sections')->assertForbidden();
-});
+    it('rejects forged, tampered and expired cookies', function () {
+        $editor = User::factory()->editor()->create();
+        $valid = accessCookieFor($editor);
+        [$id, $expires, $signature] = explode('.', $valid);
+        $check = fn (string $value) => PreviewAccess::granted(Request::create('/', cookies: ['dc_preview' => $value]));
 
-it('stays locked when no credentials are configured', function () {
-    config(['preview.username' => null, 'preview.password' => null]);
+        expect($check($valid))->toBeTrue()
+            ->and($check('forged'))->toBeFalse()
+            ->and($check(($id + 1).".{$expires}.{$signature}"))->toBeFalse()
+            ->and($check("{$id}.".($expires + 999).".{$signature}"))->toBeFalse();
 
-    $this->post('/preview/login', ['username' => '', 'password' => ''])->assertStatus(422);
-});
+        $this->travel(15)->days();
+        expect($check($valid))->toBeFalse();
+    });
 
-it('keeps crawlers out while the gate is on', function () {
-    $this->get('/robots.txt')->assertOk()->assertSee('Disallow: /')->assertDontSee('Sitemap:');
-});
+    it('stops working as soon as the account is no longer staff', function () {
+        $editor = User::factory()->editor()->create();
+        $cookie = accessCookieFor($editor);
 
-it('changes nothing when the gate is off', function () {
-    config(['preview.enabled' => false]);
+        $editor->forceFill(['role' => 'reader'])->save();
 
-    $this->get('/')->assertOk()->assertDontSee('name="password"', false);
-    $this->getJson('/api/v1/sections')->assertOk();
-});
-
-it('sends people who signed in from the landing page to the app', function (string $next) {
-    $this->post('/preview/login', ['username' => 'team', 'password' => 'launch-2026', 'next' => $next])
-        ->assertRedirect(config('app.frontend_url').'/');
-})->with(['/', '/?lang=en', '/en']);
-
-it('explains a failed sign-in in the page language', function () {
-    $this->post('/preview/login?lang=en', ['username' => 'team', 'password' => 'wrong'])
-        ->assertStatus(422)
-        ->assertSee('Those details are not right');
+        expect(PreviewAccess::granted(Request::create('/', cookies: ['dc_preview' => $cookie])))->toBeFalse();
+    });
 });

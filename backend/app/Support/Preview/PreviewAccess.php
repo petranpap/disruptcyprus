@@ -2,12 +2,14 @@
 
 namespace App\Support\Preview;
 
+use App\Models\User;
 use Illuminate\Http\Request;
 use Symfony\Component\HttpFoundation\Cookie;
 
 /**
- * The pre-launch access cookie. Its value is an HMAC of the shared credentials keyed with APP_KEY, so it can't be
- * forged, and changing the password signs everyone out.
+ * Pre-launch access for staff. Signing in to the admin panel issues a personal cookie "{user id}.{expiry}.{signature}"
+ * (HMAC with APP_KEY): it can't be forged or extended, and it stops working as soon as the account is no longer staff.
+ * There is no shared password.
  */
 final class PreviewAccess
 {
@@ -19,29 +21,31 @@ final class PreviewAccess
     public static function granted(Request $request): bool
     {
         $cookie = $request->cookie((string) config('preview.cookie'));
-
-        return is_string($cookie) && $cookie !== '' && self::configured() && hash_equals(self::token(), $cookie);
-    }
-
-    public static function attempt(string $username, string $password): bool
-    {
-        if (! self::configured()) {
+        if (! is_string($cookie) || substr_count($cookie, '.') !== 2) {
             return false;
         }
 
-        // Compare both fields every time (no early exit) so timing doesn't reveal which one was wrong.
-        $userOk = hash_equals((string) config('preview.username'), $username);
-        $passOk = hash_equals((string) config('preview.password'), $password);
+        [$userId, $expires, $signature] = explode('.', $cookie);
+        if (! ctype_digit($userId) || ! ctype_digit($expires) || (int) $expires < now()->getTimestamp()) {
+            return false;
+        }
+        if (! hash_equals(self::sign($userId, $expires), $signature)) {
+            return false;
+        }
 
-        return $userOk && $passOk;
+        // Revocable: demoted or deleted staff lose access immediately.
+        return User::query()->whereKey((int) $userId)->first()?->role->canAccessAdmin() ?? false;
     }
 
-    public static function cookie(): Cookie
+    public static function cookieFor(User $user): Cookie
     {
+        $expires = (string) now()->addDays((int) config('preview.lifetime_days'))->getTimestamp();
+        $userId = (string) $user->getKey();
+
         return Cookie::create(
             name: (string) config('preview.cookie'),
-            value: self::token(),
-            expire: now()->addDays((int) config('preview.lifetime_days')),
+            value: $userId.'.'.$expires.'.'.self::sign($userId, $expires),
+            expire: (int) $expires,
             path: '/',
             domain: config('preview.cookie_domain') ?: null,
             secure: request()->isSecure(),
@@ -55,13 +59,8 @@ final class PreviewAccess
         return Cookie::create((string) config('preview.cookie'), '', 1, '/', config('preview.cookie_domain') ?: null);
     }
 
-    private static function configured(): bool
+    private static function sign(string $userId, string $expires): string
     {
-        return filled(config('preview.username')) && filled(config('preview.password'));
-    }
-
-    private static function token(): string
-    {
-        return hash_hmac('sha256', 'preview|'.config('preview.username').'|'.config('preview.password'), (string) config('app.key'));
+        return hash_hmac('sha256', "preview|{$userId}|{$expires}", (string) config('app.key'));
     }
 }

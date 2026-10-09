@@ -2,6 +2,7 @@
 
 namespace App\Providers\Filament;
 
+use App\Http\Middleware\IssuePreviewAccess;
 use App\Http\Middleware\SetAdminLocale;
 use App\Support\DigestPeriod;
 use Filament\Actions\Action;
@@ -47,13 +48,23 @@ class AdminPanelProvider extends PanelProvider
                 'danger' => Color::hex('#BA0035'),
             ])
             ->font('Inter')
+            // Keyed: resources name their group by key ('content', …) and Filament matches groups by array key.
             ->navigationGroups([
-                NavigationGroup::make('content')->label(fn () => __('admin.nav.content')),
-                NavigationGroup::make('engagement')->label(fn () => __('admin.nav.engagement')),
-                NavigationGroup::make('taxonomy')->label(fn () => __('admin.nav.taxonomy')),
-                NavigationGroup::make('administration')->label(fn () => __('admin.nav.administration')),
+                'content' => NavigationGroup::make()->label(fn () => __('admin.nav.content')),
+                'engagement' => NavigationGroup::make()->label(fn () => __('admin.nav.engagement')),
+                'taxonomy' => NavigationGroup::make()->label(fn () => __('admin.nav.taxonomy')),
+                'administration' => NavigationGroup::make()->label(fn () => __('admin.nav.administration')),
             ])
             ->userMenuItems([
+                // While the pre-launch gate is on, these open the real site/app (staff get the access cookie here).
+                Action::make('view-site')
+                    ->label(fn () => __('admin.nav.view_site'))
+                    ->icon(Heroicon::OutlinedGlobeAlt)
+                    ->url(fn () => url('/'), shouldOpenInNewTab: true),
+                Action::make('open-app')
+                    ->label(fn () => __('admin.nav.open_app'))
+                    ->icon(Heroicon::OutlinedDevicePhoneMobile)
+                    ->url(fn () => rtrim((string) config('app.frontend_url'), '/').'/', shouldOpenInNewTab: true),
                 Action::make('language-el')
                     ->label('Ελληνικά')
                     ->icon(Heroicon::OutlinedLanguage)
@@ -85,6 +96,8 @@ class AdminPanelProvider extends PanelProvider
             ->authMiddleware([
                 Authenticate::class,
                 SetAdminLocale::class,
+                // Pre-launch: staff get the cookie that opens the public site and the app (no shared password).
+                IssuePreviewAccess::class,
             ]);
     }
 }
