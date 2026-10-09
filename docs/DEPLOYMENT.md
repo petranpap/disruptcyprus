@@ -16,6 +16,41 @@ Workflow: develop and test locally → `git push` → on the server, `./deploy.s
 
 ---
 
+## 0. Trying it on the server before the real domain
+
+Use temporary hostnames from **sslip.io**: `anything.<IP-with-dashes>.sslip.io` resolves to that IP, with no DNS setup.
+With server IP `203.0.113.10`:
+
+| Role | Temporary host | Later |
+|---|---|---|
+| Site, share pages, admin | `disrupt.203-0-113-10.sslip.io` | `disruptcyprus.com` |
+| App + API | `app.disrupt.203-0-113-10.sslip.io` | `app.disruptcyprus.com` |
+
+Follow §1 exactly, replacing the hostnames:
+- the two Apache vhosts' `ServerName` (drop the `www` alias);
+- `certbot --apache -d disrupt.203-0-113-10.sslip.io -d app.disrupt.203-0-113-10.sslip.io` (HTTPS matters: without it the
+  app can't be installed, push doesn't work and secure cookies are refused);
+- in `backend/.env`:
+  ```dotenv
+  APP_URL=https://disrupt.203-0-113-10.sslip.io
+  FRONTEND_URL=https://app.disrupt.203-0-113-10.sslip.io
+  SANCTUM_STATEFUL_DOMAINS=app.disrupt.203-0-113-10.sslip.io
+  PREVIEW_COOKIE_DOMAIN=.disrupt.203-0-113-10.sslip.io
+  GOOGLE_REDIRECT_URI=https://app.disrupt.203-0-113-10.sslip.io/api/v1/auth/social/google/callback   # or leave Google empty
+  # leave SESSION_DOMAIN unset
+  ```
+- the PWA's link back to the site, without changing the repo (git-ignored, read by `npm run build`):
+  ```bash
+  echo "VITE_SITE_URL=https://disrupt.203-0-113-10.sslip.io" > /var/www/disruptcyprus/app/web/.env.production.local
+  ```
+
+Then `./deploy.sh`. If certbot refuses the sslip.io names (shared rate limits), use two subdomains of a domain you
+already control instead, e.g. `disrupt.example.com` + `app.disrupt.example.com` (cookie domain `.disrupt.example.com`).
+
+**Moving to the real domain later** (content, users and the waitlist stay): update the five `.env` lines, delete
+`web/.env.production.local`, change both `ServerName`s (add `ServerAlias www.disruptcyprus.com`), run certbot for the
+real names, then `./deploy.sh`.
+
 ## 1. One-time server setup
 
 All commands as a sudo user unless noted.
