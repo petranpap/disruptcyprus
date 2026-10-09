@@ -304,6 +304,39 @@ sudo -u disrupt mkdir -p /var/www/disruptcyprus/backups
 ```
 Store DB credentials for that cron in `/var/www/disruptcyprus/.my.cnf` (`chmod 600`). Copy backups off the server (e.g. a Hetzner Storage Box).
 
+## 3b. Pre-launch "coming soon" gate
+
+Until launch, the public sees an animated coming-soon page; the team signs in on it with one shared username and password
+and then uses the real site and app (the access cookie lasts 30 days and covers both hosts).
+
+In `backend/.env` on the server (never in git):
+
+```dotenv
+PREVIEW_ENABLED=true
+PREVIEW_USERNAME=team
+PREVIEW_PASSWORD=<long random password>      # e.g. openssl rand -base64 18
+PREVIEW_COOKIE_DOMAIN=.disruptcyprus.com
+```
+
+then `php artisan optimize`. What it does:
+- `disruptcyprus.com` (landing and share links): coming-soon page with the sign-in; `noindex`, `robots.txt` blocks everything.
+- `app.disruptcyprus.com/api`: `403 preview_locked`; the app sends people to the coming-soon page.
+- Admin (`/admin`) is not affected: editors keep their own login and can prepare content.
+- Changing `PREVIEW_PASSWORD` signs everyone out. Sign out: `https://disruptcyprus.com/preview/logout`.
+
+Optional, so nobody even downloads the app shell without the cookie: in the `app.disruptcyprus.com` vhost add
+
+```apache
+    # Pre-launch gate (remove on launch day)
+    RewriteEngine On
+    RewriteCond %{HTTP_COOKIE} !(^|;\s*)dc_preview=
+    RewriteCond %{REQUEST_URI} !^/(api|sanctum|storage)/
+    RewriteRule ^ https://disruptcyprus.com/ [R=302,L]
+```
+
+**Launch day:** `PREVIEW_ENABLED=false` → `php artisan optimize`, remove the rewrite block (if added) and reload Apache.
+The real landing page, share pages and sitemap go live immediately.
+
 ## 4. Launch checklist
 
 1. DNS: `disruptcyprus.com`, `www` and `app` A records point at the server; certbot issued all three certificates.
