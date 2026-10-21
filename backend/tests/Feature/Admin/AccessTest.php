@@ -10,7 +10,7 @@ use App\Models\Digest;
 use App\Models\User;
 
 dataset('editorial pages', ['/backend', '/backend/articles', '/backend/events', '/backend/digests', '/backend/authors', '/backend/push-campaigns', '/backend/notification-log']);
-dataset('admin-only pages', ['/backend/users', '/backend/industries', '/backend/sections']);
+dataset('admin-only pages', ['/backend/users', '/backend/users/create', '/backend/industries', '/backend/sections', '/backend/structure', '/backend/waitlist']);
 
 it('keeps readers out of the panel by signing them out and showing the login', function () {
     $this->actingAs(reader())->get('/backend')->assertRedirect('/backend/login');
