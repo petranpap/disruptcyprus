@@ -31,6 +31,11 @@ class SecurityHeaders
             $response->headers->set('X-Frame-Options', 'SAMEORIGIN');
         }
 
+        // Admin panel: keep it out of search results without naming it in robots.txt.
+        if ($request->is('backend', 'backend/*')) {
+            $response->headers->set('X-Robots-Tag', 'noindex, nofollow');
+        }
+
         if ($profile === 'site') {
             $response->headers->set('Content-Security-Policy', self::SITE_CSP);
         }

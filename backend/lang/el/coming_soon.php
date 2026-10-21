@@ -30,7 +30,6 @@ return [
         'success_body' => 'Ευχαριστούμε. Θα σου στείλουμε email μόλις ξεκινήσει το Disrupt Cyprus.',
         'error_summary' => 'Έλεγξε τα πεδία που επισημαίνονται.',
     ],
-    'staff' => 'Συντάκτες: σύνδεση για προεπισκόπηση',
     'language' => 'English',
     'language_label' => 'Read in English',
     'contact' => 'Ερωτήσεις ή ιδέες για θέματα: hello@disruptcyprus.com',

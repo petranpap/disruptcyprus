@@ -21,7 +21,7 @@ $stateless = [StartSession::class, ShareErrorsFromSession::class, PreventRequest
 // `preview` (pre-launch gate) runs outermost so it can replace the page and the cache headers. See config/preview.php.
 Route::middleware(['preview:site', 'cache.headers:public;max_age=300;etag', 'security:site'])->withoutMiddleware($stateless)->group(function (): void {
     Route::get('/', LandingController::class)->name('site.home');
-    Route::get('en', fn () => app(LandingController::class)('en'))->name('site.home.en');
+    Route::get('el', fn () => app(LandingController::class)('el'))->name('site.home.el');
 
     Route::get('a/{slug}', [ShareController::class, 'article'])->name('site.article');
     Route::get('e/{slug}', [ShareController::class, 'event'])->name('site.event');
@@ -39,6 +39,6 @@ Route::middleware('security:site')->withoutMiddleware($stateless)->group(functio
     Route::post('waitlist', [ComingSoonController::class, 'join'])->middleware('throttle:5,1')->name('waitlist.join');
 });
 
-Route::get('admin-language/{locale}', AdminLanguageController::class)
+Route::get('backend-language/{locale}', AdminLanguageController::class)
     ->middleware('auth')
     ->name('admin.language');

@@ -128,7 +128,6 @@
 
     <footer class="cs-footer">
         <span>{{ __('coming_soon.contact') }}</span>
-        <a href="{{ url('/admin') }}" class="cs-staff">{{ __('coming_soon.staff') }}</a>
         <span>{{ __('coming_soon.rights', ['year' => now()->year]) }}</span>
     </footer>
 </body>

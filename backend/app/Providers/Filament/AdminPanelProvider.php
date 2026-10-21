@@ -37,7 +37,8 @@ class AdminPanelProvider extends PanelProvider
         return $panel
             ->default()
             ->id('admin')
-            ->path('admin')
+            // Not /admin: keeps the panel off the paths bots probe. Never linked from public pages.
+            ->path('backend')
             ->login()
             // Saves (record + industries pivot) are atomic, so after-commit listeners see the complete record.
             ->databaseTransactions()

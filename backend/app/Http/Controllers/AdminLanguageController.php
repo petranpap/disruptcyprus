@@ -20,6 +20,6 @@ class AdminLanguageController extends Controller
         $user = $request->user();
         $user->forceFill(['locale' => $locale])->save();
 
-        return redirect()->back(fallback: '/admin');
+        return redirect()->back(fallback: '/backend');
     }
 }

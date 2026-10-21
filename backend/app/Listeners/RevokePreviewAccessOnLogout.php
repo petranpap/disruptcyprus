@@ -14,7 +14,7 @@ class RevokePreviewAccessOnLogout
     public function handle(Logout $event): void
     {
         // Only the admin sign-out: signing out of the reader app must not lock staff out of the preview.
-        if (request()->is('admin', 'admin/*')) {
+        if (request()->is('backend', 'backend/*')) {
             Cookie::queue(PreviewAccess::forget());
         }
     }

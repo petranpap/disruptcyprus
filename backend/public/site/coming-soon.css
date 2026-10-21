@@ -217,9 +217,6 @@
 .cs-check { stroke-dasharray: 24; stroke-dashoffset: 24; animation: cs-draw 500ms 350ms ease forwards; }
 @keyframes cs-draw { to { stroke-dashoffset: 0; } }
 
-.cs-staff { color: var(--cs-faint); text-decoration: none; }
-.cs-staff:hover { color: var(--cs-text); text-decoration: underline; }
-
 /* After submitting: no replayed entrance animations, the card scrolls into view. */
 .cs-still .cs-rise, .cs-still .cs-mark, .cs-still .cs-bar, .cs-still .cs-word { animation: none; }
 .cs-still .cs-title { animation: cs-shine 6s 1.5s ease-in-out infinite; }
