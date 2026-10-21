@@ -46,7 +46,7 @@ to silence the provider banner; use `exec -T` in non-interactive scripts).
 | Create/promote staff | `podman compose exec app php artisan admin:user you@example.com [--role=editor]` |
 | VAPID keys (once per environment) | `podman compose exec app php artisan webpush:vapid` (writes `.env`; never commit) |
 | Run the scheduler once | `podman compose exec app php artisan schedule:run` (the `scheduler` container runs `schedule:work`) |
-| Admin panel | http://localhost:8080/admin (demo: admin@ / editor@disruptcyprus.test, password `password`) |
+| Admin panel | http://localhost:8080/backend (demo: admin@ / editor@disruptcyprus.test, password `password`) |
 | Failed jobs | `podman compose exec app php artisan queue:failed` / `queue:retry all` |
 | Web dev server | `podman compose up -d node` → http://localhost:5173 (Vite proxies /api, /sanctum, /storage to nginx) |
 | Web one-off commands | `podman compose run --rm -T node npm run <script>` (Node 20, same as production) |
@@ -74,7 +74,7 @@ Environment quirks on this machine:
 - Laravel 13 idioms: model config via attributes (`#[Fillable]`, `#[Hidden]`), `casts()` method, `bootstrap/app.php` for middleware/exceptions.
 - Morph map is enforced (`article`, `event`, `digest`, `user`, `industry`, `section`, `author`); never store class names.
 - Thin controllers → Form Requests (validation) → Services (logic) → API Resources (output). Policies for every model.
-- API prefix `/api/v1`, `Accept-Language: el|en` (default `el`). Error shape `{message, errors?, code}`. Cursor pagination everywhere.
+- API prefix `/api/v1`, `Accept-Language: en|el` (default `en`). Error shape `{message, errors?, code}`. Cursor pagination everywhere.
 - Translatable fields via `spatie/laravel-translatable`. A locale is "available" only if title + body exist for it.
 - Times stored in UTC. Business periods (digests, "this week") computed in `Asia/Nicosia`.
 - Feed ranking lives only in `App\Services\FeedService` and is unit-tested.
@@ -88,7 +88,7 @@ Environment quirks on this machine:
 - Tests touching FULLTEXT search go in `tests/Search` (truncation, not transactions: InnoDB FTS only sees committed rows).
 - Test helpers: `reader()`, `newArticle()`, `newEvent()`, `section()` (`event()` is a Laravel helper — don't shadow it).
 - Public site (`routes/web.php`, `app/Http/Controllers/Site`, `resources/views/site`, `lang/*/site.php`): stateless (no session/CSRF
-  middleware, cacheable), strict CSP, plain CSS in `public/site/site.css` using only `--dc-*` variables. `?lang=en`, Greek default.
+  middleware, cacheable), strict CSP, plain CSS in `public/site/site.css` using only `--dc-*` variables. `?lang=el`, English default (`/` English landing, `/el` Greek).
 - Media URLs are root-relative (`/storage/...`); use `SiteLocale::absolute()` where an absolute URL is required (OG, JSON-LD).
 
 **Web**
@@ -170,6 +170,8 @@ Environment quirks on this machine:
 | 2026-10-08 | Guest `GET /me` keeps returning 401 (one console error in Lighthouse) | Correct API semantics beat a Best-Practices point |
 | 2026-10-09 | Pre-launch gate (`PREVIEW_ENABLED`): animated coming-soon page with a waitlist form (name, email, consent → `waitlist_signups`, admin-only resource with CSV export) + 403 `preview_locked` API. Staff access = personal HMAC cookie `{user}.{expiry}.{sig}` issued by the admin panel, checked against the current role; no shared password | Product owner: waitlist for new users; no username/password for security |
 | 2026-10-09 | Admin navigation groups registered by key (`'content' => NavigationGroup::make()…`) | Filament matches resource groups by array key; a list showed raw keys untranslated |
+| 2026-10-21 | English is the default language everywhere (app ignores browser language until the reader picks Greek; public site `/` = EN, `/el` = EL; API and new accounts default `en`) | Product owner |
+| 2026-10-21 | Admin panel moved from `/admin` to `/backend`; never linked from public pages, not named in robots.txt, sends `X-Robots-Tag: noindex`; `/admin` is a 404 | Product owner (security); note the path is visible while the repo is public |
 | 2026-10-05 | Everything runs in containers (podman + podman-compose locally; compose file stays Docker-compatible) | Product owner |
 
 ## Phase status

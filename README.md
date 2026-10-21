@@ -32,7 +32,7 @@ podman compose restart queue scheduler
 | http://localhost:8025 | Mailpit (all outgoing mail) |
 | http://localhost:5173 | PWA dev server: `podman compose up -d node` (first start runs `npm ci`) |
 | http://localhost:5173/dev/components | Component gallery (development only) |
-| http://localhost:8080/admin | Filament admin |
+| http://localhost:8080/backend | Filament admin (not linked from any public page) |
 | http://localhost:8080/ | Public site: landing, share pages (`/a/{slug}`), sitemap |
 | http://127.0.0.1:4173 | Production build of the PWA: `npm run build` then `npm run preview` (see docs/DEPLOYMENT.md §6) |
 

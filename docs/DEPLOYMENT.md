@@ -78,6 +78,7 @@ APP_DEBUG=false
 APP_URL=https://disruptcyprus.com
 FRONTEND_URL=https://app.disruptcyprus.com
 LOG_LEVEL=warning
+APP_LOCALE=en
 
 DB_CONNECTION=mariadb
 DB_HOST=127.0.0.1
@@ -128,7 +129,7 @@ Create the first administrator (prompts for a password, or generates one):
 sudo -u disrupt php artisan admin:user you@example.com --name="Your Name"          # admin
 sudo -u disrupt php artisan admin:user editor@example.com --role=editor            # editor
 ```
-Then sign in at `https://disruptcyprus.com/admin`. (`make:filament-user` creates a reader, who cannot open the panel.)
+Then sign in at `https://disruptcyprus.com/backend` (the admin is deliberately not at `/admin` and is never linked from the site). (`make:filament-user` creates a reader, who cannot open the panel.)
 
 ### 1.5 Apache virtual hosts
 ```bash
@@ -308,7 +309,7 @@ Store DB credentials for that cron in `/var/www/disruptcyprus/.my.cnf` (`chmod 6
 
 Until launch, the public sees an animated coming-soon page that explains Disrupt Cyprus and collects a **waitlist**
 (name + email + consent). Admins see signups in **Admin → Engagement → Waitlist** (search, delete, CSV export for the
-launch email). There is **no shared password**: anyone who signs in to `/admin` (editors and admins) automatically gets
+launch email). There is **no shared password**: anyone who signs in to `/backend` (editors and admins) automatically gets
 a personal access cookie that opens the real site and the app for 14 days. It is tied to that account, can't be forged,
 and stops working when they sign out of the admin or stop being staff. The admin user menu has "View public site" and
 "Open the app".

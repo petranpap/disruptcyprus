@@ -13,7 +13,7 @@ Status: **Phase 0 draft**. Items marked ❓ are waiting for product-owner confir
                  ┌──────────────────────────── disruptcyprus.com ───────────────────────────────┐
  Search engines, │  /                 → Blade landing (GR default, /en)                          │
  social previews,│  /a/{slug}, /e/{slug}, /d/{slug} → Blade share pages (OG tags, full text)   │
- editors         │  /admin            → Filament                                                │
+ editors         │  /backend          → Filament (unlisted; not /admin)                         │
                  │  /privacy, /terms, /sitemap.xml                                               │
                  └──────────────────────────────────────────────────────────────────────────────┘
  Laravel ── MariaDB 10.11 (data, Scout database engine, cache, queue, sessions)
@@ -35,7 +35,7 @@ One Laravel codebase serves both hosts. The PWA is a separate Vite project deplo
   It sits behind the same rate limits and is unused by the PWA.
 - Google: Socialite redirect flow on `app.` (`/api/v1/auth/social/google/redirect` → Google →
   callback → session established → redirect to `/onboarding` or `/`). Apple later.
-- Filament on `disruptcyprus.com/admin` keeps its own web session (separate host cookie). Editors log in separately there.
+- Filament on `disruptcyprus.com/backend` keeps its own web session (separate host cookie). Editors log in separately there.
 
 ### 1.2 SEO / sharing decision
 
@@ -198,7 +198,7 @@ backend/app/
 ```
 
 - **Localization**: `spatie/laravel-translatable` JSON columns. A middleware sets the app locale from
-  `Accept-Language` (`en` | `el`, default `el`). Resources return the requested locale, falling back to the other locale
+  `Accept-Language` (`en` | `el`, default `en`). Resources return the requested locale, falling back to the other locale
   when the user's `content_locales` allow it, plus `locale` and `is_fallback` per item.
 - **Search**: Scout database engine over a denormalized `search_text` column per article/event (both
   locales, HTML stripped, `utf8mb4_unicode_ci` collation, FULLTEXT index). Searching translatable JSON columns directly
@@ -236,7 +236,7 @@ web/src/
 
 1. Production hosts: `app.disruptcyprus.com` (PWA + API) and `disruptcyprus.com` (landing, share pages, admin). ✅ confirmed.
 2. Latest stable versions as of today: **Laravel 13**, **Filament 5**, PHP 8.4, React 19.3, Vite 8, React Router 8, TanStack Query 5, Tailwind 4.3, vite-plugin-pwa 2. If a key package isn't compatible yet, I'll pin and note it.
-3. Default UI language is Greek when the browser isn't `en*`. `users.locale` defaults to `el`.
+3. Default UI language is English everywhere (app, public site, API, new accounts); Greek is one click away and remembered. Changed from Greek on 2026-10-21 (product owner).
 4. **Digest timing**: Daily News draft generated at **06:00** for the window `[yesterday 06:00, today 06:00)`; Weekly Events Sunday **18:00** for Mon–Sun of the coming week;
    Monthly drafts on the 1st at **06:00**. Generation runs at the same times for everyone; editor publishing is manual.
 5. **Digest notification timing**: when an editor publishes, each user is notified at their `delivery_time` (in their timezone) that day.
