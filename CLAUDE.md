@@ -90,6 +90,7 @@ Environment quirks on this machine:
 - Public site (`routes/web.php`, `app/Http/Controllers/Site`, `resources/views/site`, `lang/*/site.php`): stateless (no session/CSRF
   middleware, cacheable), strict CSP, plain CSS in `public/site/site.css` using only `--dc-*` variables. `?lang=el`, English default (`/` English landing, `/el` Greek).
 - Media URLs are root-relative (`/storage/...`); use `SiteLocale::absolute()` where an absolute URL is required (OG, JSON-LD).
+- Never hardcode a host: use `Urls::site()` / `Urls::app()` (backend) and `SITE_URL` (web), not `config('app.url')` / `config('app.frontend_url')`.
 
 **Web**
 - React 19 + React Router 7 (data router, `createBrowserRouter`), TanStack Query 5, Zustand 5, react-hook-form + zod 4, i18next, Tailwind 4 (CSS-first).
@@ -173,6 +174,7 @@ Environment quirks on this machine:
 | 2026-10-21 | English is the default language everywhere (app ignores browser language until the reader picks Greek; public site `/` = EN, `/el` = EL; API and new accounts default `en`) | Product owner |
 | 2026-10-21 | Admin panel moved from `/admin` to `/backend`; never linked from public pages, not named in robots.txt, sends `X-Robots-Tag: noindex`; `/admin` is a 404 | Product owner (security); note the path is visible while the repo is public |
 | 2026-10-21 | Admins create and edit accounts in the admin (name, email, role, language, password; empty password = unchanged); admin-created accounts count as verified; deleted accounts are read-only. "Structure" page shows sections → industry groups → industries as a tree | Product owner |
+| 2026-10-21 | No hardcoded hosts: `App\Support\Urls` gives the site/app origins from `.env` unless they are localhost on a public request, then derives them from the request (app = `app.<site host>`); Sanctum always trusts the current request host; preview cookie domain derived; the PWA derives the site from its own address (`VITE_SITE_URL` only in `.env.development`); `deploy.sh` refuses localhost `APP_URL`/`FRONTEND_URL` in production | Product owner: a server `.env` with localhost values sent buttons and links to localhost |
 | 2026-10-05 | Everything runs in containers (podman + podman-compose locally; compose file stays Docker-compatible) | Product owner |
 
 ## Phase status

@@ -70,7 +70,9 @@ sudo -u disrupt cp $APP/backend/.env.example $APP/backend/.env
 sudo -u disrupt nano $APP/backend/.env
 ```
 
-Production values (everything else as in `.env.example`):
+Production values (everything else as in `.env.example`). No domain is hardcoded anywhere: links, the app address,
+the Sanctum host and the preview cookie domain follow the address the site is opened on. `APP_URL` is still required
+(emails and queued notifications have no request to look at), and `deploy.sh` refuses localhost values in production.
 
 ```dotenv
 APP_ENV=production
@@ -89,7 +91,7 @@ DB_PASSWORD=<STRONG_PASSWORD>
 
 SESSION_DRIVER=database
 SESSION_SECURE_COOKIE=true
-SANCTUM_STATEFUL_DOMAINS=app.disruptcyprus.com
+SANCTUM_STATEFUL_DOMAINS=app.disruptcyprus.com   # optional: the app's own host is always trusted
 QUEUE_CONNECTION=database
 CACHE_STORE=database
 
