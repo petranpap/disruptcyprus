@@ -12,13 +12,13 @@
 </head>
 <body>
     <main id="main" class="container-reading reading not-found">
-        <a href="{{ url('/') }}">@include('site.partials.logo')</a>
+        <a href="{{ \App\Support\Urls::site() }}">@include('site.partials.logo')</a>
         <h1 class="article-title">Η σελίδα δεν βρέθηκε</h1>
         <p class="article-excerpt">Ο σύνδεσμος μπορεί να έχει αλλάξει ή το θέμα να μην είναι πια διαθέσιμο.</p>
         <p class="article-excerpt" lang="en">This page doesn't exist, or the story is no longer available.</p>
         <p class="hero-actions">
-            <a href="{{ url('/') }}" class="btn btn-primary">Αρχική · Home</a>
-            <a href="{{ rtrim((string) config('app.frontend_url'), '/') }}" class="btn btn-outline">Disrupt Cyprus app</a>
+            <a href="{{ \App\Support\Urls::site() }}" class="btn btn-primary">Αρχική · Home</a>
+            <a href="{{ \App\Support\Urls::app() }}" class="btn btn-outline">Disrupt Cyprus app</a>
         </p>
     </main>
 </body>

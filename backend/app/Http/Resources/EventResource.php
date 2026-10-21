@@ -4,6 +4,7 @@ namespace App\Http\Resources;
 
 use App\Models\Event;
 use App\Services\Content\HtmlSanitizer;
+use App\Support\Urls;
 use Illuminate\Http\Request;
 
 /**
@@ -29,7 +30,7 @@ class EventResource extends EventCardResource
             'organizer_name' => $event->organizer_name,
             'available_locales' => $event->available_locales,
             'ics_url' => route('events.ics', $event->slug),
-            'share_url' => rtrim((string) config('app.url'), '/').'/e/'.$event->slug,
+            'share_url' => Urls::site().'/e/'.$event->slug,
         ];
     }
 }

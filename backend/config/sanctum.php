@@ -18,12 +18,16 @@ return [
     |
     */
 
-    'stateful' => explode(',', env('SANCTUM_STATEFUL_DOMAINS', sprintf(
-        '%s%s',
-        'localhost,localhost:3000,127.0.0.1,127.0.0.1:8000,::1',
-        Sanctum::currentApplicationUrlWithPort(),
-        // Sanctum::currentRequestHost(),
-    ))),
+    // Plus the current request host: the app calls its API on its own host (app.<domain>/api), so it is always
+    // first-party, whatever SANCTUM_STATEFUL_DOMAINS says. Same-origin only; CSRF protection is unchanged.
+    'stateful' => [
+        ...explode(',', env('SANCTUM_STATEFUL_DOMAINS', sprintf(
+            '%s%s',
+            'localhost,localhost:3000,127.0.0.1,127.0.0.1:8000,::1',
+            Sanctum::currentApplicationUrlWithPort(),
+        ))),
+        Sanctum::$currentRequestHostPlaceholder,
+    ],
 
     /*
     |--------------------------------------------------------------------------

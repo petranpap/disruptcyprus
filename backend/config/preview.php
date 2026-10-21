@@ -11,6 +11,7 @@ return [
     'cookie' => 'dc_preview',
 
     // ".disruptcyprus.com" in production, so the main site and app.disruptcyprus.com share the access cookie.
+    // Optional: derived from the site host (".example.com") when unset, see PreviewAccess.
     'cookie_domain' => env('PREVIEW_COOKIE_DOMAIN'),
 
     'lifetime_days' => (int) env('PREVIEW_LIFETIME_DAYS', 14),

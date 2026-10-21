@@ -4,6 +4,7 @@ namespace App\Http\Controllers\Api\V1\Auth;
 
 use App\Http\Controllers\Controller;
 use App\Models\User;
+use App\Support\Urls;
 use Illuminate\Auth\Events\Verified;
 use Illuminate\Http\JsonResponse;
 use Illuminate\Http\RedirectResponse;
@@ -24,7 +25,7 @@ class EmailVerificationController extends Controller
             event(new Verified($user));
         }
 
-        return redirect()->away(config('app.frontend_url').'/?email_verified=1');
+        return redirect()->away(Urls::app().'/?email_verified=1');
     }
 
     public function resend(Request $request): JsonResponse

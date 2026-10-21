@@ -6,6 +6,7 @@ use App\Exceptions\UnverifiedSocialEmail;
 use App\Http\Controllers\Controller;
 use App\Models\User;
 use App\Services\Account\SocialLoginService;
+use App\Support\Urls;
 use Illuminate\Http\RedirectResponse;
 use Illuminate\Http\Request;
 use Illuminate\Support\Facades\Auth;
@@ -65,7 +66,7 @@ class SocialAuthController extends Controller
         Auth::guard('web')->login($user, remember: true);
         $request->session()->regenerate();
 
-        return redirect()->away(config('app.frontend_url').$this->landingPath($user, is_string($next) ? $next : null));
+        return redirect()->away(Urls::app().$this->landingPath($user, is_string($next) ? $next : null));
     }
 
     private function landingPath(User $user, ?string $next): string
@@ -79,6 +80,6 @@ class SocialAuthController extends Controller
 
     private function backToSignIn(string $error): RedirectResponse
     {
-        return redirect()->away(config('app.frontend_url').'/sign-in?error='.$error);
+        return redirect()->away(Urls::app().'/sign-in?error='.$error);
     }
 }

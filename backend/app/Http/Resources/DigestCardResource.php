@@ -3,6 +3,7 @@
 namespace App\Http\Resources;
 
 use App\Models\Digest;
+use App\Support\Urls;
 use Illuminate\Http\Request;
 use Illuminate\Http\Resources\Json\JsonResource;
 use Spatie\MediaLibrary\HasMedia;
@@ -29,7 +30,7 @@ class DigestCardResource extends JsonResource
             'published_at' => $this->published_at?->toIso8601String(),
             'items_count' => $this->whenCounted('items'),
             'cover_url' => $this->whenLoaded('items', fn () => $this->coverUrl()),
-            'share_url' => rtrim((string) config('app.url'), '/').'/d/'.$this->slug,
+            'share_url' => Urls::site().'/d/'.$this->slug,
         ];
     }
 

@@ -17,6 +17,17 @@ test -f backend/.env || { echo "backend/.env is missing (copy backend/.env.examp
 node -e 'const [a,b]=process.versions.node.split(".").map(Number); process.exit(a>20||(a===20&&b>=19)?0:1)' \
   || { echo "Node 20.19+ required for the PWA build (Vite 8)"; exit 1; }
 grep -q '^APP_DEBUG=false' backend/.env || echo "WARNING: APP_DEBUG is not false in backend/.env"
+# Links in emails and notifications come from .env: localhost values (copied from .env.example) would break them.
+if grep -q '^APP_ENV=production' backend/.env; then
+  for key in APP_URL FRONTEND_URL; do
+    if grep -Eq "^${key}=.*(localhost|127\.0\.0\.1)" backend/.env; then
+      echo "backend/.env: ${key} points to localhost. Set it to the real address (e.g. APP_URL=https://disruptcyprus.com," >&2
+      echo "FRONTEND_URL=https://app.disruptcyprus.com) or remove the line to derive it." >&2
+      exit 1
+    fi
+  done
+  grep -q '^APP_URL=.\+' backend/.env || { echo "backend/.env: APP_URL is required in production (used in emails)." >&2; exit 1; }
+fi
 grep -q '^VAPID_PRIVATE_KEY=.\+' backend/.env || echo "WARNING: no VAPID keys; push notifications are disabled (php artisan webpush:vapid, once)"
 
 echo "==> Pull"

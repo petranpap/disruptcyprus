@@ -2,6 +2,7 @@
 
 namespace App\Support\Site;
 
+use App\Support\Urls;
 use Illuminate\Http\Request;
 
 /**
@@ -46,6 +47,6 @@ final class SiteLocale
 
     public static function appUrl(string $path = '/'): string
     {
-        return rtrim((string) config('app.frontend_url'), '/').$path;
+        return Urls::app().$path;
     }
 }

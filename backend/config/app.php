@@ -58,7 +58,8 @@ return [
     | Origin of the React PWA. Password-reset, verification and OAuth flows
     | redirect users here.
     */
-    'frontend_url' => env('FRONTEND_URL', 'http://localhost:5173'),
+    // Optional: derived as https://app.<site host> when unset (App\Support\Urls).
+    'frontend_url' => env('FRONTEND_URL'),
 
     /*
     | Timezone used for business periods: digests, "this week", scheduler.

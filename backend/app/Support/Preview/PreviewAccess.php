@@ -3,6 +3,7 @@
 namespace App\Support\Preview;
 
 use App\Models\User;
+use App\Support\Urls;
 use Illuminate\Http\Request;
 use Symfony\Component\HttpFoundation\Cookie;
 
@@ -47,7 +48,7 @@ final class PreviewAccess
             value: $userId.'.'.$expires.'.'.self::sign($userId, $expires),
             expire: (int) $expires,
             path: '/',
-            domain: config('preview.cookie_domain') ?: null,
+            domain: self::cookieDomain(),
             secure: request()->isSecure(),
             httpOnly: true,
             sameSite: Cookie::SAMESITE_LAX,
@@ -56,7 +57,12 @@ final class PreviewAccess
 
     public static function forget(): Cookie
     {
-        return Cookie::create((string) config('preview.cookie'), '', 1, '/', config('preview.cookie_domain') ?: null);
+        return Cookie::create((string) config('preview.cookie'), '', 1, '/', self::cookieDomain());
+    }
+
+    private static function cookieDomain(): ?string
+    {
+        return config('preview.cookie_domain') ?: Urls::sharedCookieDomain();
     }
 
     private static function sign(string $userId, string $expires): string

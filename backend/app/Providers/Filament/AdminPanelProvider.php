@@ -6,6 +6,7 @@ use App\Http\Middleware\AuthenticateAdmin;
 use App\Http\Middleware\IssuePreviewAccess;
 use App\Http\Middleware\SetAdminLocale;
 use App\Support\DigestPeriod;
+use App\Support\Urls;
 use Filament\Actions\Action;
 use Filament\Http\Middleware\AuthenticateSession;
 use Filament\Http\Middleware\DisableBladeIconComponents;
@@ -65,7 +66,7 @@ class AdminPanelProvider extends PanelProvider
                 Action::make('open-app')
                     ->label(fn () => __('admin.nav.open_app'))
                     ->icon(Heroicon::OutlinedDevicePhoneMobile)
-                    ->url(fn () => rtrim((string) config('app.frontend_url'), '/').'/', shouldOpenInNewTab: true),
+                    ->url(fn () => Urls::app().'/', shouldOpenInNewTab: true),
                 Action::make('language-el')
                     ->label('Ελληνικά')
                     ->icon(Heroicon::OutlinedLanguage)

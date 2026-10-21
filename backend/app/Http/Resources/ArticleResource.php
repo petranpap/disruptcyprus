@@ -4,6 +4,7 @@ namespace App\Http\Resources;
 
 use App\Models\Article;
 use App\Services\Content\HtmlSanitizer;
+use App\Support\Urls;
 use Illuminate\Http\Request;
 use Illuminate\Support\Facades\Cache;
 
@@ -43,7 +44,7 @@ class ArticleResource extends ArticleCardResource
                 'mime_type' => $attachment->mime_type,
             ],
             'available_locales' => $article->available_locales,
-            'share_url' => rtrim((string) config('app.url'), '/').'/a/'.$article->slug,
+            'share_url' => Urls::site().'/a/'.$article->slug,
         ];
     }
 

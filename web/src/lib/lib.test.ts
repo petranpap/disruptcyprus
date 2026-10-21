@@ -1,5 +1,6 @@
 import { formatCompactNumber, formatRelative } from './dates'
 import { fold, upper } from './greek'
+import { siteUrlFor } from './env'
 
 describe('upper', () => {
   it('drops Greek accents when uppercasing', () => {
@@ -32,5 +33,15 @@ describe('formatCompactNumber', () => {
   it('formats read counts compactly', () => {
     expect(formatCompactNumber(12400, 'en')).toMatch(/^12\.4K$/i)
     expect(formatCompactNumber(12400, 'el')).toMatch(/12,4/)
+  })
+})
+
+describe('siteUrlFor', () => {
+  it('derives the public site from the app address, never from a hardcoded domain', () => {
+    expect(siteUrlFor({ protocol: 'https:', host: 'app.disruptcyprus.com' })).toBe('https://disruptcyprus.com')
+    expect(siteUrlFor({ protocol: 'https:', host: 'app.staging.example.org' })).toBe('https://staging.example.org')
+    expect(siteUrlFor({ protocol: 'http:', host: 'localhost:5173' }, 'http://localhost:8080/')).toBe(
+      'http://localhost:8080',
+    )
   })
 })

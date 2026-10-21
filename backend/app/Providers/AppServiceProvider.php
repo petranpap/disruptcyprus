@@ -10,6 +10,7 @@ use App\Models\Industry;
 use App\Models\Section;
 use App\Models\User;
 use App\Services\Content\BookmarkState;
+use App\Support\Urls;
 use Illuminate\Auth\Notifications\ResetPassword;
 use Illuminate\Cache\RateLimiting\Limit;
 use Illuminate\Database\Eloquent\Model;
@@ -45,7 +46,7 @@ class AppServiceProvider extends ServiceProvider
 
         Password::defaults(fn () => Password::min(8)->letters()->numbers());
 
-        ResetPassword::createUrlUsing(fn (User $user, string $token): string => config('app.frontend_url')
+        ResetPassword::createUrlUsing(fn (User $user, string $token): string => Urls::app()
             .'/reset-password?'.http_build_query(['token' => $token, 'email' => $user->getEmailForPasswordReset()]));
 
         $this->configureRateLimiting();

@@ -3,6 +3,7 @@
 namespace App\Services\Content;
 
 use App\Models\Event;
+use App\Support\Urls;
 
 /**
  * Minimal RFC 5545 calendar file for one event (UTC times, escaped and folded lines).
@@ -17,7 +18,7 @@ class IcsBuilder
         $description = trim(html_entity_decode(strip_tags((string) $event->getTranslation('description', $locale)), ENT_QUOTES | ENT_HTML5, 'UTF-8'));
         $location = $event->is_online ? (string) $event->online_url : implode(', ', array_filter([$event->location_name, $event->address, $event->city]));
         $endsAt = $event->ends_at ?? $event->starts_at->copy()->addHour();
-        $url = $event->registration_url ?? rtrim((string) config('app.url'), '/').'/e/'.$event->slug;
+        $url = $event->registration_url ?? Urls::site().'/e/'.$event->slug;
 
         $lines = [
             'BEGIN:VCALENDAR',
@@ -26,7 +27,7 @@ class IcsBuilder
             'CALSCALE:GREGORIAN',
             'METHOD:PUBLISH',
             'BEGIN:VEVENT',
-            'UID:event-'.$event->id.'@'.parse_url((string) config('app.url'), PHP_URL_HOST),
+            'UID:event-'.$event->id.'@'.parse_url(Urls::site(), PHP_URL_HOST),
             'DTSTAMP:'.now()->utc()->format('Ymd\THis\Z'),
             'DTSTART:'.$event->starts_at->copy()->utc()->format('Ymd\THis\Z'),
             'DTEND:'.$endsAt->copy()->utc()->format('Ymd\THis\Z'),
