@@ -145,6 +145,7 @@ class Article extends Model implements HasMedia
         $this->registerHeroImageCollection();
 
         $this->addMediaCollection(self::ATTACHMENT_COLLECTION)
+            ->useDisk((string) config('media-library.disk_name'))
             ->singleFile()
             ->acceptsMimeTypes(['application/pdf']);
     }

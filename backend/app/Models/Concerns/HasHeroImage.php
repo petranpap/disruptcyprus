@@ -15,9 +15,14 @@ trait HasHeroImage
 {
     public const HERO_COLLECTION = 'hero';
 
+    /**
+     * Every collection names its disk explicitly: Filament's upload field would otherwise fall back to
+     * FILESYSTEM_DISK (the private "local" disk) and the app could not load the image.
+     */
     protected function registerHeroImageCollection(): void
     {
         $this->addMediaCollection(self::HERO_COLLECTION)
+            ->useDisk((string) config('media-library.disk_name'))
             ->singleFile()
             ->acceptsMimeTypes(['image/jpeg', 'image/png', 'image/webp']);
     }

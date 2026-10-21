@@ -149,6 +149,7 @@ class User extends Authenticatable implements FilamentUser, HasLocalePreference,
     public function registerMediaCollections(): void
     {
         $this->addMediaCollection(self::AVATAR_COLLECTION)
+            ->useDisk((string) config('media-library.disk_name'))
             ->singleFile()
             ->acceptsMimeTypes(['image/jpeg', 'image/png', 'image/webp']);
     }
