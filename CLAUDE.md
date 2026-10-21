@@ -172,6 +172,7 @@ Environment quirks on this machine:
 | 2026-10-09 | Admin navigation groups registered by key (`'content' => NavigationGroup::make()…`) | Filament matches resource groups by array key; a list showed raw keys untranslated |
 | 2026-10-21 | English is the default language everywhere (app ignores browser language until the reader picks Greek; public site `/` = EN, `/el` = EL; API and new accounts default `en`) | Product owner |
 | 2026-10-21 | Admin panel moved from `/admin` to `/backend`; never linked from public pages, not named in robots.txt, sends `X-Robots-Tag: noindex`; `/admin` is a 404 | Product owner (security); note the path is visible while the repo is public |
+| 2026-10-21 | Admins create and edit accounts in the admin (name, email, role, language, password; empty password = unchanged); admin-created accounts count as verified; deleted accounts are read-only. "Structure" page shows sections → industry groups → industries as a tree | Product owner |
 | 2026-10-05 | Everything runs in containers (podman + podman-compose locally; compose file stays Docker-compatible) | Product owner |
 
 ## Phase status
