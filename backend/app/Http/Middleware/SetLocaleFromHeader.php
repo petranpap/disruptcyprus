@@ -8,7 +8,7 @@ use Illuminate\Http\Request;
 use Symfony\Component\HttpFoundation\Response;
 
 /**
- * Sets the application locale from Accept-Language (el|en). Defaults to the app locale (el).
+ * Sets the application locale from Accept-Language (el|en). Defaults to the app locale (en).
  */
 class SetLocaleFromHeader
 {

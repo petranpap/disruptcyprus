@@ -11,14 +11,14 @@ use App\Support\Site\SiteLocale;
 use Illuminate\Contracts\View\View;
 
 /**
- * Marketing landing page: Greek at "/", English at "/en".
+ * Marketing landing page: English at "/", Greek at "/el".
  */
 class LandingController extends Controller
 {
     public function __invoke(string $locale = SiteLocale::DEFAULT): View
     {
         app()->setLocale($locale);
-        $path = fn (string $lang) => $lang === SiteLocale::DEFAULT ? url('/') : url('/en');
+        $path = fn (string $lang) => $lang === SiteLocale::DEFAULT ? url('/') : url('/'.$lang);
 
         $articles = Article::query()
             ->published()

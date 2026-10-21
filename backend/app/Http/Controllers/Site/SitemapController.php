@@ -27,7 +27,8 @@ class SitemapController extends Controller
     {
         $lines = PreviewAccess::enabled()
             ? ['User-agent: *', 'Disallow: /']
-            : ['User-agent: *', 'Disallow: /admin', 'Disallow: /api/', '', 'Sitemap: '.url('/sitemap.xml')];
+            // The admin path is deliberately not listed (robots.txt is public); it sends noindex itself.
+            : ['User-agent: *', 'Disallow: /api/', '', 'Sitemap: '.url('/sitemap.xml')];
 
         return response(implode("\n", $lines)."\n", 200, ['Content-Type' => 'text/plain; charset=UTF-8']);
     }
@@ -35,7 +36,7 @@ class SitemapController extends Controller
     private function build(): string
     {
         $entries = [
-            $this->entry(['el' => url('/'), 'en' => url('/en')], null),
+            $this->entry(['en' => url('/'), 'el' => url('/el')], null),
         ];
         foreach (PageController::PAGES as $page) {
             $entries[] = $this->entry(['el' => SiteLocale::url('/'.$page, 'el'), 'en' => SiteLocale::url('/'.$page, 'en')], null);

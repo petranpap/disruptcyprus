@@ -5,12 +5,12 @@ namespace App\Support\Site;
 use Illuminate\Http\Request;
 
 /**
- * Language of a public page: `?lang=en|el`, Greek by default (the primary audience and the default for crawlers).
+ * Language of a public page: `?lang=el|en`, English by default (product owner); Greek one click away.
  * Share pages then fall back to whichever language the content actually exists in.
  */
 final class SiteLocale
 {
-    public const DEFAULT = 'el';
+    public const DEFAULT = 'en';
 
     public const SUPPORTED = ['el', 'en'];
 

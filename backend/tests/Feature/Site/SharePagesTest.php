@@ -14,31 +14,33 @@ it('renders an article with full text, social preview, hreflang and structured d
 
     $response = $this->get('/a/'.$article->slug)->assertOk();
 
-    $response->assertSee('<html lang="el">', false)
-        ->assertSee('Έκλεισε γύρος seed')
-        ->assertSee('<p>Ολόκληρο το θέμα.</p>', false)
-        ->assertSee('<meta property="og:title" content="Έκλεισε γύρος seed">', false)
+    $response->assertSee('<html lang="en">', false)
+        ->assertSee('Seed round closes')
+        ->assertSee('<p>Full story here.</p>', false)
+        ->assertDontSee('<script>alert(1)</script>', false)
+        ->assertSee('<meta property="og:title" content="Seed round closes">', false)
         ->assertSee('<link rel="canonical" href="'.url('/a/'.$article->slug).'">', false)
-        ->assertSee('hreflang="en" href="'.url('/a/'.$article->slug).'?lang=en"', false)
+        ->assertSee('hreflang="el" href="'.url('/a/'.$article->slug).'?lang=el"', false)
         ->assertSee('"@type":"NewsArticle"', false)
         ->assertSee(config('app.frontend_url').'/articles/'.$article->slug, false)
         ->assertHeaderMissing('Set-Cookie');
 
-    $this->get('/a/'.$article->slug.'?lang=en')
+    $this->get('/a/'.$article->slug.'?lang=el')
         ->assertOk()
-        ->assertSee('Seed round closes')
-        ->assertSee('<p>Full story here.</p>', false)
+        ->assertSee('<html lang="el">', false)
+        ->assertSee('Έκλεισε γύρος seed')
+        ->assertSee('<p>Ολόκληρο το θέμα.</p>', false)
         ->assertDontSee('<script>alert(1)</script>', false);
 });
 
 it('falls back to the language the article was written in', function () {
-    $article = Article::factory()->onlyIn('en')->for(section())->create(['title' => ['en' => 'English only']]);
+    $article = Article::factory()->onlyIn('el')->for(section())->create(['title' => ['el' => 'Μόνο στα ελληνικά']]);
 
     $this->get('/a/'.$article->slug)
         ->assertOk()
-        ->assertSee('<html lang="en">', false)
-        ->assertSee('English only')
-        ->assertDontSee('hreflang="el"', false);
+        ->assertSee('<html lang="el">', false)
+        ->assertSee('Μόνο στα ελληνικά')
+        ->assertDontSee('hreflang="en"', false);
 });
 
 it('hides unpublished content', function () {
@@ -85,8 +87,8 @@ it('renders a digest with its published items in editor order', function () {
 
     $this->get('/d/'.$digest->slug)
         ->assertOk()
-        ->assertSeeInOrder(['Πρώτο θέμα', 'Μια εκδήλωση'])
-        ->assertDontSee('Κρυφό')
+        ->assertSeeInOrder(['First story', 'An event'])
+        ->assertDontSee('Hidden')
         ->assertSee('/a/'.$first->slug, false)
         ->assertSee('/e/'.$second->slug, false);
 

@@ -14,7 +14,7 @@ interface RequestOptions<T> {
   signal?: AbortSignal
 }
 
-let languageProvider: () => string = () => 'el'
+let languageProvider: () => string = () => 'en'
 
 /** The i18n layer registers how to read the current UI language (sent as Accept-Language). */
 export function setLanguageProvider(provider: () => string): void {

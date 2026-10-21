@@ -14,7 +14,7 @@ export function useLocale() {
   const queryClient = useQueryClient()
   const { data: user } = useMe()
   const updateProfile = useUpdateProfile()
-  const locale: Locale = i18n.language === 'en' ? 'en' : 'el'
+  const locale: Locale = i18n.language === 'el' ? 'el' : 'en'
 
   const setLocale = useCallback(
     async (next: Locale, options: { sync?: boolean } = {}) => {

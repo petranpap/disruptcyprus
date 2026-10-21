@@ -38,7 +38,7 @@ class User extends Authenticatable implements FilamentUser, HasLocalePreference,
     /** @var array<string, mixed> */
     protected $attributes = [
         'role' => 'reader',
-        'locale' => 'el',
+        'locale' => 'en',
         'content_locales' => '["el","en"]',
         'timezone' => 'Asia/Nicosia',
     ];

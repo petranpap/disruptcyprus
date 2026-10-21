@@ -31,10 +31,10 @@ it('registers a user, records consent and signs them in for SPA requests', funct
     Notification::assertSentTo($user, VerifyEmail::class);
 });
 
-it('defaults the locale to Greek', function () {
+it('defaults the locale to English', function () {
     $this->postJson('/api/v1/auth/register', [
         'name' => 'Nikos', 'email' => 'nikos@example.com', 'password' => 'secret123', 'consent' => true,
-    ])->assertCreated()->assertJsonPath('data.locale', 'el')->assertJsonPath('data.timezone', 'Asia/Nicosia');
+    ])->assertCreated()->assertJsonPath('data.locale', 'en')->assertJsonPath('data.timezone', 'Asia/Nicosia');
 });
 
 it('requires consent', function () {

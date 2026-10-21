@@ -8,14 +8,11 @@ import en from './en.json'
 
 export const LOCALES: Locale[] = ['el', 'en']
 
-/** Stored choice → browser language (Greek unless the browser prefers English) → Greek. */
+/** The reader's saved choice, otherwise English (product owner: English first, Greek one tap away). */
 export function detectLocale(): Locale {
   const stored = storage.get(STORAGE_KEYS.locale)
-  if (stored === 'el' || stored === 'en') return stored
 
-  const browser = (navigator.languages?.[0] ?? navigator.language ?? 'el').toLowerCase()
-
-  return browser.startsWith('en') ? 'en' : 'el'
+  return stored === 'el' ? 'el' : 'en'
 }
 
 export function applyDocumentLanguage(locale: Locale): void {
@@ -25,7 +22,7 @@ export function applyDocumentLanguage(locale: Locale): void {
 void i18n.use(initReactI18next).init({
   resources: { el: { translation: el }, en: { translation: en } },
   lng: detectLocale(),
-  fallbackLng: 'el',
+  fallbackLng: 'en',
   supportedLngs: LOCALES,
   interpolation: { escapeValue: false },
   returnNull: false,
@@ -36,7 +33,7 @@ i18n.on('languageChanged', (language) => applyDocumentLanguage(language as Local
 setLanguageProvider(() => i18n.language)
 
 export function currentLocale(): Locale {
-  return i18n.language === 'en' ? 'en' : 'el'
+  return i18n.language === 'el' ? 'el' : 'en'
 }
 
 export default i18n

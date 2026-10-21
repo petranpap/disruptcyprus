@@ -15,8 +15,8 @@
     @foreach ($meta->alternates as $hreflang => $href)
         <link rel="alternate" hreflang="{{ $hreflang }}" href="{{ $href }}">
     @endforeach
-    @if (isset($meta->alternates['el']))
-        <link rel="alternate" hreflang="x-default" href="{{ $meta->alternates['el'] }}">
+    @if (isset($meta->alternates[\App\Support\Site\SiteLocale::DEFAULT]))
+        <link rel="alternate" hreflang="x-default" href="{{ $meta->alternates[\App\Support\Site\SiteLocale::DEFAULT] }}">
     @endif
 
     <meta property="og:site_name" content="Disrupt Cyprus">
@@ -58,12 +58,12 @@
         {{-- Only staff get past the pre-launch gate: remind them what everyone else sees (like WordPress maintenance mode). --}}
         <div class="preview-bar" role="status">
             <span><span class="preview-dot" aria-hidden="true"></span>{{ __('site.preview.notice') }}</span>
-            <a href="{{ url('/admin') }}">{{ __('site.preview.admin') }}</a>
+            <a href="{{ url('/backend') }}">{{ __('site.preview.admin') }}</a>
         </div>
     @endif
     <header class="site-header">
         <div class="container header-row">
-            <a href="{{ $locale === 'el' ? url('/') : url('/en') }}" class="header-logo">@include('site.partials.logo')</a>
+            <a href="{{ $locale === \App\Support\Site\SiteLocale::DEFAULT ? url('/') : url('/'.$locale) }}" class="header-logo">@include('site.partials.logo')</a>
             <nav aria-label="{{ __('site.nav.main') }}" class="header-actions">
                 @if ($switchUrl)
                     <a href="{{ $switchUrl }}" hreflang="{{ $otherLocale }}" lang="{{ $otherLocale }}" class="link-quiet" aria-label="{{ __('site.nav.language_label') }}">{{ __('site.nav.language') }}</a>
@@ -80,7 +80,7 @@
     <footer class="site-footer">
         <div class="container footer-grid">
             <div>
-                <a href="{{ $locale === 'el' ? url('/') : url('/en') }}">@include('site.partials.logo')</a>
+                <a href="{{ $locale === \App\Support\Site\SiteLocale::DEFAULT ? url('/') : url('/'.$locale) }}">@include('site.partials.logo')</a>
                 <p class="footer-tagline">{{ __('site.footer.tagline') }}</p>
             </div>
             <ul class="footer-links">

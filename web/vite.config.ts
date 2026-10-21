@@ -47,7 +47,7 @@ export default defineConfig({
         name: 'Disrupt Cyprus',
         short_name: 'Disrupt',
         description: 'Startup and innovation news for Cyprus and the Eastern Mediterranean, personalized by industry.',
-        lang: 'el',
+        lang: 'en',
         dir: 'ltr',
         start_url: '/',
         scope: '/',
@@ -63,13 +63,13 @@ export default defineConfig({
         ],
         shortcuts: [
           {
-            name: 'Ημερήσια Ενημέρωση',
+            name: 'Daily News',
             short_name: 'Daily',
             url: '/news?tab=daily',
             icons: [{ src: '/pwa-192x192.png', sizes: '192x192' }],
           },
           {
-            name: 'Εκδηλώσεις',
+            name: 'Events',
             short_name: 'Events',
             url: '/events',
             icons: [{ src: '/pwa-192x192.png', sizes: '192x192' }],

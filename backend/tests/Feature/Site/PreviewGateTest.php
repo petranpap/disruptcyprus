@@ -24,14 +24,14 @@ describe('coming-soon page', function () {
 
         $this->get('/')
             ->assertOk()
-            ->assertSee('Το Disrupt Cyprus έρχεται σύντομα')
+            ->assertSee('Disrupt Cyprus is launching soon')
             ->assertSee('name="email"', false)
             ->assertDontSee('name="password"', false)
             ->assertHeader('X-Robots-Tag', 'noindex, nofollow')
             ->assertHeader('Cache-Control', 'no-store, private')
             ->assertHeaderMissing('Set-Cookie');
 
-        $this->get('/?lang=en')->assertOk()->assertSee('Disrupt Cyprus is launching soon');
+        $this->get('/?lang=el')->assertOk()->assertSee('Το Disrupt Cyprus έρχεται σύντομα');
         $this->get('/a/'.$article->slug)->assertOk()->assertSee('name="email"', false);
     });
 
@@ -53,16 +53,16 @@ describe('coming-soon page', function () {
 
 describe('waitlist', function () {
     it('adds a signup with consent and shows the thank-you state', function () {
-        $this->post('/waitlist?lang=en', ['name' => ' Anna K ', 'email' => 'Anna@Example.com ', 'consent' => '1'])
-            ->assertRedirect(url('/').'?lang=en&joined=1#waitlist');
+        $this->post('/waitlist?lang=el', ['name' => ' Anna K ', 'email' => 'Anna@Example.com ', 'consent' => '1'])
+            ->assertRedirect(url('/').'?lang=el&joined=1#waitlist');
 
         $signup = WaitlistSignup::query()->sole();
         expect($signup->name)->toBe('Anna K')
             ->and($signup->email)->toBe('anna@example.com')
-            ->and($signup->locale)->toBe('en')
+            ->and($signup->locale)->toBe('el')
             ->and($signup->consented_at)->not->toBeNull();
 
-        $this->get('/?lang=en&joined=1')->assertOk()->assertSee('You are on the list')->assertDontSee('name="email"', false);
+        $this->get('/?lang=el&joined=1')->assertOk()->assertSee('Είσαι στη λίστα')->assertDontSee('name="email"', false);
     });
 
     it('never reveals whether an email is already on the list', function () {
@@ -75,14 +75,14 @@ describe('waitlist', function () {
     });
 
     it('explains invalid input in the page language and keeps what was typed', function () {
-        $this->post('/waitlist?lang=en', ['name' => 'Anna', 'email' => 'not-an-email'])
+        $this->post('/waitlist', ['name' => 'Anna', 'email' => 'not-an-email'])
             ->assertStatus(422)
             ->assertSee('Please check the highlighted fields.')
             ->assertSee('value="Anna"', false)
             ->assertSee('id="email-error"', false)
             ->assertSee('id="consent-error"', false);
 
-        $this->post('/waitlist', ['name' => '', 'email' => '', 'consent' => '1'])
+        $this->post('/waitlist?lang=el', ['name' => '', 'email' => '', 'consent' => '1'])
             ->assertStatus(422)
             ->assertSee('Έλεγξε τα πεδία');
 
@@ -100,7 +100,7 @@ describe('waitlist', function () {
         WaitlistSignup::query()->create(['name' => '=HYPERLINK("x")', 'email' => 'a@example.com', 'locale' => 'el', 'consented_at' => now()]);
         Filament::setCurrentPanel('admin');
 
-        $this->actingAs(User::factory()->editor()->create())->get('/admin/waitlist')->assertForbidden();
+        $this->actingAs(User::factory()->editor()->create())->get('/backend/waitlist')->assertForbidden();
 
         $this->actingAs(User::factory()->admin()->create());
         Livewire::test(ListWaitlistSignups::class)
@@ -127,7 +127,7 @@ describe('staff access', function () {
         $editor = User::factory()->editor()->create();
         Filament::setCurrentPanel('admin');
 
-        $response = $this->actingAs($editor)->get('/admin');
+        $response = $this->actingAs($editor)->get('/backend');
 
         $cookie = collect($response->headers->getCookies())->firstWhere(fn ($cookie) => $cookie->getName() === 'dc_preview');
         expect($cookie)->not->toBeNull()
@@ -137,7 +137,7 @@ describe('staff access', function () {
 
     it('never gives readers access', function () {
         $reader = reader();
-        $request = Request::create('/admin');
+        $request = Request::create('/backend');
         $request->setUserResolver(fn () => $reader);
 
         app(IssuePreviewAccess::class)->handle($request, fn () => response('ok'));
@@ -165,11 +165,11 @@ describe('staff access', function () {
         $editor = User::factory()->editor()->create();
 
         $this->withUnencryptedCookie('dc_preview', accessCookieFor($editor))
-            ->get('/en')
+            ->get('/')
             ->assertSee('Everyone else sees the coming-soon page.');
 
         config(['preview.enabled' => false]);
-        $this->get('/en')->assertDontSee('Everyone else sees the coming-soon page.');
+        $this->get('/')->assertDontSee('Everyone else sees the coming-soon page.');
     });
 
     it('stops working as soon as the account is no longer staff', function () {
