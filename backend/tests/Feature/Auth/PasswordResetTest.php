@@ -1,6 +1,6 @@
 <?php
 
-use Illuminate\Auth\Notifications\ResetPassword;
+use App\Notifications\QueuedResetPassword;
 use Illuminate\Support\Facades\Hash;
 use Illuminate\Support\Facades\Notification;
 use Illuminate\Support\Facades\Password;
@@ -13,8 +13,8 @@ it('answers identically whether or not the account exists', function () {
     $unknown = $this->postJson('/api/v1/auth/forgot-password', ['email' => 'nobody@example.com'])->assertOk();
 
     expect($known->json('message'))->toBe($unknown->json('message'));
-    Notification::assertSentTo($user, ResetPassword::class, function (ResetPassword $notification) use ($user) {
-        $url = call_user_func(ResetPassword::$createUrlCallback, $user, $notification->token);
+    Notification::assertSentTo($user, QueuedResetPassword::class, function (QueuedResetPassword $notification) use ($user) {
+        $url = call_user_func(QueuedResetPassword::$createUrlCallback, $user, $notification->token);
 
         return str_starts_with($url, config('app.frontend_url').'/reset-password?token=');
     });

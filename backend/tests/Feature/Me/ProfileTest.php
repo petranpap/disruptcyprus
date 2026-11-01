@@ -1,7 +1,7 @@
 <?php
 
 use App\Models\User;
-use Illuminate\Auth\Notifications\VerifyEmail;
+use App\Notifications\QueuedVerifyEmail;
 use Illuminate\Support\Facades\Notification;
 
 it('requires authentication', function () {
@@ -62,7 +62,7 @@ it('requires the current password to change the email and re-verifies it', funct
         ->assertJsonPath('data.email', 'new@example.com')
         ->assertJsonPath('data.email_verified', false);
 
-    Notification::assertSentTo($user, VerifyEmail::class);
+    Notification::assertSentTo($user, QueuedVerifyEmail::class);
 });
 
 it('lets social-only users change email without a password', function () {

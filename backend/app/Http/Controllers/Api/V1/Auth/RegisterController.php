@@ -24,7 +24,8 @@ class RegisterController extends Controller
 
         // SPA requests carry a session: sign the new user in straight away.
         if ($request->hasSession()) {
-            Auth::guard('web')->login($user);
+            // A new account on this device stays signed in (same as the default "Remember me" on sign-in).
+            Auth::guard('web')->login($user, remember: true);
             $request->session()->regenerate();
         }
 

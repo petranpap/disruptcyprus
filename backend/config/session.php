@@ -32,7 +32,8 @@ return [
     |
     */
 
-    'lifetime' => (int) env('SESSION_LIFETIME', 120),
+    // 2 days without activity; "Remember me" (on by default in the app) keeps readers signed in beyond that.
+    'lifetime' => (int) env('SESSION_LIFETIME', 2880),
 
     'expire_on_close' => env('SESSION_EXPIRE_ON_CLOSE', false),
 

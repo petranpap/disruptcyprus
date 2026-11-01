@@ -1,7 +1,8 @@
 <?php
 
 use App\Models\User;
-use Illuminate\Auth\Notifications\VerifyEmail;
+use App\Notifications\QueuedVerifyEmail;
+use Illuminate\Contracts\Queue\ShouldQueue;
 use Illuminate\Support\Facades\Notification;
 
 beforeEach(fn () => Notification::fake());
@@ -28,7 +29,7 @@ it('registers a user, records consent and signs them in for SPA requests', funct
         ->and($user->consent_version)->toBe(config('app.consent_version'));
 
     $this->assertAuthenticatedAs($user, 'web');
-    Notification::assertSentTo($user, VerifyEmail::class);
+    Notification::assertSentTo($user, QueuedVerifyEmail::class);
 });
 
 it('defaults the locale to English', function () {
@@ -68,4 +69,24 @@ it('returns Greek validation messages for Greek and unsupported languages, Engli
 
     $this->withHeader('Accept-Language', 'en-GB,en;q=0.9')->postJson('/api/v1/auth/register', [])
         ->assertJsonPath('errors.name.0', 'The name field is required.');
+});
+
+it('queues the verification email, so a broken mail server never breaks sign-up', function () {
+    Notification::fake();
+
+    $this->withHeaders(spaHeaders())->postJson('/api/v1/auth/register', [
+        'name' => 'Nikos', 'email' => 'queued@example.com', 'password' => 'secret123', 'consent' => true,
+    ])->assertCreated();
+
+    $user = User::query()->where('email', 'queued@example.com')->sole();
+    Notification::assertSentTo($user, QueuedVerifyEmail::class);
+    expect(new QueuedVerifyEmail)->toBeInstanceOf(ShouldQueue::class);
+});
+
+it('keeps a new account signed in on this device (remember me)', function () {
+    $response = $this->withHeaders(spaHeaders())->postJson('/api/v1/auth/register', [
+        'name' => 'Nikos', 'email' => 'remember@example.com', 'password' => 'secret123', 'consent' => true,
+    ])->assertCreated();
+
+    expect(collect($response->headers->getCookies())->contains(fn ($cookie) => str_starts_with($cookie->getName(), 'remember_web_')))->toBeTrue();
 });

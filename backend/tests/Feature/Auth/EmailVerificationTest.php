@@ -1,6 +1,6 @@
 <?php
 
-use Illuminate\Auth\Notifications\VerifyEmail;
+use App\Notifications\QueuedVerifyEmail;
 use Illuminate\Support\Facades\Notification;
 use Illuminate\Support\Facades\URL;
 
@@ -35,6 +35,6 @@ it('resends the verification email only to unverified users', function () {
     $this->actingAs($unverified)->postJson('/api/v1/auth/email/verification-notification')->assertAccepted();
     $this->actingAs($verified)->postJson('/api/v1/auth/email/verification-notification')->assertAccepted();
 
-    Notification::assertSentTo($unverified, VerifyEmail::class);
-    Notification::assertNotSentTo($verified, VerifyEmail::class);
+    Notification::assertSentTo($unverified, QueuedVerifyEmail::class);
+    Notification::assertNotSentTo($verified, QueuedVerifyEmail::class);
 });

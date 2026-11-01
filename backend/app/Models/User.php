@@ -4,6 +4,8 @@ namespace App\Models;
 
 use App\Enums\UserRole;
 use App\Models\Concerns\StoresUtcTimestamps;
+use App\Notifications\QueuedResetPassword;
+use App\Notifications\QueuedVerifyEmail;
 use Database\Factories\UserFactory;
 use Filament\Models\Contracts\FilamentUser;
 use Filament\Panel;
@@ -101,6 +103,22 @@ class User extends Authenticatable implements FilamentUser, HasLocalePreference,
         $preferences->wasRecentlyCreated = false;
 
         return $preferences;
+    }
+
+    /**
+     * Queued, so a slow or failing mail server never breaks sign-up or "forgot password" (the user is already saved).
+     */
+    public function sendEmailVerificationNotification(): void
+    {
+        $this->notify(new QueuedVerifyEmail);
+    }
+
+    /**
+     * @param  string  $token
+     */
+    public function sendPasswordResetNotification($token): void
+    {
+        $this->notify(new QueuedResetPassword($token));
     }
 
     /**
