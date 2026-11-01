@@ -146,3 +146,21 @@ describe('install prompt', () => {
 it('decodes VAPID keys from URL-safe base64', () => {
   expect(Array.from(urlBase64ToUint8Array('AQID_-8'))).toEqual([1, 2, 3, 255, 239])
 })
+
+const PROFILE_NAV = 'Settings'
+
+describe('install instructions', () => {
+  it('opens from the public site link and from the profile, with steps for this browser', async () => {
+    window.localStorage.setItem('dc.welcomed', '1')
+    const { user } = renderApp('/profile?install=1')
+
+    const sheet = await screen.findByRole('dialog', { name: 'Install Disrupt Cyprus' })
+    expect(within(sheet).getByText('Your browser')).toBeInTheDocument()
+    expect(within(sheet).getByText('Installing on another device?')).toBeInTheDocument()
+
+    await user.click(within(sheet).getByRole('button', { name: 'Close' }))
+    const settings = screen.getByRole('navigation', { name: PROFILE_NAV })
+    await user.click(within(settings).getByRole('button', { name: 'Install app' }))
+    expect(await screen.findByRole('dialog', { name: 'Install Disrupt Cyprus' })).toBeInTheDocument()
+  })
+})

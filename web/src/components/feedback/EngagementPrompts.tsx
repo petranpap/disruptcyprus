@@ -1,10 +1,9 @@
 import { useEffect, useState } from 'react'
-import { Trans, useTranslation } from 'react-i18next'
+import { useTranslation } from 'react-i18next'
 import { useMe } from '@/api/auth'
 import { Button } from '@/components/ui/Button'
 import { Icon, type IconName } from '@/components/ui/Icon'
 import { IconButton } from '@/components/ui/IconButton'
-import { Sheet } from '@/components/ui/Sheet'
 import { isIos, isStandalone } from '@/hooks/useStandalone'
 import { enablePush, pushAvailability } from '@/lib/push'
 import { QUIET_START_MS, READS_BEFORE_INSTALL, useEngagementStore } from '@/stores/engagement'
@@ -38,7 +37,7 @@ export function EngagementPrompts() {
   const engagement = useEngagementStore()
   const showToast = useUiStore((state) => state.showToast)
   const quietOver = useQuietPeriodOver(engagement.sessionStartedAt)
-  const [iosHelpOpen, setIosHelpOpen] = useState(false)
+  const openInstallSheet = useUiStore((state) => state.openInstallSheet)
   const [busy, setBusy] = useState(false)
   const [mountedAt] = useState(() => Date.now())
 
@@ -52,7 +51,7 @@ export function EngagementPrompts() {
     engagement.promptShownThisSession || !quietOver ? null : wantsPush ? 'push' : installDue ? 'install' : null
   const close = () => engagement.markPromptShown()
 
-  if (!prompt && !iosHelpOpen) return null
+  if (!prompt) return null
 
   const dismiss = () => {
     if (prompt === 'push') engagement.finishPushPrompt()
@@ -83,7 +82,7 @@ export function EngagementPrompts() {
       if (outcome === 'dismissed') engagement.snoozeInstall()
       close()
     } else {
-      setIosHelpOpen(true)
+      openInstallSheet()
       engagement.snoozeInstall()
       close()
     }
@@ -136,16 +135,6 @@ export function EngagementPrompts() {
           </div>
         </div>
       )}
-      <Sheet open={iosHelpOpen} onClose={() => setIosHelpOpen(false)} title={t('install.title')}>
-        <p className="pb-space-lg text-body-md text-on-surface-variant">
-          <Trans
-            i18nKey="push.installIos"
-            components={{
-              share: <Icon name="ios_share" size={18} className="-mt-0.5 inline" label={t('common.share')} />,
-            }}
-          />
-        </p>
-      </Sheet>
     </>
   )
 }

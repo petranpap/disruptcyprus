@@ -9,6 +9,8 @@
             <div class="hero-actions">
                 <a href="{{ \App\Support\Site\SiteLocale::appUrl('/sign-up') }}" class="btn btn-primary">{{ __('site.landing.create_account') }}</a>
                 <a href="{{ \App\Support\Site\SiteLocale::appUrl('/') }}" class="btn btn-outline">{{ __('site.landing.browse') }}</a>
+                {{-- Installing only works on the app's own address: the app opens the steps for this device. --}}
+                <a href="{{ \App\Support\Site\SiteLocale::appUrl('/?install=1') }}" class="btn btn-outline">{{ __('site.landing.install') }}</a>
             </div>
             <p class="hint">{{ __('site.landing.install_hint') }}</p>
         </div>

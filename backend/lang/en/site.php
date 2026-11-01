@@ -19,6 +19,7 @@ return [
         'subtitle' => 'Funding rounds, founders, research and events from Cyprus and the Eastern Mediterranean, filtered by the industries you follow.',
         'create_account' => 'Create a free account',
         'browse' => 'Read without an account',
+        'install' => 'Install the app',
         'install_hint' => 'Works in any browser. Add it to your home screen for notifications and offline reading.',
         'latest' => 'Latest stories',
         'upcoming' => 'Upcoming events',

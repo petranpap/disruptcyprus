@@ -5,6 +5,7 @@ import { useUnreadCount } from '@/api/notifications'
 import type { User } from '@/api/schemas'
 import { buttonClasses } from '@/components/ui/buttonClasses'
 import { Icon } from '@/components/ui/Icon'
+import { InstallButton } from '@/components/feedback/InstallButton'
 import { Logo } from '@/components/ui/Logo'
 import { useLocale } from '@/hooks/useLocale'
 import { cn } from '@/lib/cn'
@@ -106,6 +107,8 @@ export function SiteHeader({ tabs, user }: SiteHeaderProps) {
           >
             <Icon name="search" size={22} />
           </Link>
+
+          <InstallButton className="hidden lg:inline-flex" />
 
           <button
             type="button"

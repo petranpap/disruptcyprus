@@ -1,6 +1,7 @@
 import { Link, useNavigate } from 'react-router'
 import { useTranslation } from 'react-i18next'
 import { useMe, useSignOut } from '@/api/auth'
+import { useInstall } from '@/hooks/useInstall'
 import { useIndustryList } from '@/api/content'
 import { clearPersonalCaches } from '@/api/offline'
 import { useMyIndustries } from '@/api/taxonomy'
@@ -21,6 +22,7 @@ export function ProfilePage() {
   const navigate = useNavigate()
   const { data: user } = useMe()
   const signOut = useSignOut()
+  const install = useInstall()
   const mine = useMyIndustries(Boolean(user))
   const industries = useIndustryList(i18n.language)
   const followed = (industries.data ?? []).filter((industry) => mine.data?.industry_ids.includes(industry.id))
@@ -104,6 +106,19 @@ export function ProfilePage() {
                 </Link>
               </li>
             ))}
+          {!install.installed && (
+            <li>
+              <button
+                type="button"
+                onClick={() => void install.install()}
+                className="flex min-h-tap w-full items-center gap-3 px-space-md py-3.5 text-left text-label-lg text-on-surface hover:bg-surface-container-low"
+              >
+                <Icon name="download" size={20} className="text-primary" />
+                <span className="flex-1">{t('install.button')}</span>
+                <Icon name="chevron_right" size={20} className="text-outline" />
+              </button>
+            </li>
+          )}
         </ul>
       </nav>
 

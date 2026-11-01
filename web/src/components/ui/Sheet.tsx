@@ -1,4 +1,4 @@
-import { useEffect, useRef, type ReactNode } from 'react'
+import { useEffect, useId, useRef, type ReactNode } from 'react'
 import { useTranslation } from 'react-i18next'
 import { IconButton } from './IconButton'
 
@@ -13,6 +13,8 @@ interface SheetProps {
 export function Sheet({ open, onClose, title, children }: SheetProps) {
   const { t } = useTranslation()
   const dialog = useRef<HTMLDialogElement>(null)
+  // Unique per sheet: several sheets are mounted at once (guest prompt, install steps).
+  const titleId = useId()
 
   useEffect(() => {
     const element = dialog.current
@@ -24,7 +26,7 @@ export function Sheet({ open, onClose, title, children }: SheetProps) {
   return (
     <dialog
       ref={dialog}
-      aria-labelledby="sheet-title"
+      aria-labelledby={titleId}
       onCancel={(event) => {
         event.preventDefault()
         onClose()
@@ -37,7 +39,7 @@ export function Sheet({ open, onClose, title, children }: SheetProps) {
       <div className="px-space-md pt-space-sm pb-safe">
         <div className="mx-auto mb-2 h-1 w-10 rounded-pill bg-outline-variant lg:hidden" aria-hidden="true" />
         <div className="flex items-center justify-between gap-2">
-          <h2 id="sheet-title" className="font-headline text-headline-md text-on-surface">
+          <h2 id={titleId} className="font-headline text-headline-md text-on-surface">
             {title}
           </h2>
           <IconButton icon="close" label={t('common.close')} onClick={onClose} />

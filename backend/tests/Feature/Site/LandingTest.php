@@ -12,6 +12,7 @@ it('serves the landing page in English at / and in Greek at /el', function () {
         ->assertSee('Latest English story')
         ->assertSee('Upcoming meetup')
         ->assertSee('/a/'.$article->slug, false)
+        ->assertSee('/?install=1', false)
         ->assertSee('hreflang="el" href="'.url('/el').'"', false)
         ->assertSee('hreflang="x-default" href="'.url('/').'"', false)
         ->assertHeader('Cache-Control', 'max-age=300, public')
