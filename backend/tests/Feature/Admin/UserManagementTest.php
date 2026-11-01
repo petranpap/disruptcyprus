@@ -4,6 +4,7 @@ use App\Enums\UserRole;
 use App\Filament\Pages\TaxonomyTree;
 use App\Filament\Resources\Users\Pages\CreateUser;
 use App\Filament\Resources\Users\Pages\EditUser;
+use App\Filament\Resources\Users\Pages\ListUsers;
 use App\Models\Industry;
 use App\Models\User;
 use Filament\Facades\Filament;
@@ -91,4 +92,8 @@ it('shows the structure tree with sections, groups and industries', function () 
         ->assertSee('/news')
         ->assertSee('Deep Tech')
         ->assertSee('TreeTech');
+});
+
+it('shows a New user button on the users list', function () {
+    Livewire::test(ListUsers::class)->assertActionVisible('create');
 });
