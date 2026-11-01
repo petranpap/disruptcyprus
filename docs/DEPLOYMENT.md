@@ -90,6 +90,7 @@ DB_USERNAME=disrupt
 DB_PASSWORD=<STRONG_PASSWORD>
 
 SESSION_DRIVER=database
+SESSION_LIFETIME=2880        # 2 days; "Remember me" (default on) keeps readers signed in beyond that
 SESSION_SECURE_COOKIE=true
 SANCTUM_STATEFUL_DOMAINS=app.disruptcyprus.com   # optional: the app's own host is always trusted
 QUEUE_CONNECTION=database
@@ -342,6 +343,26 @@ Optional, so nobody even downloads the app shell without the cookie: in the `app
 remove the rewrite block (if added) and reload Apache. The real landing page, share pages and sitemap go live immediately.
 After the launch email, delete the waitlist (Admin → Waitlist → select all → delete): the privacy policy promises we
 keep it only until then.
+
+## 3c. Email (verification, password reset, data export)
+
+All emails are sent by the queue worker, so a mail problem never breaks sign-up. Use the SMTP details of the
+mailbox you send from (e.g. info@disruptcyprus.com) in `backend/.env`, then `php artisan optimize` and
+`sudo systemctl restart disrupt-queue`:
+
+```dotenv
+MAIL_MAILER=smtp
+MAIL_HOST=<from your email provider>
+MAIL_PORT=587                 # 465 with MAIL_SCHEME=smtps
+MAIL_SCHEME=null
+MAIL_USERNAME=info@disruptcyprus.com
+MAIL_PASSWORD=<mailbox password or app password>
+MAIL_FROM_ADDRESS=info@disruptcyprus.com
+MAIL_FROM_NAME="Disrupt Cyprus"
+```
+
+Check it: `php artisan mail:test you@example.com` (sends immediately and prints the server's error if any).
+So that emails don't land in spam, the domain needs the provider's **SPF** and **DKIM** DNS records (GoDaddy DNS).
 
 ## 4. Launch checklist
 
